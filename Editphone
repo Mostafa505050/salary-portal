@@ -1,0 +1,57 @@
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://fmgtrtudpardxsvjbcve.supabase.co";
+const SUPABASE_KEY = "sb_publishable_w3Mdg-WdxcmXNk03fj45KA_Ol6MLulH";
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+async function searchData(){
+  let nid = document.getElementById("nid").value.trim();
+  let hidden = document.getElementById("hiddenFields");
+  let nidBox = document.getElementById("nidBox");
+  if(nid.length!=14){ hidden.style.display="none"; nidBox.style.display="block"; document.getElementById("status").innerText=""; return; }
+  
+  document.getElementById("status").style.color="#0f9d58";
+  document.getElementById("status").innerText="⏳ جاري البحث...";
+
+  const { data, error } = await supabaseClient.from("employees").select("*").eq("national_id", nid).single();
+  
+  if(data){
+    document.getElementById("code").value = data.emp_code;
+    document.getElementById("name").value = data.emp_name;
+    nidBox.style.display="none";
+    hidden.style.display="block";
+    document.getElementById("status").innerText="";
+  } else {
+    document.getElementById("status").style.color="red";
+    document.getElementById("status").innerText="❌ الرقم غير موجود";
+    hidden.style.display="none";
+  }
+}
+
+async function save(){
+  let whatsapp = document.getElementById("whatsapp").value;
+  if(whatsapp.length < 11){ alert("من فضلك اكتب رقم واتساب صحيح"); return; }
+  
+  let btn=document.getElementById("saveBtn"), loader=document.getElementById("loader"), progress=document.getElementById("progress"), percent=document.getElementById("percent");
+  btn.disabled=true; loader.style.display="block"; let p=0;
+  let interval=setInterval(function(){ p+=Math.random()*15; if(p>90) p=90; progress.style.width=p+"%"; progress.innerText=Math.round(p)+"%"; percent.innerText=Math.round(p)+"%"; },150);
+
+  const nid = document.getElementById("nid").value;
+
+  const { error } = await supabaseClient.from("employees").update({
+    whatsapp: whatsapp,
+    whatsapp_notes: document.getElementById("notes").value,
+    updated_at: new Date()
+  }).eq("national_id", nid);
+
+  clearInterval(interval); 
+  progress.style.width="100%"; progress.innerText="100%"; percent.innerText="100%";
+  setTimeout(function(){ 
+    loader.style.display="none"; 
+    document.getElementById("successBox").style.display="flex"; 
+    btn.disabled=false; 
+  },500);
+}
+
+function closeSuccess(){ document.getElementById("successBox").style.display="none"; location.reload(); }
+</script>
