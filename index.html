@@ -1,131 +1,129 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>نظام مفردات المرتبات - دخول</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<title>نظام تسجيل واتساب الموظفين</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{font-family:'Cairo',sans-serif;box-sizing:border-box}
-body{margin:0;min-height:100vh;background:#040a08;color:#fff;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
-.bg-glow{position:absolute;inset:0;pointer-events:none}
-.bg-glow::before{content:"";position:absolute;top:-30%;right:-20%;width:80%;height:80%;border-radius:50%;background:radial-gradient(circle at center,rgba(16,185,129,0.18),transparent 65%);filter:blur(10px)}
-.bg-glow::after{content:"";position:absolute;bottom:-30%;left:-25%;width:90%;height:90%;border-radius:50%;background:radial-gradient(circle at center,rgba(212,175,55,0.12),transparent 60%);filter:blur(12px)}
-.card{position:relative;width:100%;max-width:420px;margin:16px;background:linear-gradient(135deg,rgba(13,31,23,.9),rgba(7,15,11,.9));border:1px solid rgba(255,255,255,.1);border-radius:28px;backdrop-filter:blur(28px);padding:32px;box-shadow:0 20px 80px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.08);z-index:10}
-.logo{width:72px;height:72px;margin:0 auto 16px;border-radius:18px;background:linear-gradient(135deg,#102a1d,#06110a);border:1px solid rgba(52,211,153,.25);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.5)}
-.input-group{margin-bottom:20px}
-.label{font-size:12px;font-weight:600;color:rgba(255,255,255,.6);margin-bottom:8px;display:block}
-.input-wrap{position:relative;background:#050c08;border:1px solid rgba(255,255,255,.08);border-radius:14px;transition:.2s}
-.input-wrap:focus-within{border-color:rgba(52,211,153,.3);box-shadow:0 0 0 3px rgba(16,185,129,.12)}
-.input-wrap input{width:100%;height:52px;background:transparent;border:0;padding:0 16px 0 48px;color:#fff;font-weight:700;outline:none;letter-spacing:.1em}
-.btn{width:100%;height:56px;border:0;border-radius:16px;background:linear-gradient(135deg,#34d399,#059669);color:#fff;font-weight:800;font-size:15px;cursor:pointer;box-shadow:0 4px 16px rgba(16,185,129,.3);transition:.2s}
-.btn:disabled{opacity:.6;cursor:not-allowed}
-.btn:hover{transform:translateY(-1px)}
-.msg{margin-top:16px;min-height:20px;text-align:center;font-size:13px;padding:8px;border-radius:12px;display:none}
-.msg.show{display:block}
-.msg.err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#fca5a5}
-.msg.ok{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);color:#6ee7b7}
-.result{margin-top:20px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:16px;display:none}
-.result.show{display:block}
-.row{display:flex;justify-content:space-between;margin:8px 0;font-size:14px}
-.row b{color:#6ee7b7}
+  *{font-family:'Cairo', Tahoma; box-sizing:border-box}
+  body{background: radial-gradient(ellipse at top, #fff1f1 0%, #fde8e8 40%, #f3f6ff 100%);margin:0; padding:18px; min-height:100vh;}
+ .container{max-width:740px; margin:auto;}
+ .header-card{background:white;border-radius:24px; overflow:hidden;box-shadow:0 15px 35px rgba(185,28,28,0.12);margin-bottom:15px; text-align:center;border-top:8px solid #d93025}
+ .box{background:white;padding:24px; border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,0.08),6px 0 0 #d93025 inset;margin-bottom:18px;}
+  label{font-weight:800; color:#222; display:block; margin-bottom:8px; font-size:14px;}
+  input, textarea{width:100%; padding:15px 16px;border:2px solid #ececec; border-radius:14px;font-size:16px; outline:none; background:#fafafa}
+  input:focus{border-color:#d93025;background:white}
+  input[readonly]{background:#eee;color:#444;font-weight:700}
+  textarea{resize:none; height:95px}
+ .btn-3d{width:100%; padding:16px;background: linear-gradient(to bottom, #ff4d4a 0%, #e53935 45%, #b71c1c 100%);color:white; border:none; border-radius:14px;font-size:19px; font-weight:800; cursor:pointer;box-shadow:0 7px 0 #7f0000,0 12px 25px rgba(183,28,28,0.35);}
+ .btn-3d:active{transform:translateY(7px);box-shadow:none}
+  #loader{display:none; margin-top:18px}
+  #progressBar{width:100%; background:#eee;border-radius:20px; height:26px; overflow:hidden;padding:3px;}
+  #progress{width:0%; height:100%;background: linear-gradient(90deg, #0f9d58 0%, #1fdb84 100%);transition:width 0.3s; text-align:center; color:white;font-size:13px; line-height:20px; font-weight:800;border-radius:20px;}
+  #successBox{display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); backdrop-filter:blur(8px); justify-content:center; align-items:center; z-index:9999}
+ .row{display:flex; gap:14px;}
+ .col-code{flex: 0 0 28%;} .col-name{flex: 1 1 72%;}
+  @media(max-width:600px){.row{flex-direction:column}.col-code,.col-name{flex:1 1 100%; width:100%}}
 </style>
 </head>
 <body>
-<div class="bg-glow"></div>
-<div class="card">
-  <div class="logo">💰</div>
-  <h1 style="text-align:center;margin:0;font-size:22px;font-weight:800">نظام مفردات المرتبات</h1>
-  <p style="text-align:center;color:rgba(167,243,208,.8);font-size:13px;margin:4px 0 24px">شركة مصر الوسطى لنقل الكهرباء - بني سويف</p>
+<div class="container">
+  <div class="header-card">
+    <img src="https://upload.wikimedia.org/wikipedia/ar/archive/8/85/20231203193514%21%D8%A7%D9%84%D8%B4%D8%B1%D9%83%D8%A9_%D8%A7%D9%84%D9%82%D8%A7%D8%A8%D8%B6%D8%A9_%D9%84%D9%83%D9%87%D8%B1%D8%A8%D8%A7%D8%A1_%D9%85%D8%B5%D8%B1.png" style="width:100%; height:135px; object-fit:contain; display:block; background:white; padding:10px;">
+    <h2 style="margin:14px 0 4px; color:#b91c1c; font-weight:800; font-size:22px">نموذج تسجيل بيانات رسائل whatsapp</h2>
+    <p style="color:#6b7280; margin:0; padding-bottom:16px; font-weight:600">برجاء إدخال الرقم القومي للبحث تلقائياً - نظام يتحمل 500+ موظف</p>
+  </div>
 
-  <div class="input-group">
-    <label class="label">الرقم القومي (14 رقم)</label>
-    <div class="input-wrap">
-      <input id="nid" maxlength="14" inputmode="numeric" placeholder="29901010101010" dir="ltr">
+  <div class="box" id="nidBox">
+    <label>🔢 الرقم القومي *</label>
+    <input type="text" id="nid" maxlength="14" placeholder="اكتب 14 رقم" oninput="searchData()">
+    <div id="status" style="margin-top:8px;font-weight:700"></div>
+  </div>
+
+  <div id="hiddenFields" style="display:none">
+    <div class="box">
+      <div class="row">
+        <div class="col-code"><label>كود العامل *</label><input type="text" id="code" readonly></div>
+        <div class="col-name"><label>إسم العامل رباعي *</label><input type="text" id="name" readonly></div>
+      </div>
+    </div>
+    <div class="box">
+      <label>📱 رقم الواتساب الجديد *</label>
+      <input type="text" id="whatsapp" placeholder="مثال: 012xxxxxxxx">
+      <label style="margin-top:16px">📝 الملاحظات (اختياري)</label>
+      <textarea id="notes" placeholder="اكتب أي ملاحظة هنا..."></textarea>
+      <button id="saveBtn" onclick="save()" class="btn-3d" style="margin-top:22px">💾 حفظ البيانات</button>
+      <div id="loader">
+        <p style="text-align:center; margin:8px; font-weight:800; color:#0f9d58">جاري الحفظ... <span id="percent">0%</span></p>
+        <div id="progressBar"><div id="progress">0%</div></div>
+      </div>
     </div>
   </div>
-  <div class="input-group">
-    <label class="label">كلمة المرور</label>
-    <div class="input-wrap">
-      <input id="pass" type="password" placeholder="••••••" dir="ltr">
-    </div>
-  </div>
-
-  <button id="btn" class="btn" onclick="doLogin()">دخول آمن للنظام</button>
-  <div id="msg" class="msg"></div>
-
-  <div id="result" class="result">
-    <div class="row"><span>الاسم:</span><b id="r_name">-</b></div>
-    <div class="row"><span>كود الموظف:</span><b id="r_code">-</b></div>
-    <div class="row"><span>المرتب:</span><b id="r_salary">-</b></div>
-    <div class="row"><span>الحافز:</span><b id="r_inc">-</b></div>
-    <div class="row" style="border-top:1px solid rgba(255,255,255,.1);padding-top:8px;margin-top:8px"><span>الإجمالي:</span><b id="r_total" style="color:#fde68a">-</b></div>
-  </div>
-
-  <div style="text-align:center;margin-top:20px;font-size:11px;color:rgba(255,255,255,.3)">🔒 اتصال مشفر - يستحمل 500 موظف في نفس الوقت</div>
 </div>
 
+<div id="successBox"><div style="background:white;padding:40px;border-radius:24px;text-align:center;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,0.25)"><div style="font-size:64px;">✅</div><h3 style="color:#0f9d58; font-weight:800; margin:12px 0">تم التسجيل بنجاح</h3><p style="color:#555">تم حفظ رقم الواتساب بنجاح في قاعدة البيانات</p><button onclick="closeSuccess()" style="background:#0f9d58; color:white; padding:13px 40px; border:none; border-radius:12px; font-weight:800; cursor:pointer;">حسناً</button></div></div>
+
 <script>
-// === إعداداتك ===
 const SUPABASE_URL = "https://fmgtrtudpardxsvjbcve.supabase.co";
 const SUPABASE_KEY = "sb_publishable_w3Mdg-WdxcmXNk03fj45KA_Ol6MLulH";
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-function toEng(str){
-  const map={"٠":"0","١":"1","٢":"2","٣":"3","٤":"4","٥":"5","٦":"6","٧":"7","٨":"8","٩":"9"};
-  return String(str).replace(/[٠-٩]/g, c=>map[c]).replace(/\s+/g,"").trim();
-}
-
-function showMsg(text, type){
-  const el=document.getElementById("msg");
-  el.textContent=text;
-  el.className="msg show "+(type==="err"?"err":"ok");
-}
-
-async function doLogin(){
-  const nidEl=document.getElementById("nid");
-  const passEl=document.getElementById("pass");
-  const btn=document.getElementById("btn");
-  const result=document.getElementById("result");
-
-  const nid=toEng(nidEl.value);
-  const pass=passEl.value.trim();
-
-  if(nid.length!==14){ showMsg("الرقم القومي يجب أن يكون 14 رقمًا","err"); return; }
-  if(!pass){ showMsg("ادخل كلمة المرور","err"); return; }
-
-  btn.disabled=true; btn.textContent="جاري التحقق..."; result.classList.remove("show");
-  showMsg("","ok");
-
-  try{
-    const { data, error } = await supabaseClient
-      .from("employees")
-      .select("*")
-      .eq("national_id", nid)
-      .eq("password", pass)
-      .single();
-
-    if(error || !data){
-      showMsg("الرقم القومي أو كلمة المرور غير صحيحة","err");
-      btn.disabled=false; btn.textContent="دخول آمن للنظام";
-      return;
+let debounceTimer;
+function searchData(){
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(async ()=>{
+    let nid = document.getElementById("nid").value.trim();
+    let hidden = document.getElementById("hiddenFields");
+    let status = document.getElementById("status");
+    if(nid.length!=14){ hidden.style.display="none"; status.innerText=""; return; }
+    status.style.color="#0f9d58";
+    status.innerText="⏳ جاري البحث في قاعدة البيانات...";
+    
+    // بحث سريع مع cache
+    const { data, error } = await supabaseClient.from("employees").select("*").eq("national_id", nid).maybeSingle();
+    
+    if(data){
+      document.getElementById("code").value = data.emp_code;
+      document.getElementById("name").value = data.emp_name;
+      document.getElementById("whatsapp").value = data.whatsapp || "";
+      document.getElementById("notes").value = data.notes || "";
+      document.getElementById("nidBox").style.display="none";
+      hidden.style.display="block";
+      status.innerText="";
+    } else {
+      status.style.color="red";
+      status.innerText="❌ الرقم غير موجود - تأكد من رفع ملف الإكسيل في صفحة الأدمن";
+      hidden.style.display="none";
     }
-
-    showMsg(`مرحباً ${data.emp_name} - تم تسجيل الدخول بنجاح`,"ok");
-    document.getElementById("r_name").textContent=data.emp_name;
-    document.getElementById("r_code").textContent=data.emp_code;
-    document.getElementById("r_salary").textContent=(data.salary||0)+" جنيه";
-    document.getElementById("r_inc").textContent=(data.incentive||0)+" جنيه";
-    document.getElementById("r_total").textContent=((parseFloat(data.salary||0)+parseFloat(data.incentive||0)))+" جنيه";
-    result.classList.add("show");
-
-  }catch(e){
-    console.error(e);
-    showMsg("خطأ في الاتصال: "+e.message,"err");
-  }
-  btn.disabled=false; btn.textContent="دخول آمن للنظام";
+  }, 400);
 }
+
+async function save(){
+  let whatsapp = document.getElementById("whatsapp").value.trim();
+  if(whatsapp.length < 11){ alert("من فضلك اكتب رقم واتساب صحيح"); return; }
+  let btn=document.getElementById("saveBtn"), loader=document.getElementById("loader"), progress=document.getElementById("progress"), percent=document.getElementById("percent");
+  btn.disabled=true; loader.style.display="block"; let p=0;
+  let interval=setInterval(function(){ p+=Math.random()*15; if(p>90) p=90; progress.style.width=p+"%"; progress.innerText=Math.round(p)+"%"; percent.innerText=Math.round(p)+"%"; },150);
+  
+  const nid = document.getElementById("nid").value.trim();
+  const { error } = await supabaseClient.from("employees").update({
+    whatsapp: whatsapp,
+    notes: document.getElementById("notes").value,
+    updated_at: new Date().toISOString()
+  }).eq("national_id", nid);
+
+  clearInterval(interval); 
+  if(error){
+    alert("خطأ: "+error.message);
+    loader.style.display="none"; btn.disabled=false; return;
+  }
+  progress.style.width="100%"; progress.innerText="100%"; percent.innerText="100%";
+  setTimeout(function(){ loader.style.display="none"; document.getElementById("successBox").style.display="flex"; btn.disabled=false; },500);
+}
+
+function closeSuccess(){ document.getElementById("successBox").style.display="none"; location.reload(); }
 </script>
 </body>
 </html>
