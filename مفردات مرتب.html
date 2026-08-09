@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مفردات مرتب - Supabase</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.42.0/dist/umd/supabase.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+*{box-sizing:border-box;font-family:'Cairo',Tahoma;margin:0;padding:0}
+body{
+  background: #06110a;
+  background-image: radial-gradient(800px 400px at 20% 10%, rgba(16,185,129,0.15), transparent 60%), radial-gradient(600px 400px at 90% 80%, rgba(5,95,70,0.2), transparent 60%);
+  padding:12px; display:flex; flex-direction:column; align-items:center; min-height:100vh;
+}
+.top-strip{
+  width:100%; max-width:900px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.06));
+  backdrop-filter: blur(20px); border:1px solid rgba(255,255,255,0.15);
+  border-right:6px solid #10b981; border-radius:16px; padding:10px 14px;
+  display:flex; align-items:center; gap:10px; margin-bottom:12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+.main-card{
+  width:100%; max-width:900px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.05));
+  backdrop-filter: blur(22px); border:1px solid rgba(255,255,255,0.12);
+  border-radius:18px; padding:16px;
+  box-shadow: 0 20px 60px -20px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+.row-2{display:flex;gap:8px;margin-bottom:8px}.row-2>div{flex:1}
+.row-emp{display:flex;gap:8px;margin-bottom:12px}
+.emp-search{flex:0 0 70%!important;width:70%!important}
+.emp-code{flex:0 0 30%!important;max-width:calc(30% - 8px)!important}
+.inline-field{display:flex;align-items:center;gap:6px}.inline-field label{font-size:11px;font-weight:800;min-width:45px;color:#a7f3d0}
+.input-3d,.select-trigger{
+  width:100%;padding:10px 12px;border-radius:12px;
+  border:1.5px solid rgba(255,255,255,0.15);
+  background: rgba(0,0,0,0.35); color:#fff; font-size:12px;font-weight:700;
+  outline:none; transition:.2s;
+}
+.input-3d:focus{border-color: rgba(52,211,153,0.5); box-shadow:0 0 15px rgba(16,185,129,0.3)}
+.btn-3d{
+  padding:10px 14px;border-radius:12px;border:none;color:#fff;font-weight:800;cursor:pointer;
+  box-shadow: 0 6px 0 rgba(0,0,0,0.3), 0 10px 20px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.3);
+  transition:.12s;
+}
+.btn-3d:active{ transform: translateY(6px); box-shadow:none}
+.btn-print{background:linear-gradient(180deg,#34d399,#059669);color:#000;flex:1}
+.btn-whats{background:linear-gradient(180deg,#25D366,#128C7E);flex:1}
+.btn-mail{background:linear-gradient(180deg,#60a5fa,#1d4ed8);flex:1}
+.btn-save{background:linear-gradient(180deg,#34d399,#065f46)}
+.btn-toggle{background:linear-gradient(180deg,rgba(255,255,255,0.15),rgba(255,255,255,0.05));border:1px solid rgba(255,255,255,0.15)}
+.btn-back{background:linear-gradient(180deg,#4b5563,#1f2937)}
+.custom-select{position:relative}.select-trigger{cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.select-panel{position:absolute;top:110%;left:0;right:0;z-index:99;background: rgba(10,26,18,0.95); backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.15);border-radius:12px;display:none;max-height:260px;overflow:hidden;box-shadow:0 15px 35px rgba(0,0,0,.5)}
+.select-panel.open{display:block}.options{max-height:210px;overflow:auto}.option{padding:8px 10px;display:flex;justify-content:space-between;font-size:12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.05);color:#d1fae5}.option:hover{background: rgba(16,185,129,0.15)}
+.result-wrapper{width:100%;max-width:900px;margin:0 auto;display:none;margin-top:12px}
+.loader{display:none;text-align:center;color:#6ee7b7;font-weight:800;margin:10px;background: rgba(255,255,255,0.08); backdrop-filter:blur(15px); padding:10px;border-radius:12px;border:1px solid rgba(16,185,129,0.2)}
+#printArea{background:#fff!important;border:2px solid #000;border-radius:10px;padding:6px;width:100%;max-width:900px;margin:0 auto;box-sizing:border-box;font-weight:700;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.actions{display:flex;gap:8px;max-width:900px;margin:0 auto 8px auto;width:100%}
+.controls-panel{width:100%;max-width:900px;background: rgba(255,255,255,0.08); backdrop-filter:blur(18px); border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:10px;display:none;flex-direction:column;gap:8px;margin-bottom:10px}
+.controls-panel.show{display:flex}
+.controls-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.controls-row label{font-size:11px;font-weight:800;color:#a7f3d0}
+.controls-row input[type=range]{width:80px; accent-color:#10b981}
+.controls-row input[type=number]{width:48px;padding:4px;border-radius:6px;border:1.5px solid rgba(255,255,255,0.2);background:rgba(0,0,0,0.3);color:#fff;font-weight:800;font-size:11px;text-align:center}
+.controls-row input[type=text],.controls-row input[type=email]{width:135px;padding:6px 8px;border-radius:8px;border:1.5px solid rgba(255,255,255,0.2);background:rgba(0,0,0,0.3);color:#fff;font-size:11px;font-weight:800}
+@media print{
+  @page{margin:3mm;size:A4}
+  html,body{background:#fff!important;margin:0!important;padding:0!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+ .no-print{display:none!important}
+ .result-wrapper{display:block!important;margin:0!important;padding:0!important;width:100%!important}
+  #printArea{border:2px solid #000!important;border-radius:0!important;box-shadow:none!important;width:100%!important;max-width:100%!important;padding:3mm!important}
+}
+</style>
+</head>
+<body>
+
+<div class="top-strip no-print"><img src="https://upload.wikimedia.org/wikipedia/ar/archive/8/85/20231203193514%21%D8%A7%D9%84%D8%B4%D8%B1%D9%83%D8%A9_%D8%A7%D9%84%D9%82%D8%A7%D8%A8%D8%B6%D8%A9_%D9%84%D9%83%D9%87%D8%B1%D8%A8%D8%A7%D8%A1_%D9%85%D8%B5%D8%B1.png" style="width:38px"><div><b style="font-size:13px;color:#6ee7b7">نظام مفردات المرتبات - Supabase</b><div style="font-size:10px;color:rgba(255,255,255,0.6)">مربوط بجدول salaries • تصميم 3D</div></div><div id="countInfo" style="margin-right:auto;font-size:10px;background:rgba(16,185,129,0.2);border:1px solid rgba(16,185,129,0.3);padding:5px 10px;border-radius:999px;font-weight:800;color:#a7f3d0">0</div></div>
+
+<div id="searchCard" class="main-card no-print">
+<div class="row-2"><div class="inline-field"><label>📅 السنة:</label><select id="yearSelect" class="input-3d"><option>2024</option><option selected>2025</option><option>2026</option></select></div><div class="inline-field"><label>📆 الشهر:</label><select id="monthSelect" class="input-3d"><option value="1">يناير</option><option value="2">فبراير</option><option value="3">مارس</option><option value="4">أبريل</option><option value="5">مايو</option><option value="6">يونيو</option><option value="7">يوليو</option><option value="8">أغسطس</option><option value="9">سبتمبر</option><option value="10">أكتوبر</option><option value="11">نوفمبر</option><option value="12">ديسمبر</option></select></div></div>
+<div class="row-emp"><div class="emp-search"><div style="font-size:10px;font-weight:800;margin-bottom:4px;color:#a7f3d0">📝 الموظف:</div><div class="custom-select" id="empCustomSelect"><div class="select-trigger" id="selectTrigger" onclick="togglePanel()"><span id="triggerText">-- اختر --</span><span>▾</span></div><div class="select-panel" id="selectPanel"><div style="padding:6px"><input id="empSearchBox" class="input-3d" placeholder="بحث بالاسم أو الكود..." oninput="filterEmp()"></div><div class="options" id="optionsList"></div></div></div></div><div class="emp-code inline-field"><label>👤 الكود:</label><input id="empCodeInput" class="input-3d" readonly></div></div>
+<button class="btn-3d" style="background:linear-gradient(180deg,#34d399,#065f46);color:#000;width:100%;height:46px;font-size:14px" onclick="executeSearch()">🔍 عرض الاستمارة من Supabase</button>
+</div>
+
+<div id="loader" class="loader no-print">⏳ جاري التحميل من Supabase... <span id="loadCounter" style="background:#10b981;color:#000;padding:3px 12px;border-radius:999px;font-size:13px;margin-right:8px">٠ ث</span> <span id="loadDots">.</span></div>
+<div id="displayArea" class="result-wrapper"></div>
+
+<script>
+const SUPABASE_URL="https://fmgtrtudpardxsvjbcve.supabase.co";
+const SUPABASE_KEY="sb_publishable_w3Mdg-WdxcmXNk03fj45KA_Ol6MLulH";
+const supa=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+function toArabicDigits(str){ if(str===null||str===undefined) return ""; var map={'0':'٠','1':'١','2':'٢','3':'٣','4':'٤','5':'٥','6':'٦','7':'٧','8':'٨','9':'٩'}; return String(str).replace(/[0-9]/g,d=>map[d]); }
+
+let saved = JSON.parse(localStorage.getItem('salarySettings')||'{}');
+let currentFontSize = saved.fontSize || 12;
+let currentWidth = saved.width || 100;
+let colWidths = saved.colWidths || { notes:30, amt1:10, data1:40, amt2:10, data2:40 };
+let uniqueEmployees=[];
+let lastData=null;
+
+const AR_LABELS={
+"moratab_asasy":"مرتب اساسي","hafez_dawry":"الحافز الدورى","tabeeat_amal":"طبيعه عمل","alawa_2014":"علاوه 2014","alawa_2015":"علاوه 2015","eana_egtemaya":"اعانه اجتماعيه","badal_deyafa":"بدل ضيافة","badal_tafarogh":"بدل تفرغ","tafarogh_tegareen":"تفرغ تجارين","tafarogh_atbaa":"تفرغ اطباء","tafarogh_kemyaeen":"تفرغ كيميائيين","badal_tamtheel":"بدل تمثيل","hafez_840":"حافز 840","badal_naqdy":"بدل النقدي","badal_eqama":"بدل الإقامة","badal_wardiya":"بدل ورديه","badal_serafa":"بدل صرافة","badal_adwa":"بدل عدوه","badal_samaa":"بدل سماعه","omana_makhazen":"امناء مخازن","alawa_estesnaya":"علاوه استثنائية","alawa_estesnaya_2022":"علاوه استثنائية 2022","hafez_2024_2025":"حافز 2024-2025","sandouk_nehaya_kahraba_reef_13":"صندوق نهاية الخدمة","asasy_15_hessa_hokoma":"اساسى 15 % حصة حكومة","t_esabet_amal":"ت اصابة العمل","t_betala":"ت البطالة","t_sheikhoukha_wafah_agez":"ت الشيخوخة","t_marad":"ت المرض","t_mokafaa":"ت المكافاءة","warady_shamela":"ورادى شامله","enara":"اناره","wagabat":"وجبات","easha":"اعاشه","eid_ommal":"عيد العمال","egmaly_mostahaq":"أجمالى المستحق",
+// استقطاع
+"asasy_15_hessa_hokoma1":"اساسى 15 % حصة حكومة1","asasy_10_0":"اساسى 10%","asasy_2_betala1":"اساسى 2% بطالة","asasy_3_0":"اساسى 3%","asasy_2_esaba1":"اساسى 2% اصابة عمل","t_mokafaa1":"ت المكافاءة1","t_mokafaa_hessat_amel":"ت المكافاءة حصة العامل","t_marad1":"ت المرض1","t_sheikhoukha1":"ت الشيخوخة1","t_sheikhoukha_hessat_amel":"ت الشيخوخة حصة العامل","t_betala1":"ت البطالة1","t_esabet_amal1":"ت اصابة العمل1","eara":"اعاره","estebdal":"استبدال","eshtrak_sayara":"اشتراك سياره","sandouk_reaya":"صندوق الرعاية","sandouk_entemaa":"صندوق الانتماء","qest_sandouk_entemaa":"قسط صندوق انتماء","sandouk_nehaya_kahraba_reef_13_1":"صندوق نهاية الخدمة 1","nady_kahraba":"نادى الكهرباء","neqaba":"نقابه","sandouk_khedma_egtemaya":"صندوق خدمه اجتماعيه","gameya_khadamat_egtemaya":"جمعيه الخدمات","elag_teby":"علاج طبى","elag_osry":"علاج اسرى","elag_hesab_177":"علاج حساب 177","balagh_mardy":"بلاغ مرضى","dareba":"ضريبه","nafaqa":"نفقة","mostashfa_57357":"مستشفى 57357","qard_sandouk_reaya":"قرض صندوق الرعايه","masr_tamin":"مصر للتامين","gezaat_moratab":"جزاءات مرتب","arseda_madina_hesab_177":"أرصدة مدينة","lagna_reyadeya":"اللجنة الرياضية","masroufat_bankia":"مصروفات بنكية","mosahma_takafolya1":"مساهمة تكافلية","sandouk_tekreem_shohadaa":"صندوق تكريم الشهداء","khasm_taakherat":"خصم تأخيرات","eshtrak_shahry_orange":"أشتراك شهرى خط أورنج","egar_sakan_mostamara":"ايجار سكن مستعمره","khasm_kahraba_sakan":"خصم كهرباء سكن","khasm_mayah_sakan":"خصم مياه سكن","egmaly_mostaqtaa":"أجمالى المستقطع","safy":"الصافى"
+};
+
+const ISTIHQaq_KEYS=["moratab_asasy","hafez_dawry","tabeeat_amal","alawa_2014","alawa_2015","eana_egtemaya","badal_deyafa","badal_tafarogh","tafarogh_tegareen","tafarogh_atbaa","tafarogh_kemyaeen","badal_tamtheel","hafez_840","badal_naqdy","badal_eqama","badal_wardiya","badal_serafa","badal_adwa","badal_samaa","omana_makhazen","alawa_estesnaya","alawa_estesnaya_2022","hafez_2024_2025","enara","wagabat","easha","eid_ommal","warady_shamela","hafez_mokafaa_shamela","moratab_asasy_mokafaa_shamela"];
+
+const ISTIQTA_KEYS=["asasy_15_hessa_hokoma1","asasy_10_0","asasy_2_betala1","asasy_3_0","asasy_2_esaba1","t_mokafaa1","t_mokafaa_hessat_amel","t_marad1","t_sheikhoukha1","t_sheikhoukha_hessat_amel","t_betala1","t_esabet_amal1","t_masaref_edareya_esaba1","masaref_edareya_marad_hokoma1","asasy_khade3_1_mardy","motaghayer_15_hessa_hokoma1","eara","estebdal","modad_etebareya","eshtrak_sayara","sandouk_reaya","qest_s_reaya","sandouk_entemaa","qest_sandouk_entemaa","sandouk_nehaya_kahraba_reef_13_1","nady_kahraba","neqaba","sandouk_khedma_egtemaya","elag_teby","elag_osry","dareba","nafaqa","mostashfa_57357","masr_tamin","gezaat_moratab","masroufat_bankia","mosahma_takafolya1","khasm_taakherat","egar_sakan_mostamara","khasm_kahraba_sakan","khasm_mayah_sakan"];
+
+async function loadEmployees(){
+  const {data,error}=await supa.from("employees_full").select("emp_code, emp_name, national_id").limit(10000);
+  if(error){ document.getElementById("countInfo").innerText="❌ خطأ"; return; }
+  uniqueEmployees=data.map(r=>({code:r.emp_code||r.national_id?.slice(-6)||"", name:r.emp_name, national_id:r.national_id})).filter(e=>e.name);
+  populate(uniqueEmployees);
+}
+
+function populate(list){
+  var c=document.getElementById('optionsList'); c.innerHTML="";
+  list.slice(0,500).forEach(emp=>{
+    var d=document.createElement('div'); d.className='option';
+    d.innerHTML='<span>'+emp.name+'</span><small>'+toArabicDigits(emp.code)+'</small>';
+    d.onclick=()=>{
+      document.getElementById('empCodeInput').value=toArabicDigits(emp.code);
+      document.getElementById('triggerText').textContent=emp.name+' - '+toArabicDigits(emp.code);
+      document.getElementById('empCodeInput').dataset.emptid=emp.code;
+      document.getElementById('empCodeInput').dataset.national=emp.national_id||"";
+      closePanel();
+    };
+    c.appendChild(d);
+  });
+  document.getElementById('countInfo').textContent=toArabicDigits(list.length)+' موظف';
+}
+function filterEmp(){
+  var t=document.getElementById('empSearchBox').value.toLowerCase();
+  var f=t? uniqueEmployees.filter(e=>e.name.toLowerCase().indexOf(t)>-1||e.code.indexOf(t)>-1) : uniqueEmployees;
+  populate(f);
+}
+function togglePanel(){document.getElementById('selectPanel').classList.toggle('open')}
+function closePanel(){document.getElementById('selectPanel').classList.remove('open')}
+function toggleSearch(s){document.getElementById('searchCard').style.display=s?'block':'none'; if(s) document.getElementById('displayArea').style.display='none';}
+
+let loadTimer=null;
+function startLoadCounter(){
+  document.getElementById('loader').style.display='block';
+  let sec=0;
+  loadTimer=setInterval(()=>{sec++; document.getElementById('loadCounter').textContent=toArabicDigits(sec)+' ث';},1000);
+}
+function stopLoadCounter(){ clearInterval(loadTimer); document.getElementById('loader').style.display='none'; }
+
+async function executeSearch(){
+  var codeEl=document.getElementById('empCodeInput');
+  var emptid=codeEl.dataset.emptid;
+  if(!emptid){ alert('اختر الموظف'); return; }
+  var year=document.getElementById('yearSelect').value;
+  var month=document.getElementById('monthSelect').value;
+  
+  toggleSearch(false); startLoadCounter();
+  
+  const {data, error}=await supa.from("salaries").select("*").eq("emptid", emptid).eq("sanah", parseInt(year)).eq("shahr", parseInt(month)).limit(1);
+  
+  stopLoadCounter();
+  if(error){ alert("خطأ: "+error.message); toggleSearch(true); return; }
+  if(!data || data.length===0){
+    document.getElementById('displayArea').style.display='block';
+    document.getElementById('displayArea').innerHTML=`<div style="background:#fff;padding:20px;text-align:center;color:red;font-weight:800;border-radius:12px">❌ لا يوجد مرتب لهذا الموظف في ${month}/${year}<br>الموظف: ${emptid}<br>تأكد من رفع المرتبات لهذا الشهر</div><div class="no-print" style="text-align:center;margin-top:10px"><button class="btn-3d btn-back" onclick="toggleSearch(true)">↩ رجوع</button></div>`;
+    return;
+  }
+  renderForm(data[0]);
+}
+
+function getFormHtmlJS(real_emp_name, emp_code_val, financial_year_val, month_val, bankName, accountNum, table_rows_html){
+  return `<div id="printArea" style="font-size:${currentFontSize}px;width:${currentWidth}%">
+    <div style="display:flex;align-items:center;gap:8px;width:100%;border:2px solid #000;border-radius:8px;background:#fff;padding:4px;margin-bottom:6px;height:80px">
+      <img src="https://upload.wikimedia.org/wikipedia/ar/8/85/%D8%A7%D9%84%D8%B4%D8%B1%D9%83%D8%A9_%D8%A7%D9%84%D9%82%D8%A7%D8%A8%D8%B6%D8%A9_%D9%84%D9%83%D9%87%D8%B1%D8%A8%D8%A7%D8%A1_%D9%85%D8%B5%D8%B1.png" style="width:150px;height:70px;object-fit:contain;background:#fff;border:1px solid #ddd;border-radius:6px;padding:2px;flex-shrink:0">
+      <div style="flex:1;text-align:center;font-size:${currentFontSize+2}px;font-weight:800;white-space:nowrap">نموذج مفردات مرتب غير قابلة للصرف - شركة مصر الوسطى لنقل الكهرباء</div>
+    </div>
+    <div style="text-align:center;padding:4px;border:1px solid #000;border-radius:6px;background:#fff;margin-bottom:4px;white-space:nowrap"><span style="font-size:${currentFontSize+1}px;font-weight:900;color:#7f0000">👤 اسم الموظف: ${real_emp_name}</span></div>
+    <table style="width:100%;border-collapse:collapse;font-size:${currentFontSize}px;font-weight:700;margin-bottom:4px;table-layout:fixed"><tr><td style="border:1px solid #000;padding:3px;text-align:center;background:#fffde7">السنة المالية: ${toArabicDigits(financial_year_val)} -- بيان شهر: ${toArabicDigits(month_val)}</td><td style="border:1px solid #000;padding:3px;text-align:center;background:#fce4ec">كود الموظف ${toArabicDigits(emp_code_val)}</td></tr><tr><td style="border:1px solid #000;padding:3px;text-align:center;background:#e3f2fd">جهة الصرف: ${bankName?bankName:'--'}</td><td style="border:1px solid #000;padding:3px;text-align:center;background:#f3e5f5">رقم الحساب: ${toArabicDigits(accountNum)}</td></tr></table>
+    <table style="width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed"><tr>
+      <td class="notes-col" style="width:${colWidths.notes}%;border:1px solid #000;border-radius:6px;vertical-align:top;padding:5px;background:#fff"><div style="text-align:center;background:#fff176;border:1px solid #000;border-radius:4px;padding:4px;margin-bottom:6px;font-weight:900">بيان مفردات مرتب</div>للسيد/ <b style="color:#b71c1c">${real_emp_name}</b><br><br><span style="font-size:${currentFontSize-2}px">1- قد أعطيت هذه المفردات بناء على طلب المذكور دون أدنى مسئولية على الشركة.<br>2- الشركة غير مسئولة تجاه البنك عن أية قروض تمنح للعامل بناء على هذه المفردات.<br>3- الشركة غير مسئولة عن سداد أية مديونيات.</span></td>
+      <td style="width:1%"></td>
+      <td style="width:${99-colWidths.notes}%;vertical-align:top;border:1px solid #000;border-radius:6px;overflow:hidden">
+        <table style="width:100%;border-collapse:collapse;text-align:center;font-weight:700;table-layout:fixed">
+          <colgroup><col style="width:${colWidths.amt1}%"><col style="width:${colWidths.data1}%"><col style="width:${colWidths.amt2}%"><col style="width:${colWidths.data2}%"></colgroup>
+          <thead><tr><th colspan="2" style="background:#b71c1c;color:#fff;border:1px solid #000;padding:5px">الإستحقاقات</th><th colspan="2" style="background:#b71c1c;color:#fff;border:1px solid #000;padding:5px">المستقطع</th></tr><tr style="background:#e8f5e9"><th style="border:1px solid #000;padding:4px">المبلغ</th><th style="border:1px solid #000;padding:4px">البيانات</th><th style="border:1px solid #000;padding:4px">المبلغ</th><th style="border:1px solid #000;padding:4px">البيانات</th></tr></thead>
+          <tbody style="background:#fff">${table_rows_html}</tbody>
+        </table>
+      </td></tr></table>
+    <table style="width:100%;border-collapse:collapse;margin-top:6px;font-size:${currentFontSize-1}px;font-weight:800;table-layout:fixed">
+      <tr>
+        <td style="width:25%;border:1px solid #000;padding:5px;text-align:center;background:#fffde7">مسئول الإستحقاقات</td>
+        <td style="width:25%;border:1px solid #000;padding:5px;text-align:center;background:#e8f5e9">رئيس الشئون الإدارية</td>
+        <td style="width:25%;border:1px solid #000;padding:5px;text-align:center;background:#e3f2fd">مدير عام شبكات بنى سويف</td>
+        <td style="width:25%;border:none"></td>
+      </tr>
+      <tr>
+        <td style="border:1px solid #000;height:55px;padding:4px;vertical-align:top">توقيع / <div style="text-align:center;margin-top:18px">------</div></td>
+        <td style="border:1px solid #000;height:55px;padding:4px;vertical-align:top">محاسب /<div style="text-align:center;margin-top:18px;color:#b71c1c">إبراهيم محمد سعيد</div></td>
+        <td style="border:1px solid #000;height:55px;padding:4px;vertical-align:top">مهندس /<div style="text-align:center;margin-top:18px;color:#0d47a1">سيد محمد عبد الحفيظ</div></td>
+        <td style="border:none;padding:4px;text-align:left;line-height:1.2"><span style="font-size:9px">إعداد وتطوير</span><br><b style="font-size:10px">أ/ مصطفى درويش</b><br><span style="font-size:9px">📱 ${toArabicDigits("01092259655")}</span></td>
+      </tr>
+    </table>
+  </div>`;
+}
+
+function renderForm(row){
+  lastData=row;
+  var area=document.getElementById('displayArea'); area.style.display='block';
+  
+  // بناء الاستحقاقات والمستقطع
+  let inst=[], must=[];
+  ISTIHQaq_KEYS.forEach(k=>{
+    let v=row[k];
+    if(v && parseFloat(v)!=0){
+      inst.push({key: AR_LABELS[k]||k, val: parseFloat(v).toFixed(2)});
+    }
+  });
+  ISTIQTA_KEYS.forEach(k=>{
+    let v=row[k];
+    if(v && parseFloat(v)!=0){
+      must.push({key: AR_LABELS[k]||k, val: parseFloat(v).toFixed(2)});
+    }
+  });
+  // اضافة الاجماليات
+  if(row.egmaly_mostahaq) inst.push({key:"إجمالي المستحق", val: row.egmaly_mostahaq});
+  if(row.egmaly_mostaqtaa) must.push({key:"إجمالي المستقطع", val: row.egmaly_mostaqtaa});
+  
+  var max=Math.max(inst.length, must.length);
+  var rowsHtml="";
+  for(var i=0;i<max;i++){
+    var a=inst[i]||{key:"",val:""};
+    var b=must[i]||{key:"",val:""};
+    rowsHtml+=`<tr style="height:24px"><td style="border:1px solid #000;padding:2px 3px;text-align:center;font-size:${currentFontSize}px">${a.val?toArabicDigits(a.val):""}</td><td style="border:1px solid #000;padding:2px 6px;text-align:right;font-size:${currentFontSize}px">${a.key}</td><td style="border:1px solid #000;padding:2px 3px;text-align:center;font-size:${currentFontSize}px">${b.val?toArabicDigits(b.val):""}</td><td style="border:1px solid #000;padding:2px 6px;text-align:right;font-size:${currentFontSize}px">${b.key}</td></tr>`;
+  }
+  if(row.safy){
+    rowsHtml+=`<tr><td colspan="2" style="border:2px solid #000;padding:5px;text-align:center;font-weight:900;background:#fff9c4">الصافي</td><td colspan="2" style="border:2px solid #000;padding:5px;text-align:center;font-weight:900;background:#fff176;color:#b71c1c;font-size:${currentFontSize+2}px">${toArabicDigits(parseFloat(row.safy).toFixed(2))}</td></tr>`;
+  }
+  
+  var formHtml=getFormHtmlJS(row.empname||"", row.emptid||"", row.sanah||"", row.shahr||"", row.code_bank||"", row.bank_hesab_no||"", rowsHtml);
+  
+  area.innerHTML=`
+    <div class="no-print" style="max-width:900px;margin:0 auto 6px;display:flex;gap:6px">
+      <button class="btn-3d btn-toggle" onclick="document.getElementById('controlsPanel').classList.toggle('show')" style="flex:1">⚙ إعدادات العرض</button>
+      <button class="btn-3d btn-back" onclick="toggleSearch(true)">↩ رجوع</button>
+    </div>
+    <div id="controlsPanel" class="no-print controls-panel show">
+      <div class="controls-row">
+        <div style="display:flex;align-items:center;gap:4px"><label>🔍 خط:</label><input type="range" min="9" max="16" value="${currentFontSize}" oninput="currentFontSize=this.value; renderForm(lastData)"><span style="font-weight:900;background:rgba(16,185,129,0.2);padding:2px 6px;border-radius:6px;color:#a7f3d0">${toArabicDigits(currentFontSize)}</span></div>
+        <div style="display:flex;align-items:center;gap:4px"><label>↔ عرض:</label><input type="range" min="85" max="115" value="${currentWidth}" oninput="currentWidth=this.value; renderForm(lastData)"><span style="font-weight:900;background:rgba(59,130,246,0.2);padding:2px 6px;border-radius:6px;color:#bfdbfe">${toArabicDigits(currentWidth)}%</span></div>
+        <button class="btn-3d btn-save" onclick="localStorage.setItem('salarySettings',JSON.stringify({fontSize:currentFontSize,width:currentWidth,colWidths:colWidths})); this.innerText='✅ تم'">💾 حفظ</button>
+      </div>
+    </div>
+    <div class="no-print actions"><button class="btn-3d btn-print" onclick="window.print()">🖨 طباعة</button><button class="btn-3d btn-whats" onclick="downloadImage()">📤 تحميل صورة</button></div>
+    ${formHtml}<br>`;
+}
+
+async function downloadImage(){
+  let area=document.getElementById('printArea');
+  let canvas=await html2canvas(area,{scale:2,useCORS:true,backgroundColor:'#ffffff'});
+  let link=document.createElement('a');
+  link.download=`مرتب-${lastData.empname||lastData.emptid}-${lastData.shahr}-${lastData.sanah}.png`;
+  link.href=canvas.toDataURL('image/png');
+  link.click();
+}
+
+window.onload=()=>{ loadEmployees(); document.addEventListener('click',e=>{ if(!document.getElementById('empCustomSelect').contains(e.target)) closePanel(); }); };
+</script>
+</body>
+</html>
