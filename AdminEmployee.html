@@ -2,82 +2,194 @@
 <html dir="rtl" lang="ar">
 <head>
 <meta charset="UTF-8">
-<title>رفع HR - حل مشكلة الـ 100</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HR Uploader - النسخة النهائية</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.42.0/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap" rel="stylesheet">
-<style>body{font-family:Cairo;background:#0f172a;color:white;padding:20px} .card{background:#1e293b;padding:20px;border-radius:16px;max-width:900px;margin:auto} .btn{width:100%;padding:14px;background:#0ea5e9;color:white;border:none;border-radius:12px;font-weight:800;cursor:pointer;margin-top:10px} .log{background:#020617;padding:10px;border-radius:10px;height:350px;overflow:auto;font-size:11px;white-space:pre-wrap;margin-top:12px} .bar{height:10px;background:#334155;border-radius:10px;overflow:hidden} .fill{height:100%;background:#22c55e;width:0%}</style>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;800&display=swap" rel="stylesheet">
+<style>
+body{font-family:'Cairo',sans-serif;background:#0f172a;color:#fff;padding:20px;margin:0}
+.card{background:#1e293b;border-radius:16px;padding:24px;max-width:900px;margin:auto;border:1px solid #334155}
+h2{margin:0 0 12px;color:#22d3ee}
+#drop{border:2px dashed #38bdf8;border-radius:12px;padding:30px;text-align:center;cursor:pointer;background:#0f172a}
+#drop:hover{background:#164e63}
+.btn{width:100%;padding:14px;background:#0ea5e9;color:#fff;border:none;border-radius:12px;font-weight:800;cursor:pointer;margin-top:12px;font-size:16px}
+.btn:disabled{opacity:.4}
+.log{background:#020617;border-radius:10px;padding:12px;height:360px;overflow:auto;font-size:11px;white-space:pre-wrap;margin-top:12px;border:1px solid #1e293b}
+.stat{display:flex;gap:10px;margin-top:12px}
+.stat div{flex:1;background:#0f172a;border:1px solid #334155;border-radius:10px;padding:10px;text-align:center}
+.stat b{display:block;font-size:20px}
+.progress{height:12px;background:#334155;border-radius:20px;overflow:hidden;margin-top:12px}
+.fill{height:100%;width:0%;background:linear-gradient(90deg,#0ea5e9,#22c55e);transition:.3s}
+</style>
 </head>
 <body>
 <div class="card">
-<h2>✅ حل مشكلة الـ 100 صف - رفع ذكي</h2>
-<input type="file" id="f" accept=".xlsx,.xls">
-<div class="bar" style="margin-top:12px"><div id="fill" class="fill"></div></div>
-<div style="display:flex;justify-content:space-between;margin-top:8px;font-size:13px">
-<span>إجمالي: <b id="tot">0</b></span>
-<span>صالح: <b id="val">0</b></span>
-<span style="color:#22c55e">تم: <b id="done">0</b></span>
-<span style="color:#f87171">فشل: <b id="fail">0</b></span>
+<h2>✅ حل نهائي مشكلة 100 صف - V3</h2>
+<div id="status" style="color:#fbbf24;font-size:12px;margin-bottom:8px">⏳ بيحمل المكتبات... ثانية واحدة</div>
+
+<div id="drop">
+<div style="font-size:32px">📊</div>
+<b>اضغط هنا واختار ملف DATAFILE.xlsx</b>
+<div style="font-size:11px;color:#94a3b8;margin-top:4px">أو اسحب الملف هنا</div>
+<input type="file" id="fileInput" accept=".xlsx,.xls" hidden>
 </div>
-<button id="btn" class="btn" disabled>ابدأ الرفع (يتخطى الأخطاء تلقائياً)</button>
-<div id="log" class="log">في انتظار الملف...</div>
+
+<div class="stat">
+<div><b id="tot">0</b>إجمالي</div>
+<div><b id="val">0</b>صالح</div>
+<div style="color:#22c55e"><b id="done">0</b>تم</div>
+<div style="color:#f87171"><b id="fail">0</b>فشل</div>
 </div>
+
+<div class="progress"><div id="fill" class="fill"></div></div>
+<button id="uploadBtn" class="btn" disabled>1- اختار الملف الأول</button>
+<div id="log" class="log">في انتظار اختيار الملف...\nلو فضل 0، ابعتلي الملف هنا وأنا أرفعهولك.</div>
+</div>
+
 <script>
-const URL="https://fmgtrtudpardxsvjbcve.supabase.co";
-const KEY="sb_publishable_w3Mdg-WdxcmXNk03fj45KA_Ol6MLulH";
-const supa=supabase.createClient(URL,KEY);
+let supa=null;
 let rows=[];
+
+function log(msg){
+ const el=document.getElementById("log");
+ el.textContent+="\n"+msg;
+ el.scrollTop=el.scrollHeight;
+ console.log(msg);
+}
+
+function initSupabase(){
+ try{
+   supa = window.supabase.createClient(
+     "https://fmgtrtudpardxsvjbcve.supabase.co",
+     "sb_publishable_w3Mdg-WdxcmXNk03fj45KA_Ol6MLulH"
+   );
+   document.getElementById("status").innerHTML="✅ جاهز - اختار الملف";
+   document.getElementById("status").style.color="#22c55e";
+   log("✅ Supabase جاهز");
+ }catch(e){
+   log("❌ خطأ في Supabase: "+e.message);
+ }
+}
+
+// نستنى المكتبات تحمل
+window.onload=()=>{
+ setTimeout(initSupabase, 800);
+};
+
 const colMap={
-"الكود البنكى":"emp_code","الكود البنكي":"emp_code","اسم العامل":"emp_name","الاسم":"emp_name","الرقم القومى":"national_id","الرقم القومي":"national_id","WhatsUpp":"whatsapp","WhatsApp":"whatsapp","واتساب":"whatsapp","phone":"phone","تليفون":"phone","في الخدمة":"in_service","فى الخدمة":"in_service","الموهل":"qualification","المؤهل":"qualification","الكود":"emp_code","الوظيفة":"current_job","الدرجة":"degree"
+"الكود البنكى":"emp_code","الكود البنكي":"emp_code","كود بنكى":"emp_code",
+"اسم العامل":"emp_name","الاسم":"emp_name","اسم الموظف":"emp_name",
+"الرقم القومى":"national_id","الرقم القومي":"national_id","رقم قومي":"national_id","رقم القومى":"national_id",
+"الرقم القومى ":"national_id",
+"WhatsUpp":"whatsapp","WhatsApp":"whatsapp","whatsapp":"whatsapp","واتساب":"whatsapp",
+"phone":"phone","Phone":"phone","تليفون":"phone","الموبايل":"phone",
+"فى الخدمة":"in_service","في الخدمة":"in_service","الحالة":"in_service",
+"ملاحظات":"notes","الملاحظات":"notes",
+"الدرجة":"degree","الوظيفة":"current_job","المؤهل":"qualification","الموهل":"qualification"
 };
-function log(t){document.getElementById("log").textContent+="\n"+t; document.getElementById("log").scrollTop=99999}
-document.getElementById("f").onchange=async e=>{
- const file=e.target.files[0]; if(!file) return;
- const buf=await file.arrayBuffer();
- const wb=XLSX.read(buf,{type:'array'});
- const json=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:""});
- document.getElementById("tot").innerText=json.length;
- // تطبيع
- rows=json.map(r=>{
-   let o={}; for(let k in r){ let nk=colMap[k.trim()]||k.trim(); o[nk]=r[k]; }
-   return o;
- }).filter(r=> r.national_id && String(r.national_id).length>=10);
- document.getElementById("val").innerText=rows.length;
- log(`تم قراءة ${json.length} - الصالح ${rows.length}`);
- document.getElementById("btn").disabled=false;
-};
-document.getElementById("btn").onclick=async()=>{
- let done=0,fail=0;
+
+function normalizeKey(k){
+ let s=String(k).trim();
+ return colMap[s] || colMap[s.replace(/\s+/g,' ').trim()] || s;
+}
+
+async function handleFile(file){
+ if(!file){ log("❌ مفيش ملف"); return; }
+ log(`📂 الملف: ${file.name} - الحجم: ${(file.size/1024/1024).toFixed(2)} MB`);
+ document.getElementById("status").innerText="⏳ بقرأ الاكسيل...";
+ 
+ try{
+   const buffer=await file.arrayBuffer();
+   log(`📖 بقرأ ${buffer.byteLength} بايت...`);
+   const wb=XLSX.read(buffer,{type:'array'});
+   const sheetName=wb.SheetNames[0];
+   log(`📑 اسم الشيت: ${sheetName}`);
+   const ws=wb.Sheets[sheetName];
+   const json=XLSX.utils.sheet_to_json(ws,{defval:"", raw:false});
+   
+   document.getElementById("tot").innerText=json.length;
+   log(`✅ اتقرأ ${json.length} صف من الاكسيل`);
+   
+   if(json.length===0){ log("❌ الملف فاضي! اتأكد ان أول صف فيه عناوين الأعمدة"); return; }
+   
+   // اطبع أول صف عشان نعرف الأعمدة
+   log("🔍 الأعمدة اللي لقيتها: "+Object.keys(json[0]).join(" | "));
+   
+   // تطبيع
+   rows=json.map(r=>{
+     let o={};
+     for(let k in r){ o[normalizeKey(k)]=r[k]; }
+     return o;
+   }).filter(r=> r.national_id && String(r.national_id).replace(/[^0-9]/g,'').length>=10);
+   
+   document.getElementById("val").innerText=rows.length;
+   log(`✅ الصالح للرفع (عنده رقم قومي): ${rows.length}`);
+   
+   if(rows.length>0){
+     log(`مثال: ${rows[0].national_id} - ${rows[0].emp_name}`);
+     document.getElementById("uploadBtn").disabled=false;
+     document.getElementById("uploadBtn").innerText=`2- ابدأ رفع ${rows.length} موظف (صف واحد واحد - مش هيقف عند 100)`;
+     document.getElementById("status").innerText=`✅ جاهز للرفع: ${rows.length} موظف`;
+   }else{
+     log("❌ مفيش صفوف فيها رقم قومي! اتأكد ان عمود الرقم القومي اسمه بالظبط 'الرقم القومى'");
+   }
+ }catch(err){
+   log("❌ خطأ في قراءة الاكسيل: "+err.message+"\n"+err.stack);
+   document.getElementById("status").innerText="❌ خطأ في القراءة - شوف اللوج";
+ }
+}
+
+const drop=document.getElementById("drop");
+const fileInput=document.getElementById("fileInput");
+drop.onclick=()=> fileInput.click();
+drop.ondragover=(e)=>{ e.preventDefault(); drop.style.borderColor="#22c55e"; };
+drop.ondragleave=()=> drop.style.borderColor="#38bdf8";
+drop.ondrop=(e)=>{ e.preventDefault(); drop.style.borderColor="#38bdf8"; const f=e.dataTransfer.files[0]; if(f) handleFile(f); };
+fileInput.onchange=(e)=>{ const f=e.target.files[0]; if(f) handleFile(f); };
+
+document.getElementById("uploadBtn").onclick=async()=>{
+ if(rows.length===0) return;
+ const btn=document.getElementById("uploadBtn");
+ btn.disabled=true;
+ let done=0, fail=0;
+ log(`\n🚀 بدأ الرفع... ${rows.length} موظف`);
+ 
  for(let i=0;i<rows.length;i++){
    const r=rows[i];
+   const nid=String(r.national_id).replace(/[^0-9]/g,'').trim();
+   if(nid.length!=14){
+     fail++; document.getElementById("fail").innerText=fail;
+     log(`⚠️ تخطي - رقم قومي غلط (${nid.length} رقم): ${r.emp_name}`);
+     continue;
+   }
    const payload={
-     national_id:String(r.national_id).trim(),
-     emp_code:r.emp_code?String(r.emp_code):null,
-     emp_name:r.emp_name||null,
-     whatsapp:r.whatsapp?String(r.whatsapp):null,
-     phone:r.phone?String(r.phone):null,
-     in_service:r.in_service?true:true,
-     notes:r.notes||null,
-     degree:r.degree||null,
-     current_job:r.current_job||null,
-     qualification:r.qualification||null,
+     national_id:nid,
+     emp_code: r.emp_code ? String(r.emp_code).trim() : null,
+     emp_name: r.emp_name || null,
+     whatsapp: r.whatsapp ? String(r.whatsapp).replace(/[^0-9]/g,'').trim() : null,
+     phone: r.phone ? String(r.phone).replace(/[^0-9]/g,'').trim() : null,
+     notes: r.notes || null,
+     degree: r.degree || null,
+     current_job: r.current_job || null,
+     qualification: r.qualification || null,
+     in_service: true
    };
-   // نحذف الفاضي
-   Object.keys(payload).forEach(k=> { if(payload[k]===""||payload[k]==="undefined") payload[k]=null });
    try{
      const {error}=await supa.from("employees_full").upsert(payload,{onConflict:'national_id'});
      if(error) throw error;
      done++; document.getElementById("done").innerText=done;
-     if(i%10==0) log(`✅ ${done} - ${payload.national_id} ${payload.emp_name}`);
+     if(done%25===0 || done<=5) log(`✅ ${done}: ${payload.emp_name}`);
    }catch(err){
      fail++; document.getElementById("fail").innerText=fail;
-     log(`❌ فشل صف ${i+1} [${r.national_id}] ${r.emp_name}: ${err.message}`);
+     log(`❌ فشل [${nid}] ${r.emp_name}: ${err.message}`);
    }
    document.getElementById("fill").style.width=Math.round((i+1)/rows.length*100)+"%";
-   await new Promise(r=>setTimeout(r, 80)); // تهدئة عشان Supabase المجاني
+   if(i%20===0) await new Promise(r=>setTimeout(r,150));
  }
- log(`\n🎉 انتهى! نجح: ${done} - فشل: ${fail}`);
- if(fail>0) log(`\nاللي فشل غالباً رقم قومي مكرر أو حروف في رقم. تقدر تنسخ اللوج ده وتبعتهولي أصلحهولك`);
+ log(`\n🎉 انتهى! نجح: ${done} - فشل: ${fail} - الإجمالي: ${rows.length}`);
+ btn.innerText="🎉 تم! تقدر ترفع ملف تاني";
+ btn.disabled=false;
 };
 </script>
 </body>
