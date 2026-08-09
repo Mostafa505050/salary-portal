@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>رفع المرتبات - 130 بند</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.42.0/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;800&display=swap" rel="stylesheet">
+<style>
+body{font-family:'Cairo',sans-serif;background:#0a0f1c;color:#fff;padding:20px}
+.card{max-width:1100px;margin:auto;background:#151d2f;border-radius:20px;padding:24px;border:1px solid #223}
+.drop{border:2px dashed #0ea5e9;border-radius:16px;padding:30px;text-align:center;cursor:pointer;background:#0f172a}
+.btn{width:100%;padding:14px;background:linear-gradient(90deg,#0ea5e9,#22c55e);border:none;border-radius:12px;color:#fff;font-weight:800;font-size:16px;cursor:pointer;margin-top:12px}
+.log{background:#020617;border-radius:12px;padding:12px;height:380px;overflow:auto;font-size:11px;white-space:pre-wrap;margin-top:12px}
+.grid{display:flex;gap:8px;margin:12px 0}
+.grid div{flex:1;background:#0f172a;border-radius:10px;padding:10px;text-align:center;border:1px solid #334155}
+.bar{height:10px;background:#334155;border-radius:10px;overflow:hidden}
+.fill{height:100%;background:#22c55e;width:0%}
+table{width:100%;font-size:10px;border-collapse:collapse;margin-top:10px}
+th,td{border:1px solid #334155;padding:4px;text-align:center}
+</style>
+</head>
+<body>
+<div class="card">
+<h2>💰 رفع المرتبات الشامل - 130 بند</h2>
+<div style="color:#94a3b8;font-size:12px">يدعم ملفك الحالي بالأسماء العربية + الإنجليزية: السنه، الشهر، emptid، مرتب اساسي... الصافى</div>
+<div class="drop" id="drop">
+<div style="font-size:30px">📊</div>
+<b>اسحب ملف مرتبات الشهر هنا (Excel)</b>
+<div style="font-size:11px;color:#64748b">هيقرأ كل الأعمدة تلقائياً حتى لو 130 عمود</div>
+<input type="file" id="file" accept=".xlsx,.xls" hidden>
+</div>
+
+<div class="grid">
+<div><b id="tot">0</b>إجمالي صفوف</div>
+<div><b id="val">0</b>صالح</div>
+<div><b id="done">0</b>تم رفعه</div>
+<div><b id="fail">0</b>فشل</div>
+</div>
+<div class="bar"><div id="fill" class="fill"></div></div>
+<button id="uploadBtn" class="btn" disabled>اختار الملف أولاً</button>
+<div id="preview" style="overflow:auto"></div>
+<div id="log" class="log">في انتظار الملف...</div>
+</div>
+
+<script>
+const supa=supabase.createClient("https://fmgtrtudpardxsvjbcve.supabase.co","sb_publishable_w3Mdg-WdxcmXNk03fj45KA_Ol6MLulH");
+let rows=[];
+
+// خريطة ضخمة لكل الأسماء اللي بعتها
+const MAP={
+"السنه":"sanah","السنة":"sanah","سنه":"sanah","year":"sanah",
+"الشهر":"shahr","شهر":"shahr","month":"shahr",
+"emptid":"emptid","emp id":"emptid","كود الموظف":"emptid",
+"empname":"empname","اسم الموظف":"empname","الاسم":"empname",
+"Emp_Bank_Code":"emp_bank_code","كود بنكي":"emp_bank_code",
+"empname1":"empname1","Bank Hesab No":"bank_hesab_no","رقم حساب":"bank_hesab_no",
+"Code_Bank":"code_bank","Code_Dept":"code_dept","CODE_SARF":"code_sarf",
+"مرتب اساسي":"moratab_asasy","المرتب الاساسي":"moratab_asasy",
+"الحافز الدورى":"hafez_dawry","طبيعه عمل":"tabeeat_amal","علاوه 2014":"alawa_2014","علاوه 2015":"alawa_2015",
+"اعانه اجتماعيه":"eana_egtemaya","بدل ضيافة":"badal_deyafa","بدل تفرغ":"badal_tafarogh",
+"تفرغ تجارين":"tafarogh_tegareen","تفرغ اطباء":"tafarogh_atbaa","تفرغ كيميائيين":"tafarogh_kemyaeen",
+"بدل تمثيل":"badal_tamtheel","حافز 840":"hafez_840","بدل النقدي":"badal_naqdy","بدل الإقامة":"badal_eqama",
+"بدل ورديه":"badal_wardiya","بدل صرافة":"badal_serafa","بدل عدوه":"badal_adwa","بدل سماعه":"badal_samaa",
+"امناء مخاذن":"omana_makhazen","علاوه استثنائية":"alawa_estesnaya","علاوه استثنائية 2022":"alawa_estesnaya_2022",
+"حافز 2024- 2025":"hafez_2024_2025","حافز 2024-2025":"hafez_2024_2025",
+"صندوق نهاية الخدمة كهرباء الريف 13 %":"sandouk_nehaya_kahraba_reef_13",
+"اساسى 15 % حصة حكومة":"asasy_15_hessa_hokoma","ت اصابة العمل":"t_esabet_amal","ت البطالة":"t_betala",
+"ت الشيخوخة والوفاه والعجز":"t_sheikhoukha_wafah_agez","ت المرض":"t_marad","ت المكافاءة":"t_mokafaa",
+"ت مصاريف إدارية للإصابة":"t_masaref_edareya_esaba","مصاريف ادارية المرض حكومة":"masaref_edareya_marad_hokoma",
+"مرتب اساسي-مكافأة شاملة":"moratab_asasy_mokafaa_shamela","اساسى خاضع 1 % تامين طوارى":"asasy_khade3_1_tamin_taware2",
+"حافز - مكافأة شاملة":"hafez_mokafaa_shamela","ورادى شامله":"warady_shamela","اناره":"enara","وجبات":"wagabat","اعاشه":"easha","عيد العمال":"eid_ommal","أجمالى المستحق":"egmaly_mostahaq","اجمالى المستحق":"egmaly_mostahaq",
+"اساسى 15 % حصة حكومة1":"asasy_15_hessa_hokoma1","اساسى 10% 0":"asasy_10_0","اساسى 2% بطالة1":"asasy_2_betala1","اساسى 3%0":"asasy_3_0","اساسى 2% اصابة عمل1":"asasy_2_esaba1","ت المكافاءة1":"t_mokafaa1","ت المكافاءة حصة العامل":"t_mokafaa_hessat_amel","ت المرض1":"t_marad1","ت مصاريف إدارية للإصابة1":"t_masaref_edareya_esaba1","ت الشيخوخة والوفاه والعجز1":"t_sheikhoukha1","ت الشيخوخة والوفاه والعجز حصة العامل":"t_sheikhoukha_hessat_amel","ت البطالة1":"t_betala1","ت اصابة العمل1":"t_esabet_amal1","مصاريف ادارية المرض حكومة1":"masaref_edareya_marad_hokoma1","اساسى2 %01":"asasy_2_01","اساسي خاضع 1% تامين مرضي":"asasy_khade3_1_mardy","متغير 15 % حصة حكومة1":"motaghayer_15_hessa_hokoma1","متغير 10% 0":"motaghayer_10_0","متغير 2% بطالة1":"motaghayer_2_betala1","متغير 2% اصابة عمل1":"motaghayer_2_esaba1","متغير خاضع 3% تامين صحي":"motaghayer_khade3_3_sehy","متغير خاضع 1%تامين مرضي":"motaghayer_khade3_1_mardy",
+"اعاره":"eara","استبدال":"estebdal","مدد اعتبارية":"modad_etebareya","مدد سابقه":"modad_sabqa","اشتراك سياره":"eshtrak_sayara","صندوق الرعاية":"sandouk_reaya","قسط ص رعايه":"qest_s_reaya","صندوق الانتماء":"sandouk_entemaa","قسط صندوق انتماء":"qest_sandouk_entemaa","صندوق نهاية الخدمة كهرباء الريف 13 %1":"sandouk_nehaya_kahraba_reef_13_1","نادى الكهرباء":"nady_kahraba","نقابه":"neqaba","صندوق خدمه اجتماعيه":"sandouk_khedma_egtemaya","يوم لصالح الانتما":"youm_enteamaa","جمعيه الخدمات الاجتماعية":"gameya_khadamat_egtemaya","جمعية المنطقة الجنوبية":"gameya_manteqa_ganobya","جمعية مصر الوسطى":"gameya_masr_wosta","علاج طبى":"elag_teby","علاج اسرى":"elag_osry","قسط علاج اسرى":"qest_elag_osry","علاج حساب 177":"elag_hesab_177","بلاغ مرضى":"balagh_mardy","نقابه التطبيقين":"neqaba_tatbeqeen","ضريبه":"dareba","مديونيه ضرائب 2020":"madeyounet_daraeb_2020","عجز عهدومخالفات":"agez_ohda_mokhalafat","نفقة":"nafaqa","خصم مستشفى السرطان":"khasm_mostashfa_saratan","مستشفى 57357":"mostashfa_57357","قرض صندوق الرعايه":"qard_sandouk_reaya","مصر للتامين":"masr_tamin","قسط المصيف":"qest_masyaf","جزاءات مرتب":"gezaat_moratab","قرض الحج":"qard_hajj","أرصدة مدينة حساب 177":"arseda_madina_hesab_177","اللجنة الرياضية":"lagna_reyadeya","مجلس مدينة سفاجا":"magles_madina_safaga","ايجار مجلس الغردقة":"egar_magles_ghardaqa","مديريةالتضامن الاجتماعى":"modereya_tadamom","متأخرات اشتراكات خط أورنج":"motaakherat_eshterak_orange","قيمة شراء خط أورنج":"qeema_shera_khat_orange","دمغة تشغيل خط أورنج":"demgha_tashgheel_orange","مصروفات بنكية":"masroufat_bankia","حساب مستشفى 999":"hesab_mostashfa_999","مساهمة تكافلية1":"mosahma_takafolya1","صندوق تكريم الشهداء":"sandouk_tekreem_shohadaa","خصم تأخيرات":"khasm_taakherat","متجمد نفقه":"motagamed_nafqa","أشتراك شهرى خط أورنج":"eshtrak_shahry_orange","ايجار سكن مستعمره":"egar_sakan_mostamara","خصم كهرباء سكن مستعمره":"khasm_kahraba_sakan","خصم مياه سكن مستعمره":"khasm_mayah_sakan","متجمد سكن مستعمره":"motagamed_sakan","أجمالى المستقطع":"egmaly_mostaqtaa","اجمالى المستقطع":"egmaly_mostaqtaa","الصافى":"safy","الصافي":"safy","صافي":"safy"
+};
+
+function log(m){document.getElementById("log").textContent+="\n"+m; document.getElementById("log").scrollTop=99999;}
+
+document.getElementById("drop").onclick=()=>document.getElementById("file").click();
+document.getElementById("file").onchange=async e=> handleFile(e.target.files[0]);
+
+async function handleFile(file){
+ if(!file) return;
+ log(`📂 ${file.name} ${(file.size/1024/1024).toFixed(2)} MB`);
+ const buf=await file.arrayBuffer();
+ const wb=XLSX.read(buf,{type:'array'});
+ const ws=wb.Sheets[wb.SheetNames[0]];
+ const aoa=XLSX.utils.sheet_to_json(ws,{header:1, defval:""});
+ 
+ let headerIdx=0;
+ for(let i=0;i<Math.min(10,aoa.length);i++){
+   if(aoa[i].join(" ").includes("emptid") || aoa[i].join(" ").includes("السنه") || aoa[i].join(" ").includes("مرتب اساسي")){
+     headerIdx=i; break;
+   }
+ }
+ log(`✅ صف العناوين: ${headerIdx+1}`);
+ const headers=aoa[headerIdx].map(h=>String(h).trim());
+ log(`🔍 عدد الأعمدة: ${headers.length}`);
+ 
+ const dataRows=aoa.slice(headerIdx+1);
+ let json=[];
+ dataRows.forEach(r=>{
+   let obj={};
+   headers.forEach((h,i)=>{
+     if(!h || h.startsWith("__EMPTY")) return;
+     let key=MAP[h] || MAP[h.trim()] || h.trim().toLowerCase().replace(/\s+/g,'_');
+     let val=r[i];
+     if(val==="" || val===undefined) return;
+     // تحويل أرقام
+     if(typeof val==="string") val=val.replace(/,/g,'').trim();
+     obj[key]=val;
+   });
+   if(obj.emptid || obj.empname) json.push(obj);
+ });
+ 
+ document.getElementById("tot").innerText=dataRows.length;
+ document.getElementById("val").innerText=json.length;
+ rows=json;
+ log(`✅ الصالح: ${rows.length}`);
+ if(rows.length>0){
+   log(`مثال: ${rows[0].emptid} - ${rows[0].empname} - الصافي: ${rows[0].safy}`);
+   document.getElementById("uploadBtn").disabled=false;
+   document.getElementById("uploadBtn").innerText=`🚀 رفع ${rows.length} مرتب`;
+   // معاينة
+   let html="<table><tr><th>emptid</th><th>الاسم</th><th>الشهر</th><th>السنه</th><th>المستحق</th><th>المستقطع</th><th>الصافي</th></tr>";
+   rows.slice(0,5).forEach(r=> html+=`<tr><td>${r.emptid||""}</td><td>${r.empname||""}</td><td>${r.shahr||""}</td><td>${r.sanah||""}</td><td>${r.egmaly_mostahaq||""}</td><td>${r.egmaly_mostaqtaa||""}</td><td style="color:#22c55e;font-weight:800">${r.safy||""}</td></tr>`);
+   html+="</table>";
+   document.getElementById("preview").innerHTML=html;
+ }
+}
+
+document.getElementById("uploadBtn").onclick=async()=>{
+ let done=0,fail=0;
+ log(`\n🚀 بدأ رفع ${rows.length} مرتب...`);
+ for(let i=0;i<rows.length;i++){
+   let r=rows[i];
+   // تحويل الأرقام
+   for(let k in r){
+     if(k!=="empname" && k!=="emptid" && k!=="emp_bank_code" && k!=="bank_hesab_no" && k!=="empname1"){
+       let v=r[k];
+       if(typeof v==="string"){
+         let num=parseFloat(String(v).replace(/[^0-9.\-]/g,''));
+         if(!isNaN(num)) r[k]=num;
+       }
+     }
+   }
+   r.sanah=parseInt(r.sanah)||new Date().getFullYear();
+   r.shahr=parseInt(r.shahr)||new Date().getMonth()+1;
+   r.emptid=String(r.emptid||"").trim();
+   if(!r.emptid){ fail++; continue; }
+   try{
+     const {error}=await supa.from("salaries").upsert(r,{onConflict:'sanah,shahr,emptid'});
+     if(error) throw error;
+     done++;
+     if(i%20===0) log(`✅ ${done}: ${r.empname}`);
+   }catch(err){
+     fail++; log(`❌ ${r.emptid}: ${err.message}`);
+   }
+   document.getElementById("done").innerText=done;
+   document.getElementById("fail").innerText=fail;
+   document.getElementById("fill").style.width=Math.round((i+1)/rows.length*100)+"%";
+   if(i%15===0) await new Promise(r=>setTimeout(r,100));
+ }
+ log(`\n🎉 انتهى! نجح: ${done} - فشل: ${fail}`);
+};
+</script>
+</body>
+</html>
