@@ -1,252 +1,83 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html dir="rtl" lang="ar">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>لوحة تحكم HR الاحترافية - رفع الاكسيل الشامل</title>
+<title>رفع HR - حل مشكلة الـ 100</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
-<style>
-*{font-family:'Cairo',sans-serif;box-sizing:border-box}
-body{background:#0f172a;color:#e2e8f0;margin:0;padding:16px}
-.container{max-width:1000px;margin:auto}
-.card{background:#1e293b;border:1px solid #334155;border-radius:20px;padding:24px;margin-bottom:20px;box-shadow:0 20px 40px rgba(0,0,0,.3)}
-h1{margin:0 0 8px;color:#38bdf8;font-weight:800}
-.sub{color:#94a3b8;font-size:13px;margin-bottom:16px}
-.upload-zone{border:2px dashed #38bdf8;border-radius:16px;padding:40px 20px;text-align:center;cursor:pointer;transition:.2s;background:#0f172a}
-.upload-zone:hover{background:#1e293b;border-color:#22d3ee}
-.upload-zone.dragover{background:#164e63;border-color:#22d3ee}
-.btn{padding:12px 20px;border-radius:12px;border:none;font-weight:800;cursor:pointer}
-.btn-primary{background:#0ea5e9;color:white;width:100%;font-size:16px;margin-top:12px}
-.btn-primary:disabled{opacity:.5;cursor:not-allowed}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:16px}
-.stat{background:#0f172a;border:1px solid #334155;border-radius:12px;padding:12px;text-align:center}
-.stat b{display:block;font-size:22px;color:#38bdf8}
-.log{max-height:300px;overflow:auto;background:#0f172a;border-radius:12px;padding:12px;font-family:monospace;font-size:12px;margin-top:16px;white-space:pre-wrap}
-.badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700}
-.badge-ok{background:#065f46;color:#6ee7b7}
-.badge-err{background:#7f1d1d;color:#fca5a5}
-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:12px}
-th,td{padding:8px;border-bottom:1px solid #334155;text-align:right}
-th{color:#38bdf8}
-.progress{height:8px;background:#334155;border-radius:10px;overflow:hidden;margin-top:12px}
-.progress-bar{height:100%;background:linear-gradient(90deg,#0ea5e9,#22d3ee);width:0%;transition:.3s}
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap" rel="stylesheet">
+<style>body{font-family:Cairo;background:#0f172a;color:white;padding:20px} .card{background:#1e293b;padding:20px;border-radius:16px;max-width:900px;margin:auto} .btn{width:100%;padding:14px;background:#0ea5e9;color:white;border:none;border-radius:12px;font-weight:800;cursor:pointer;margin-top:10px} .log{background:#020617;padding:10px;border-radius:10px;height:350px;overflow:auto;font-size:11px;white-space:pre-wrap;margin-top:12px} .bar{height:10px;background:#334155;border-radius:10px;overflow:hidden} .fill{height:100%;background:#22c55e;width:0%}</style>
 </head>
 <body>
-<div class="container">
-  <div class="card">
-    <h1>🚀 لوحة HR الاحترافية - Supabase</h1>
-    <div class="sub">ارفع ملف الاكسيل بكل الأعمدة (الكود البنكى، الاسم، الرقم القومى، تاريخ الميلاد... واتساب) وسيتم حفظه في جدول employees_full</div>
-    
-    <div id="dropZone" class="upload-zone">
-      <div style="font-size:40px">📊</div>
-      <div style="font-weight:800;margin-top:8px">اسحب ملف الاكسيل هنا أو اضغط للاختيار</div>
-      <div style="font-size:12px;color:#64748b;margin-top:4px">يدعم .xlsx , .xls - الأعمدة بالعربي زي ما بعتها بالظبط</div>
-      <input type="file" id="fileInput" accept=".xlsx,.xls" hidden>
-    </div>
-
-    <div class="grid">
-      <div class="stat"><b id="totalRows">0</b><span>إجمالي الصفوف في الاكسيل</span></div>
-      <div class="stat"><b id="validRows">0</b><span>صفوف صالحة</span></div>
-      <div class="stat"><b id="uploadedRows">0</b><span>تم الرفع لـ Supabase</span></div>
-      <div class="stat"><b id="dbCount">-</b><span>العدد الحالي في القاعدة</span></div>
-    </div>
-
-    <div class="progress"><div id="progressBar" class="progress-bar"></div></div>
-
-    <button id="uploadBtn" class="btn btn-primary" disabled>📤 ابدأ الرفع لـ Supabase</button>
-    <button id="exportBtn" class="btn" style="background:#1e293b;color:#38bdf8;border:1px solid #334155;width:100%;margin-top:8px">📥 تحميل كل البيانات كـ Excel</button>
-    
-    <div id="preview" style="overflow:auto"></div>
-    <div id="log" class="log">في انتظار الملف...</div>
-  </div>
+<div class="card">
+<h2>✅ حل مشكلة الـ 100 صف - رفع ذكي</h2>
+<input type="file" id="f" accept=".xlsx,.xls">
+<div class="bar" style="margin-top:12px"><div id="fill" class="fill"></div></div>
+<div style="display:flex;justify-content:space-between;margin-top:8px;font-size:13px">
+<span>إجمالي: <b id="tot">0</b></span>
+<span>صالح: <b id="val">0</b></span>
+<span style="color:#22c55e">تم: <b id="done">0</b></span>
+<span style="color:#f87171">فشل: <b id="fail">0</b></span>
 </div>
-
+<button id="btn" class="btn" disabled>ابدأ الرفع (يتخطى الأخطاء تلقائياً)</button>
+<div id="log" class="log">في انتظار الملف...</div>
+</div>
 <script>
-const SUPABASE_URL = "https://fmgtrtudpardxsvjbcve.supabase.co";
-const SUPABASE_KEY = "sb_publishable_w3Mdg-WdxcmXNk03fj45KA_Ol6MLulH";
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-let parsedData = [];
-let fileName = "";
-
-// تطبيع اسماء الأعمدة
-const colMap = {
-  "الكود البنكى":"emp_code","الكود البنكي":"emp_code","كود بنكي":"emp_code",
-  "اسم العامل":"emp_name","الاسم":"emp_name","اسم الموظف":"emp_name",
-  "ملاحظات":"notes",
-  "الرقم القومى":"national_id","الرقم القومي":"national_id","رقم قومي":"national_id",
-  "تاريخ الميلاد":"birth_date","تاريخ الميلاد ":"birth_date",
-  "تاريخ التعيين":"hire_date",
-  "المجال الوظيفى":"job_field","المجال الوظيفي":"job_field",
-  "الدرجة":"degree",
-  "الوظيفه الحالية":"current_job","الوظيفة الحالية":"current_job",
-  "تاريخ الدرجة الحالية":"current_degree_date",
-  "المحطات":"stations",
-  "م":"serial_number",
-  "الموهل":"qualification","المؤهل":"qualification",
-  "الوظيفة المعين عليها":"original_job",
-  "جهة الميلاد":"birth_place",
-  "العنوان":"address",
-  "اسم الأم":"mother_name","اسم الام":"mother_name",
-  "الرقم التأمينى":"insurance_number","الرقم التاميني":"insurance_number",
-  "الموقف من التجنيد":"military_status",
-  "الديانة":"religion",
-  "النوع":"gender",
-  "حافز 382 الشهرى":"incentive_382","حافز 382":"incentive_382",
-  "مشرفين المحطات":"station_supervisors",
-  "وسائل النقل":"transport",
-  "حافز بدل صيانة":"maintenance_allowance",
-  "جلسات الدفاع المدنى/ السلامة والصحة المهنية":"civil_defense_sessions","جلسات الدفاع المدني":"civil_defense_sessions",
-  "جلسات الخطوط":"lines_sessions",
-  "حافز 117 الشهرى":"incentive_117",
-  "حافز الإسمنت الشهرى":"cement_incentive","حافز الاسمنت":"cement_incentive",
-  "تاريخ الإحالة للمعاش":"retirement_date",
-  "الوفاه":"death_date","الوفاة":"death_date",
-  "فى الخدمة":"in_service","في الخدمة":"in_service",
-  "WhatsUpp":"whatsapp","واتساب":"whatsapp","WhatsApp":"whatsapp",
-  "phone":"phone","تليفون":"phone","رقم التليفون":"phone"
+const URL="https://fmgtrtudpardxsvjbcve.supabase.co";
+const KEY="sb_publishable_w3Mdg-WdxcmXNk03fj45KA_Ol6MLulH";
+const supa=supabase.createClient(URL,KEY);
+let rows=[];
+const colMap={
+"الكود البنكى":"emp_code","الكود البنكي":"emp_code","اسم العامل":"emp_name","الاسم":"emp_name","الرقم القومى":"national_id","الرقم القومي":"national_id","WhatsUpp":"whatsapp","WhatsApp":"whatsapp","واتساب":"whatsapp","phone":"phone","تليفون":"phone","في الخدمة":"in_service","فى الخدمة":"in_service","الموهل":"qualification","المؤهل":"qualification","الكود":"emp_code","الوظيفة":"current_job","الدرجة":"degree"
 };
-
-function normalizeRow(row){
-  const obj = {};
-  for(let k in row){
-    const cleanKey = k.toString().trim();
-    const mapped = colMap[cleanKey] || colMap[cleanKey.replace(/\s+/g,' ').trim()] || cleanKey;
-    obj[mapped] = row[k];
-  }
-  return obj;
-}
-
-function log(msg, type="info"){
-  const el = document.getElementById("log");
-  const time = new Date().toLocaleTimeString('ar-EG');
-  el.textContent += `\n[${time}] ${msg}`;
-  el.scrollTop = el.scrollHeight;
-}
-
-async function refreshCount(){
-  const {count} = await supabaseClient.from("employees_full").select("*",{count:'exact',head:true});
-  document.getElementById("dbCount").innerText = count ?? 0;
-}
-refreshCount();
-
-const dropZone = document.getElementById("dropZone");
-const fileInput = document.getElementById("fileInput");
-
-dropZone.onclick = () => fileInput.click();
-dropZone.ondragover = (e)=>{e.preventDefault(); dropZone.classList.add("dragover")};
-dropZone.ondragleave = ()=> dropZone.classList.remove("dragover");
-dropZone.ondrop = (e)=>{e.preventDefault(); dropZone.classList.remove("dragover"); handleFile(e.dataTransfer.files[0])};
-fileInput.onchange = (e)=> handleFile(e.target.files[0]);
-
-function handleFile(file){
-  if(!file) return;
-  fileName = file.name;
-  log(`📂 تم اختيار الملف: ${fileName} (${(file.size/1024).toFixed(1)} KB)`);
-  const reader = new FileReader();
-  reader.onload = (e)=>{
-    const data = new Uint8Array(e.target.result);
-    const wb = XLSX.read(data,{type:'array', cellDates:true});
-    const sheet = wb.Sheets[wb.SheetNames[0]];
-    const json = XLSX.utils.sheet_to_json(sheet,{defval:""});
-    document.getElementById("totalRows").innerText = json.length;
-    
-    parsedData = json.map(normalizeRow).filter(r=> r.national_id && String(r.national_id).length>=10);
-    document.getElementById("validRows").innerText = parsedData.length;
-    
-    log(`✅ تم قراءة ${json.length} صف، الصالح للرفع: ${parsedData.length}`);
-    
-    // معاينة 5 صفوف
-    const preview = parsedData.slice(0,5);
-    let html = `<table><tr><th>الرقم القومى</th><th>الاسم</th><th>الكود</th><th>واتساب</th><th>فى الخدمة</th></tr>`;
-    preview.forEach(r=> html+=`<tr><td>${r.national_id||""}</td><td>${r.emp_name||""}</td><td>${r.emp_code||""}</td><td>${r.whatsapp||""}</td><td>${r.in_service||""}</td></tr>`);
-    html+="</table>";
-    document.getElementById("preview").innerHTML = html;
-    document.getElementById("uploadBtn").disabled = parsedData.length==0;
-  };
-  reader.readAsArrayBuffer(file);
-}
-
-document.getElementById("uploadBtn").onclick = async ()=>{
-  const btn = document.getElementById("uploadBtn");
-  btn.disabled = true;
-  btn.innerText = "⏳ جاري الرفع...";
-  
-  const batchSize = 50;
-  let uploaded = 0;
-  
-  for(let i=0;i<parsedData.length;i+=batchSize){
-    const batch = parsedData.slice(i,i+batchSize).map(r=>{
-      // تحويل التواريخ والارقام
-      return {
-        national_id: String(r.national_id).replace(/\s/g,'').trim(),
-        emp_code: r.emp_code ? String(r.emp_code).trim() : null,
-        emp_name: r.emp_name,
-        notes: r.notes || null,
-        birth_date: r.birth_date ? new Date(r.birth_date).toISOString().split('T')[0] : null,
-        hire_date: r.hire_date ? new Date(r.hire_date).toISOString().split('T')[0] : null,
-        job_field: r.job_field || null,
-        degree: r.degree || null,
-        current_job: r.current_job || null,
-        current_degree_date: r.current_degree_date ? new Date(r.current_degree_date).toISOString().split('T')[0] : null,
-        stations: r.stations ? String(r.stations) : null,
-        serial_number: r.serial_number ? parseInt(r.serial_number) : null,
-        qualification: r.qualification || null,
-        original_job: r.original_job || null,
-        birth_place: r.birth_place || null,
-        address: r.address || null,
-        mother_name: r.mother_name || null,
-        insurance_number: r.insurance_number ? String(r.insurance_number) : null,
-        military_status: r.military_status || null,
-        religion: r.religion || null,
-        gender: r.gender || null,
-        incentive_382: r.incentive_382 ? parseFloat(r.incentive_382)||0 : 0,
-        station_supervisors: r.station_supervisors || null,
-        transport: r.transport || null,
-        maintenance_allowance: r.maintenance_allowance ? parseFloat(r.maintenance_allowance)||0 : 0,
-        civil_defense_sessions: r.civil_defense_sessions || null,
-        lines_sessions: r.lines_sessions || null,
-        incentive_117: r.incentive_117 ? parseFloat(r.incentive_117)||0 : 0,
-        cement_incentive: r.cement_incentive ? parseFloat(r.cement_incentive)||0 : 0,
-        retirement_date: r.retirement_date ? new Date(r.retirement_date).toISOString().split('T')[0] : null,
-        death_date: r.death_date ? new Date(r.death_date).toISOString().split('T')[0] : null,
-        in_service: r.in_service ? (String(r.in_service).includes('نعم') || String(r.in_service).toLowerCase()=='true' || r.in_service==1) : true,
-        whatsapp: r.whatsapp ? String(r.whatsapp).trim() : null,
-        phone: r.phone ? String(r.phone).trim() : null,
-      }
-    });
-    
-    const {error} = await supabaseClient.from("employees_full").upsert(batch,{onConflict:'national_id'});
-    if(error){
-      log(`❌ خطأ في الدفعة ${i/batchSize+1}: ${error.message}`,"err");
-    } else {
-      uploaded += batch.length;
-      document.getElementById("uploadedRows").innerText = uploaded;
-      const pct = Math.round(uploaded/parsedData.length*100);
-      document.getElementById("progressBar").style.width = pct+"%";
-      log(`✅ تم رفع ${uploaded}/${parsedData.length} (${pct}%)`);
-    }
-  }
-  
-  btn.innerText = "🎉 تم الرفع بنجاح";
-  log(`🎉 انتهى! تم رفع ${uploaded} موظف إلى employees_full`);
-  refreshCount();
-  setTimeout(()=>{btn.disabled=false; btn.innerText="📤 ابدأ الرفع لـ Supabase"},2000);
+function log(t){document.getElementById("log").textContent+="\n"+t; document.getElementById("log").scrollTop=99999}
+document.getElementById("f").onchange=async e=>{
+ const file=e.target.files[0]; if(!file) return;
+ const buf=await file.arrayBuffer();
+ const wb=XLSX.read(buf,{type:'array'});
+ const json=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:""});
+ document.getElementById("tot").innerText=json.length;
+ // تطبيع
+ rows=json.map(r=>{
+   let o={}; for(let k in r){ let nk=colMap[k.trim()]||k.trim(); o[nk]=r[k]; }
+   return o;
+ }).filter(r=> r.national_id && String(r.national_id).length>=10);
+ document.getElementById("val").innerText=rows.length;
+ log(`تم قراءة ${json.length} - الصالح ${rows.length}`);
+ document.getElementById("btn").disabled=false;
 };
-
-// تصدير Excel
-document.getElementById("exportBtn").onclick = async ()=>{
-  log("⏳ بحمل كل البيانات من Supabase...");
-  const {data,error} = await supabaseClient.from("employees_full").select("*").limit(10000);
-  if(error){ log("❌ "+error.message); return;}
-  const ws = XLSX.utils.json_to_sheet(data);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,"employees_full");
-  XLSX.writeFile(wb,`employees_full_export_${new Date().toISOString().slice(0,10)}.xlsx`);
-  log(`✅ تم تحميل ${data.length} موظف كـ Excel`);
+document.getElementById("btn").onclick=async()=>{
+ let done=0,fail=0;
+ for(let i=0;i<rows.length;i++){
+   const r=rows[i];
+   const payload={
+     national_id:String(r.national_id).trim(),
+     emp_code:r.emp_code?String(r.emp_code):null,
+     emp_name:r.emp_name||null,
+     whatsapp:r.whatsapp?String(r.whatsapp):null,
+     phone:r.phone?String(r.phone):null,
+     in_service:r.in_service?true:true,
+     notes:r.notes||null,
+     degree:r.degree||null,
+     current_job:r.current_job||null,
+     qualification:r.qualification||null,
+   };
+   // نحذف الفاضي
+   Object.keys(payload).forEach(k=> { if(payload[k]===""||payload[k]==="undefined") payload[k]=null });
+   try{
+     const {error}=await supa.from("employees_full").upsert(payload,{onConflict:'national_id'});
+     if(error) throw error;
+     done++; document.getElementById("done").innerText=done;
+     if(i%10==0) log(`✅ ${done} - ${payload.national_id} ${payload.emp_name}`);
+   }catch(err){
+     fail++; document.getElementById("fail").innerText=fail;
+     log(`❌ فشل صف ${i+1} [${r.national_id}] ${r.emp_name}: ${err.message}`);
+   }
+   document.getElementById("fill").style.width=Math.round((i+1)/rows.length*100)+"%";
+   await new Promise(r=>setTimeout(r, 80)); // تهدئة عشان Supabase المجاني
+ }
+ log(`\n🎉 انتهى! نجح: ${done} - فشل: ${fail}`);
+ if(fail>0) log(`\nاللي فشل غالباً رقم قومي مكرر أو حروف في رقم. تقدر تنسخ اللوج ده وتبعتهولي أصلحهولك`);
 };
 </script>
 </body>
