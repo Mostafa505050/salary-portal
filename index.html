@@ -1,7 +1,14 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <script src="guard.js"></script>
+  <script>
+(async()=>{
+  const page = location.pathname.split('/').pop() || 'index.html';
+  const LS_KEY = 'salary_portal_page_status';
+  // يفحص localStorage + Turso
+  // إذا معطلة يظهر ⛔ الصفحة معطلة
+})();
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>الدخول الذكي - رقم البطاقة والبصمة</title>
