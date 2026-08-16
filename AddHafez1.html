@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>تحميل قوالب - استبعاد المعاش/وفاة أوتوماتيك</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+body{font-family:Tahoma; background:#f0f2f5; padding:15px}
+.card{max-width:1000px; margin:auto; background:#fff; border-radius:14px; padding:20px; box-shadow:0 8px 25px rgba(0,0,0,.1)}
+h2{text-align:center; color:#065f46}
+label{font-weight:bold; display:block; margin-top:12px; font-size:13px}
+input,select{width:100%; padding:10px; border:1.5px solid #ccc; border-radius:8px; margin-top:4px}
+button{padding:10px 14px; border:none; border-radius:8px; cursor:pointer; font-weight:bold; font-size:13px; margin:5px}
+.btn-green{background:#065f46; color:#fff}
+.btn-blue{background:#1d4ed8; color:#fff}
+.btn-red{background:#b91c1c; color:#fff}
+table{width:100%; border-collapse:collapse; margin-top:12px; font-size:12px}
+th{background:#065f46; color:#fff; padding:8px; border:1px solid #ddd}
+td{padding:6px; border:1px solid #ddd; text-align:center}
+.log{background:#111; color:#0f0; padding:10px; border-radius:8px; font-size:12px; white-space:pre-wrap; direction:ltr; text-align:left; max-height:220px; overflow:auto; margin-top:12px}
+.info{background:#ecfdf5; border:1px solid #10b981; padding:10px; border-radius:8px; font-size:12px; margin-top:10px}
+</style>
+</head>
+<body>
+<div class="card">
+<h2>📋 تحميل قوالب الترتيب - استبعاد المعاش/وفاة تلقائياً ⛔</h2>
+<p style="text-align:center; font-size:12px; color:#666">Excel: العمود 1 = الكود | العمود 2 = الترتيب - المحطة + اسم + حالة المعاش من <b>موظفين_مرتبات</b> أوتوماتيك + استبعاد المعاش</p>
+
+<label>نوع_الحافز *</label>
+<select id="typeSelect" onchange="onTypeChange()">
+<option value="">-- اختر نوع الحافز --</option>
+<option value="117 الشهرى">117 الشهرى</option>
+<option value="382 الشهرى">382 الشهرى</option>
+<option value="جهود">جهود</option>
+<option value="مميز">مميز</option>
+<option value="طاقة">طاقة</option>
+<option value="__custom__">+ نوع جديد</option>
+</select>
+<input id="typeCustom" placeholder="اكتب نوع الحافز..." style="display:none; margin-top:8px">
+
+<label>ملف Excel - كود + ترتيب</label>
+<input type="file" id="fileInput" accept=".xlsx,.xls,.csv">
+
+<div class="info">
+- أي موظف تاريخ ميلاده يدل أنه <b>معاش (60 سنة+) أو وفاة</b> سيتم استبعاده تلقائياً ولا يحفظ في القالب<br>
+- المحطة والاسم هتتجيب أوتوماتيك من موظفين_مرتبات<br>
+- العمود 2 لو فاضي الترتيب = ترتيب الصف
+</div>
+
+<div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:12px">
+<button class="btn-green" onclick="parseAndPreview()">👁️ معاينة مع فلترة المعاش</button>
+<button class="btn-blue" onclick="saveToDB()" id="btnSave" style="display:none">💾 حفظ (نشط فقط بدون معاش)</button>
+<button class="btn-blue" onclick="loadTemplate()">🔍 عرض القالب</button>
+<button class="btn-blue" onclick="loadAllTypes()">📋 كل القوالب</button>
+<button class="btn-red" onclick="deleteTemplate()">🗑️ حذف</button>
+</div>
+
+<div id="preview"></div>
+<div id="log" class="log">جاهز...</div>
+</div>
+
+<script>
+const API = "https://hafez-api.mostafa-voic77729.workers.dev";
+let parsedOrders=[];
+let allEmployees=[];
+
+function getType(){
+  const sel=document.getElementById('typeSelect').value;
+  if(sel==='__custom__') return document.getElementById('typeCustom').value.trim();
+  return sel.trim();
+}
+function onTypeChange(){
+  document.getElementById('typeCustom').style.display = document.getElementById('typeSelect').value==='__custom__' ? 'block' : 'none';
+}
+function logMsg(m){ document.getElementById('log').textContent += "\n" + m; }
+
+function isRetired(birth, name){
+  if(!birth && !name) return false;
+  const s=String(birth||'');
+  const n=String(name||'');
+  if(s.includes('معاش')||s.includes('محال')||s.includes('وفاة')||s.includes('وفاه')||s.includes('متوفي')||s.includes('متوفى')||n.includes('معاش')||n.includes('وفاة')||n.includes('متوفي')) return true;
+  try{
+    let year=0; const m=s.match(/(\d{4})/); if(m) year=parseInt(m[1]);
+    if(year&&year<100) year+=1900;
+    if(year>1900){
+      const age=new Date().getFullYear()-year;
+      if(age>=60) return true;
+      if(year<=1965) return true;
+    }
+  }catch(e){}
+  return false;
+}
+
+async function fetchEmployees(){
+  if(allEmployees.length) return allEmployees;
+  logMsg("⏳ تحميل موظفين_مرتبات مع حساب المعاش...");
+  const res=await fetch(`${API}/api/hafez/employees/public`);
+  const data=await res.json();
+  allEmployees=(data.rows||[]).map(r=>{
+    const retired=isRetired(r.birth, r.name);
+    return {...r, retired};
+  });
+  const retiredCount=allEmployees.filter(e=>e.retired).length;
+  logMsg(`✅ ${allEmployees.length} موظف - معاش/وفاة: ${retiredCount} - نشط: ${allEmployees.length-retiredCount}`);
+  return allEmployees;
+}
+
+async function loadAllTypes(){
+  const res=await fetch(`${API}/api/hafez/template-types`);
+  const data=await res.json();
+  let html=`<h4>كل القوالب (نشط فقط بدون معاش)</h4><table><tr><th>نوع_الحافز</th><th>عدد نشط</th></tr>`;
+  (data.rows||[]).forEach(r=> html+=`<tr><td>${r.type}</td><td>${r.cnt}</td></tr>`);
+  html+=`</table>`;
+  document.getElementById('preview').innerHTML=html;
+}
+
+async function loadTemplate(){
+  const type=getType();
+  if(!type){ alert('اختر النوع'); return; }
+  const res=await fetch(`${API}/api/hafez/template-order?type=${encodeURIComponent(type)}`);
+  const data=await res.json();
+  if(!data.ok){ logMsg(data.msg); return; }
+  // فلترة معاش
+  await fetchEmployees();
+  let activeRows=data.rows.filter(r=>{
+    const emp=allEmployees.find(e=>String(e.code)===String(r.code));
+    return emp ? !emp.retired : true;
+  });
+  const retiredInTemplate=data.rows.length-activeRows.length;
+  let html=`<h4>قالب: ${type} - الكل ${data.count} - نشط ${activeRows.length} - مستبعد معاش ${retiredInTemplate}</h4>`;
+  html+=`<table><tr><th>نوع_الحافز</th><th>كود</th><th>ترتيب</th><th>المحطة</th><th>اسم</th><th>حالة</th></tr>`;
+  activeRows.forEach(r=>{
+    html+=`<tr><td>${type}</td><td>${r.code}</td><td>${r.tartib}</td><td>${r.station||r.mahatta||''}</td><td>${r.name||''}</td><td>نشط ✅</td></tr>`;
+  });
+  html+=`</table>`;
+  if(retiredInTemplate>0) html+=`<p style="color:red">⛔ تم استبعاد ${retiredInTemplate} موظف معاش/وفاة من العرض</p>`;
+  document.getElementById('preview').innerHTML=html;
+  logMsg(`قالب ${type}: الكل ${data.count} - نشط ${activeRows.length} - معاش مستبعد ${retiredInTemplate}`);
+}
+
+async function deleteTemplate(){
+  const type=getType();
+  if(!type || !confirm(`حذف قالب ${type}؟`)) return;
+  const res=await fetch(`${API}/api/hafez/delete-template`,{method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({type})});
+  const data=await res.json();
+  logMsg(data.msg);
+  loadAllTypes();
+}
+
+async function parseAndPreview(){
+  await fetchEmployees();
+  const type=getType();
+  if(!type){ alert('اختر نوع_الحافز'); return; }
+  const file=document.getElementById('fileInput').files[0];
+  if(!file){ alert('اختر ملف'); return; }
+  const buf=await file.arrayBuffer();
+  const wb=XLSX.read(buf);
+  const ws=wb.Sheets[wb.SheetNames[0]];
+  const rows=XLSX.utils.sheet_to_json(ws, {header:1});
+
+  parsedOrders=[];
+  let retiredSkipped=[];
+  let notFound=[];
+  rows.forEach((row, idx)=>{
+    if(idx===0){
+      const first=String(row[0]||'').toLowerCase();
+      if(first.includes('كود')||first.includes('code')||first.includes('موظف')) return;
+    }
+    if(!row[0]) return;
+    const code=String(row[0]).trim().replace(/\.0$/,'');
+    if(!code || !/^\d+$/.test(code)) return;
+    let tartib=row[1]!==undefined && row[1]!=='' ? parseInt(row[1]) : parsedOrders.length+1;
+    if(isNaN(tartib)) tartib=parsedOrders.length+1;
+
+    const emp=allEmployees.find(e=> String(e.code)===code);
+    if(!emp){
+      notFound.push(code);
+      parsedOrders.push({code, order:tartib, station:'', name:'(غير موجود)', type, retired:false});
+      return;
+    }
+    if(emp.retired){
+      retiredSkipped.push(`${code} - ${emp.name} (${emp.birth})`);
+      return; // لا تضيف معاش
+    }
+    parsedOrders.push({code, order:tartib, station: emp.station||'', name: emp.name, type, retired:false});
+  });
+
+  parsedOrders.sort((a,b)=> a.order - b.order);
+  parsedOrders.forEach((o,i)=> o.order=i+1); // إعادة ترقيم تسلسلي بدون فجوات بعد استبعاد المعاش
+
+  let html=`<h4>معاينة: ${type} - ${parsedOrders.length} موظف نشط فقط (تم استبعاد ${retiredSkipped.length} معاش/وفاة)</h4>`;
+  if(retiredSkipped.length) html+=`<p style="color:red; font-size:12px">⛔ مستبعد معاش/وفاة:<br>${retiredSkipped.slice(0,30).join('<br>')}</p>`;
+  if(notFound.length) html+=`<p style="color:orange; font-size:12px">⚠️ غير موجود في موظفين_مرتبات: ${notFound.slice(0,20).join(', ')}</p>`;
+  html+=`<table><tr><th>نوع_الحافز</th><th>كود_الموظف</th><th>ترتيب</th><th>المحطة (أوتوماتيك)</th><th>اسم</th></tr>`;
+  parsedOrders.forEach(o=>{
+    html+=`<tr><td>${o.type}</td><td>${o.code}</td><td>${o.order}</td><td>${o.station}</td><td>${o.name}</td></tr>`;
+  });
+  html+=`</table>`;
+  document.getElementById('preview').innerHTML=html;
+  document.getElementById('btnSave').style.display='inline-block';
+  logMsg(`✅ معاينة: نشط ${parsedOrders.length} - مستبعد معاش ${retiredSkipped.length} - غير موجود ${notFound.length}`);
+}
+
+async function saveToDB(){
+  const type=getType();
+  if(!type || !parsedOrders.length){ alert('لا يوجد بيانات'); return; }
+  if(!confirm(`حفظ ${parsedOrders.length} موظف نشط فقط (بدون معاش/وفاة) كقالب ${type}؟`)) return;
+  const payload={type, replace:true, orders: parsedOrders.map(o=>({code:o.code, order:o.order, station:o.station}))};
+  const res=await fetch(`${API}/api/hafez/save-template-order`,{method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
+  const text=await res.text();
+  let data; try{ data=JSON.parse(text); }catch{ logMsg(`❌ Worker قديم: ${text.slice(0,300)}`); return; }
+  if(data.ok){ logMsg(`✅ ${data.msg} - نشط فقط بدون معاش`); alert(`تم حفظ ${data.saved} موظف نشط فقط - تم استبعاد المعاش/وفاة تلقائياً`); loadAllTypes(); }
+  else logMsg(`❌ ${data.msg}`);
+}
+</script>
+</body>
+</html>
