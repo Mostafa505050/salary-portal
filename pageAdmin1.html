@@ -1,6 +1,25 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+  <script>
+(async()=>{
+  const page = location.pathname.split('/').pop() || 'index.html';
+  const LS_KEY = 'salary_portal_page_status';
+  const TURSO_API = 'https://turso-api.mostafa-voic77729.workers.dev/api/turso';
+  function block(src){
+    document.documentElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f8f9fb;font-family:Tajawal"><div style="text-align:center;background:white;padding:40px;border-radius:16px;border:1px solid #e2e8f0;box-shadow:0 4px 12px rgba(0,0,0,0.05)"><div style="font-size:48px">⛔</div><h2>الصفحة معطلة</h2><p>تم إلغاء تفعيل '+page+' من لوحة التحكم ('+src+')</p></div></div>';
+  }
+  try{
+    const local = JSON.parse(localStorage.getItem(LS_KEY)||'{}');
+    if(local[page] && local[page].enabled===false){ block('localStorage'); return; }
+    const res = await fetch(TURSO_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sql: `SELECT "مفعلة" FROM "صفحات_الموقع" WHERE "اسم_الصفحة"='${page}'`})});
+    const data = await res.json();
+    let rows = data.rows || []; 
+    if(data.results){ const cols=data.results[0].response.result.cols.map(c=>c.name); rows=data.results[0].response.result.rows.map(r=>{let o={}; r.forEach((c,i)=>{o[cols[i]]=c.value}); return o;}); }
+    if(rows[0] && rows[0]["مفعلة"]==0) block('Turso DB');
+  }catch(e){}
+})();
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>لوحة المدير - Admin</title>
