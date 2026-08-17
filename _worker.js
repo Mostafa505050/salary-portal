@@ -54,7 +54,7 @@ export default {
       if (shouldBlock) {
         return new Response(`<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>معطلة</title></head><body><div style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f8f9fb;font-family:Tajawal;direction:rtl"><div style="text-align:center;background:white;padding:40px;border-radius:16px;border:1px solid #e2e8f0;max-width:400px"><div style="font-size:48px">⛔</div><h2>الصفحة معطلة</h2><p>${pageName}</p><a href="/database-manager-FIXED.html" style="padding:8px 16px;background:#0f172a;color:white;border-radius:8px;text-decoration:none;display:inline-block;margin-top:12px">لوحة التحكم</a></div></div></body></html>`, {
           status: 403,
-          headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache, no-store, must-revalidate' }
+          headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache, no-store, must-revalidate', 'X-Worker-Active': 'v2', 'X-Guard-Injected': 'true' }
         });
       }
     }
@@ -79,7 +79,7 @@ export default {
       }
       return new Response(html, {
         status: response.status,
-        headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache, no-store, must-revalidate' }
+        headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache, no-store, must-revalidate', 'X-Worker-Active': 'v2', 'X-Guard-Injected': 'true' }
       });
     }
 
