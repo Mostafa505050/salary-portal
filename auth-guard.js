@@ -237,7 +237,44 @@
         window.location.href = CONFIG.LOGIN_ROUTING_PAGE;
       }
     }, 3000);
-    
+    // 🔒 مسح تلقائي عند غلق الصفحة / التاب - لازم يدخل من index مرة أخرى
+window.addEventListener('pagehide', function(){
+  localStorage.clear();
+  sessionStorage.clear();
+});
+
+// للـ Desktop - عند غلق المتصفح
+window.addEventListener('beforeunload', function(){
+  // يمسح فقط لو الصفحة هتتقفل، لكن sessionStorage يحافظ على الـ refresh
+  // لذلك ننقل التوكن لـ sessionStorage مؤقتاً
+  try {
+    const token = localStorage.getItem('secure_token');
+    const user = localStorage.getItem('logged_user');
+    const entry = localStorage.getItem('entry_via_index');
+    if(token){
+      sessionStorage.setItem('secure_token', token);
+      sessionStorage.setItem('logged_user', user);
+      sessionStorage.setItem('entry_via_index', entry);
+    }
+  } catch(e){}
+});
+
+// عند فتح الصفحة - لو كان refresh رجّع البيانات، لو كان غلق تاب جديد هتكون فاضية
+(function restoreOnReload(){
+  try{
+    if(!localStorage.getItem('secure_token') && sessionStorage.getItem('secure_token')){
+      // هذا refresh وليس غلق - رجّع البيانات
+      localStorage.setItem('secure_token', sessionStorage.getItem('secure_token'));
+      localStorage.setItem('logged_user', sessionStorage.getItem('logged_user'));
+      localStorage.setItem('entry_via_index', sessionStorage.getItem('entry_via_index'));
+    } else if(!localStorage.getItem('secure_token')) {
+      // غلق فعلي - يبقى فاضي ويمنع الدخول
+      console.log('🔒 تم مسح الجلسة عند غلق الصفحة - يجب الدخول من index');
+    }
+    // مسح الـ sessionStorage المؤقت بعد ثانية
+    setTimeout(()=>{ sessionStorage.clear(); }, 1000);
+  }catch(e){}
+})();
     // منع تحميل باقي الصفحة
     window.stop && window.stop();
     throw new Error('Access blocked by auth-guard');
