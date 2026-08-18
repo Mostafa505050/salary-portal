@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة المدير - Admin - بيج غامق</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+<!-- 1- كود حماية التوكن -->
+<script>
+  (function(){
+    const token = localStorage.getItem('secure_token');
+    if(!token){
+      alert('يجب تسجيل الدخول أولا');
+      window.location.href='login_secure.html';
+    }
+  })();
+</script>
+
+<!-- 2- كود حماية من المستخدمين العاديين - فقط Admin -->
+<script>
+  (function(){
+    try{
+      const userStr = localStorage.getItem('logged_user');
+      if(!userStr){
+        window.location.href='login.html';
+        return;
+      }
+      const user = JSON.parse(userStr);
+      const role = (user.role || user.type || '').toLowerCase();
+      if(role !== 'admin'){
+        alert('هذه الصفحة للمدير فقط');
+        window.location.href='pageUser1.html';
+      }
+    }catch(e){
+      console.error('خطأ في التحقق من الصلاحية', e);
+      window.location.href='login.html';
+    }
+  })();
+</script>
+
+<style>
+  *{font-family:'Cairo',sans-serif}
+  /* تغيير لون الصفحة الى بيج غامق مع نص واضح */
+  body{
+    background: #8b7a62;
+    background-image: 
+      radial-gradient(800px 400px at 20% 10%, rgba(255,251,243,0.28), transparent 60%),
+      radial-gradient(600px 400px at 90% 80%, rgba(60,50,35,0.28), transparent 60%);
+    color:#3a2f24;
+    min-height:100vh;
+  }
+  .glass{
+    background: linear-gradient(180deg, rgba(255,251,243,0.55), rgba(255,251,243,0.22));
+    backdrop-filter:blur(20px);
+    border:1px solid rgba(120,100,80,0.25);
+  }
+  .glass-dark{
+    background: linear-gradient(180deg, rgba(60,50,35,0.85), rgba(60,50,35,0.65));
+    backdrop-filter:blur(20px);
+    border:1px solid rgba(120,100,80,0.35);
+    color:#fdf8ef;
+  }
+  
+  /* Scrollbar بيج */
+  html{scrollbar-width:thin;scrollbar-color:rgba(122,102,82,.6) rgba(255,251,243,0.2)}
+  html::-webkit-scrollbar{width:8px;height:8px}
+  html::-webkit-scrollbar-track{background:rgba(255,251,243,0.2);border-radius:10px}
+  html::-webkit-scrollbar-thumb{background:linear-gradient(180deg,rgba(122,102,82,.8),rgba(90,77,61,.7));border-radius:10px;border:1px solid rgba(255,255,255,.2)}
+  html::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,rgba(122,102,82,1),rgba(90,77,61,.9))}
+
+  body::-webkit-scrollbar{width:8px}
+  body::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#7a6652,#4a3f32);border-radius:10px}
+
+  .custom-scroll{overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:rgba(122,102,82,.5) transparent}
+  .custom-scroll::-webkit-scrollbar{width:6px}
+  .custom-scroll::-webkit-scrollbar-track{background:transparent;margin:10px 0}
+  .custom-scroll::-webkit-scrollbar-thumb{background:linear-gradient(180deg,rgba(122,102,82,.7),rgba(90,77,61,.6));border-radius:20px;border:1px solid rgba(255,255,255,.1)}
+  .custom-scroll::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,rgba(122,102,82,1),rgba(90,77,61,.9))}
+
+  #main{overflow-y:auto;max-height:100vh;scrollbar-width:thin;scrollbar-color:rgba(122,102,82,.4) transparent}
+  #main::-webkit-scrollbar{width:8px}
+  #main::-webkit-scrollbar-track{background:rgba(255,251,243,.15);border-radius:10px}
+  #main::-webkit-scrollbar-thumb{background:linear-gradient(180deg,rgba(122,102,82,.6),rgba(122,102,82,.3));border-radius:10px}
+
+  /* Sidebar قابلة للطي - بيج */
+  #sidebar{width:280px;min-width:280px;flex-shrink:0;transition:all .35s cubic-bezier(.4,0,.2,1)}
+  #sidebar.collapsed{width:88px;min-width:88px}
+  #sidebar.collapsed .label-text, #sidebar.collapsed .title-text, #sidebar.collapsed .section-title{display:none}
+  #sidebar.collapsed .link{justify-content:center;padding:12px}
+  #sidebar.collapsed .logo-box{margin:auto}
+
+  /* 3D Cards - بيج غامق مع نص واضح */
+  .card-3d{
+    position:relative;
+    background:linear-gradient(145deg, rgba(255,251,243,0.72), rgba(255,251,243,0.35));
+    border:1px solid rgba(120,100,80,0.22);
+    border-right:4px solid #7a6652;
+    border-radius:16px;
+    padding:14px;
+    transform-style:preserve-3d;
+    transition:all .4s cubic-bezier(.175,.885,.32,1.275);
+    cursor:pointer;
+    overflow:hidden;
+    box-shadow: 0 6px 0 rgba(60,50,35,0.15), 0 12px 24px rgba(60,50,35,0.12);
+    color:#3a2f24;
+  }
+  .card-3d::before{
+    content:'';position:absolute;inset:0;
+    background:radial-gradient(600px 300px at var(--x,50%) var(--y,50%), rgba(122,102,82,0.18), transparent 40%);
+    opacity:0;transition:.4s;
+  }
+  .card-3d:hover{
+    transform:translateY(-6px) rotateX(4deg) rotateY(-4deg) scale(1.02);
+    box-shadow:0 18px 36px rgba(60,50,35,.25), 0 0 0 1px rgba(122,102,82,.25), 0 10px 24px rgba(122,102,82,.18);
+    border-color:rgba(122,102,82,.35);
+    border-right-color:#4a3f32;
+  }
+  .card-3d:hover::before{opacity:1}
+  .card-3d .icon-box{
+    width:42px;height:42px;border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:20px;
+    background:linear-gradient(135deg,rgba(122,102,82,.22),rgba(90,77,61,.18));
+    border:1px solid rgba(120,100,80,.18);
+    transform:translateZ(20px);
+  }
+  .card-3d h3{color:#2c241c}
+  .card-3d p{color:rgba(58,47,36,0.7)}
+
+  /* موبايل: القائمة اسفل الشاشة ثلاثية الابعاد */
+  @media(max-width:768px){
+    #sidebar{
+      position:fixed !important;
+      bottom:0 !important;
+      top:auto !important;
+      left:0 !important;
+      right:0 !important;
+      width:100% !important;
+      min-width:100% !important;
+      height:78px !important;
+      z-index:100 !important;
+      background: linear-gradient(180deg, rgba(255,251,243,0.92), rgba(255,251,243,0.78)) !important;
+      backdrop-filter: blur(22px) !important;
+      border-top: 2px solid rgba(122,102,82,0.28) !important;
+      border-left:none !important;
+      border-right:none !important;
+      border-bottom:none !important;
+      padding:6px 8px !important;
+      border-radius:18px 18px 0 0 !important;
+      box-shadow: 0 -8px 30px rgba(60,50,35,0.22), 0 -2px 0 rgba(60,50,35,0.15) inset !important;
+      transform: translateX(0) !important;
+      display:flex !important;
+    }
+    #sidebar.collapsed{
+      width:100% !important;
+      min-width:100% !important;
+    }
+    #sidebar .glass{
+      flex-direction:row !important;
+      height:100% !important;
+      width:100% !important;
+      padding:4px !important;
+      border-radius:14px !important;
+      background: transparent !important;
+      border:none !important;
+      box-shadow:none !important;
+      backdrop-filter:none !important;
+      overflow:hidden !important;
+    }
+    #sidebar .glass > .text-center,
+    #sidebar .glass > #toggleSidebar,
+    #sidebar .glass > .mt-4{
+      display:none !important;
+    }
+    #sidebar.collapsed .label-text, 
+    #sidebar.collapsed .title-text, 
+    #sidebar.collapsed .section-title{display:flex !important}
+
+    #navLinks{
+      display:flex !important;
+      flex-direction:row !important;
+      overflow-x:auto !important;
+      overflow-y:hidden !important;
+      gap:6px !important;
+      width:100% !important;
+      height:100% !important;
+      align-items:center !important;
+      justify-content:flex-start !important;
+      padding:0 4px !important;
+      scrollbar-width:none !important;
+    }
+    #navLinks::-webkit-scrollbar{display:none !important}
+
+    #navLinks .link{
+      flex-direction:column !important;
+      padding:6px 8px !important;
+      font-size:9px !important;
+      min-width:58px !important;
+      max-width:68px !important;
+      height:58px !important;
+      justify-content:center !important;
+      align-items:center !important;
+      border-radius:12px !important;
+      background: linear-gradient(180deg, rgba(255,251,243,0.9), rgba(255,251,243,0.55)) !important;
+      border:1px solid rgba(120,100,80,0.22) !important;
+      border-bottom:3px solid rgba(90,77,61,0.25) !important;
+      color:#4a3f32 !important;
+      font-weight:800 !important;
+      transform-style: preserve-3d !important;
+      box-shadow: 0 4px 0 rgba(60,50,35,0.12), 0 6px 12px rgba(60,50,35,0.1) !important;
+      transition: all .2s cubic-bezier(.175,.885,.32,1.275) !important;
+      gap:2px !important;
+      white-space:nowrap !important;
+      flex-shrink:0 !important;
+    }
+    #navLinks .link:hover,
+    #navLinks .link:active{
+      transform: translateY(-3px) translateZ(8px) !important;
+      box-shadow: 0 7px 0 rgba(60,50,35,0.15), 0 10px 18px rgba(60,50,35,0.15) !important;
+      background: linear-gradient(180deg, rgba(255,251,243,1), rgba(255,251,243,0.7)) !important;
+    }
+    #navLinks .link .label-text{
+      display:block !important;
+      font-size:8px !important;
+      line-height:1 !important;
+      margin-top:2px !important;
+    }
+
+    #main{
+      margin-right:0 !important;
+      padding-bottom:90px !important;
+      max-height:none !important;
+    }
+
+    /* البطاقات في صف واحد ثلاثي الابعاد لا تأخذ مساحة كبيرة */
+    .admin-grid{
+      display:flex !important;
+      flex-wrap:nowrap !important;
+      overflow-x:auto !important;
+      overflow-y:hidden !important;
+      gap:10px !important;
+      padding:6px 4px 14px 4px !important;
+      scroll-snap-type:x mandatory !important;
+      -webkit-overflow-scrolling:touch !important;
+      scrollbar-width:none !important;
+    }
+    .admin-grid::-webkit-scrollbar{display:none !important}
+    .admin-grid .card-3d{
+      min-width:150px !important;
+      max-width:160px !important;
+      height:105px !important;
+      flex-shrink:0 !important;
+      scroll-snap-align:start !important;
+      padding:10px !important;
+      border-radius:14px !important;
+      border-right:3px solid #7a6652 !important;
+      box-shadow: 0 4px 0 rgba(60,50,35,0.14), 0 8px 16px rgba(60,50,35,0.12) !important;
+    }
+    .admin-grid .card-3d .icon-box{
+      width:30px !important;
+      height:30px !important;
+      font-size:14px !important;
+      border-radius:8px !important;
+    }
+    .admin-grid .card-3d h3{
+      font-size:10px !important;
+      margin-top:6px !important;
+      line-height:1.2 !important;
+      white-space:nowrap !important;
+      overflow:hidden !important;
+      text-overflow:ellipsis !important;
+    }
+    .admin-grid .card-3d p{
+      font-size:8.5px !important;
+      margin-top:3px !important;
+      line-height:1.2 !important;
+      display:-webkit-box !important;
+      -webkit-line-clamp:2 !important;
+      -webkit-box-orient:vertical !important;
+      overflow:hidden !important;
+      height:20px !important;
+    }
+    .admin-grid .card-3d .mt-2{
+      font-size:8px !important;
+      margin-top:4px !important;
+    }
+  }
+</style>
+</head>
+<body class="flex min-h-screen gap-0">
+
+<!-- Sidebar - قابلة للطي ومتائمة مع الهاتف -->
+<aside id="sidebar" class="bg-[#fdf8ef]/70 border-l border-[#c9b99f]/30 p-4 flex flex-col shadow-[0_0_30px_rgba(60,50,35,0.12)]">
+  <div class="glass rounded-[20px] p-4 flex flex-col h-full custom-scroll">
+    <div class="text-center py-3 border-b border-[#c9b99f]/20 mb-4">
+      <div class="logo-box w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br from-[#7a6652] to-[#4a3f32] flex items-center justify-center text-xl shadow-lg border border-white/20">👑</div>
+      <h2 id="adminPanelTitle" class="title-text text-[14px] font-black mt-2 text-[#3a2f24]">لوحة المدير</h2>
+      <div id="adminNameBadge" class="title-text mt-2 inline-flex px-3 py-1 rounded-full bg-[#7a6652]/15 border border-[#7a6652]/20 text-[10px] text-[#4a3f32] font-bold">🛡 Admin Panel</div>
+    </div>
+
+    <button id="toggleSidebar" class="w-full mb-4 h-10 rounded-xl bg-[#7a6652]/10 border border-[#7a6652]/20 text-[12px] text-[#4a3f32] font-bold hover:bg-[#7a6652]/20 flex items-center justify-center gap-2 transition">
+      <span class="label-text">طي القائمة</span><span>◀</span>
+    </button>
+
+    <nav class="flex-1 space-y-1.5" id="navLinks">
+      <a href="index.html" class="link flex gap-3 px-4 py-3 rounded-xl text-[13px] font-semibold text-[#4a3f32]/70 hover:bg-[#7a6652]/10 hover:text-[#2c241c] transition">🏡 <span class="label-text">الصفحة الرئيسية</span></a>
+      <a href="#" class="link flex gap-3 px-4 py-3 rounded-xl text-[13px] font-semibold bg-[#7a6652]/15 border border-[#7a6652]/25 text-[#2c241c]">👑 <span class="label-text">لوحة المدير</span></a>
+      <a href="tables.html" class="link flex gap-3 px-4 py-3 rounded-xl text-[13px] font-semibold text-[#4a3f32]/70 hover:bg-white/60 transition">🗂 <span class="label-text">إنشاء الجداول</span></a>
+      <a href="employees.html" class="link flex gap-3 px-4 py-3 rounded-xl text-[13px] font-semibold text-[#4a3f32]/70 hover:bg-white/60 transition">👨🏻💼 <span class="label-text">بيانات موظفين</span></a>
+      <a href="salary.html" class="link flex gap-3 px-4 py-3 rounded-xl text-[13px] font-semibold text-[#4a3f32]/70 hover:bg-white/60 transition">📃 <span class="label-text">مفردات مرتب</span></a>
+      <a href="hafez.html" class="link flex gap-3 px-4 py-3 rounded-xl text-[13px] font-semibold text-[#4a3f32]/70 hover:bg-white/60 transition">💵 <span class="label-text">إنشاء حافز</span></a>
+    </nav>
+
+    <div class="mt-4 pt-4 border-t border-[#c9b99f]/20">
+      <p class="section-title text-[10px] text-[#7a6652]/60 mb-2 px-2">Token محمي</p>
+      <div class="section-title glass rounded-xl p-2 text-[10px] text-[#4a3f32]/70 border border-[#c9b99f]/20">🔒 الجلسة آمنة - <span id="sidebarUserName">Admin</span></div>
+    </div>
+  </div>
+</aside>
+
+<!-- Main -->
+<div id="main" class="flex-1 flex flex-col min-w-0 w-full" style="margin-right:0">
+
+  <header class="h-[70px] glass sticky top-0 z-30 m-4 rounded-[18px] px-6 flex items-center justify-between shadow-[0_8px_24px_rgba(60,50,35,0.12)] border-r-[5px] border-r-[#7a6652]">
+    <div class="flex items-center gap-3">
+      <button id="mobileMenuBtn" class="md:hidden w-10 h-10 rounded-xl bg-[#7a6652]/15 border border-[#7a6652]/20 text-[#4a3f32] font-bold">☰</button>
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#7a6652] to-[#4a3f32] flex items-center justify-center text-white shadow-md">👤</div>
+      <div>
+        <h1 id="welcomeText" class="font-black text-[16px] text-[#2c241c]">مرحبا Admin</h1>
+        <p class="text-[11px] text-[#7a6652]">تم تسجيل الدخول بنجاح - <span id="welcomeRole">Admin</span></p>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#7a6652]/10 border border-[#7a6652]/20 text-[11px] text-[#4a3f32] font-bold">🟢 متصل</div>
+      <button onclick="logout()" class="h-10 px-5 rounded-xl bg-red-500/10 border border-red-500/20 text-[13px] text-red-700 font-bold hover:bg-red-500/20 transition">🚪 تسجيل الخروج</button>
+    </div>
+  </header>
+
+  <main class="p-4 md:p-8">
+    <div class="mb-6 glass rounded-[16px] p-4 border-r-[4px] border-r-[#7a6652]">
+      <h2 class="text-[20px] font-black text-[#2c241c]">الخدمات الإدارية</h2>
+      <p class="text-[12px] text-[#7a6652] mt-1 font-bold">11 خدمة رئيسية - كروت ثلاثية الأبعاد - تصميم بيج غامق</p>
+    </div>
+
+    <div class="admin-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+
+      <div class="card-3d group" onclick="location.href='my_data.html'">
+        <div class="icon-box group-hover:scale-110 transition">👤</div>
+        <h3 class="font-bold mt-3 text-[12.5px]">البيانات الشخصية</h3>
+        <p class="text-[10px] mt-1 leading-4 line-clamp-2">عرض وتعديل بياناتك الأساسية والوظيفية</p>
+        <div class="mt-2 text-[9px] text-[#7a6652] font-bold">فتح ←</div>
+      </div>
+
+      <div class="card-3d group" onclick="location.href='family.html'">
+        <div class="icon-box">🏥</div>
+        <h3 class="font-bold mt-3 text-[12.5px]">العلاج الاسرى</h3>
+        <p class="text-[11px] mt-1">إدارة ملف العلاج الاسرى والتحويلات</p>
+        <div class="mt-2 text-[9px] text-[#7a6652] font-bold">فتح ←</div>
+      </div>
+
+      <div class="card-3d group" onclick="location.href='pageelawat.html'">
+        <div class="icon-box">⭐</div>
+        <h3 class="font-bold mt-3 text-[12.5px]">العلاوات الدورية</h3>
+        <p class="text-[11px] mt-1">حساب ومتابعة العلاوات السنوية والدورية</p>
+        <div class="mt-2 text-[9px] text-[#7a6652] font-bold">فتح ←</div>
+      </div>
+
+      <div class="card-3d group" onclick="location.href='pagechangesalaey.html'">
+        <div class="icon-box">📊</div>
+        <h3 class="font-bold mt-3 text-[12.5px]">التقارير الشهرية</h3>
+        <p class="text-[11px] mt-1">تقارير الأداء والمتغيرات الشهرية</p>
+        <div class="mt-2 text-[9px] text-[#7a6652] font-bold">فتح ←</div>
+      </div>
+
+      <div class="card-3d group" onclick="location.href='salary_log.html'">
+        <div class="icon-box">📒</div>
+        <h3 class="font-bold mt-3 text-[12.5px]">سجل المرتبات</h3>
+        <p class="text-[11px] mt-1">أرشيف كامل لكل مرتباتك السابقة</p>
+        <div class="mt-2 text-[9px] text-[#7a6652] font-bold">فتح ←</div>
+      </div>
+
+      <div class="card-3d group" onclick="location.href='salary.html'">
+        <div class="icon-box">💰</div>
+        <h3 class="font-bold mt-3 text-[12.5px]">مفردات المرتب</h3>
+        <p class="text-[11px] mt-1">تفاصيل مفردات المرتب والاستقطاعات</p>
+        <div class="mt-2 text-[9px] text-[#7a6652] font-bold">فتح ←</div>
+      </div>
+
+      <div class="card-3d group" onclick="location.href='tadarg.html'">
+        <div class="icon-box">📈</div>
+        <h3 class="font-bold mt-3 text-[12.5px]">تدرج المرتب</h3>
+        <p class="text-[11px] mt-1">تتبع تطور مرتبك عبر السنوات</p>
+        <div class="mt-2 text-[9px] text-[#7a6652] font-bold">فتح ←</div>
+      </div>
+
+      <div class="card-3d group" onclick="location.href='hafez.html'">
+        <div class="icon-box">🎁</div>
+        <h3 class="font-bold mt-3 text-[12.5px]">الحوافز الشهرية</h3>
+        <p class="text-[11px] mt-1">حوافز الأداء والمكافآت الشهرية</p>
+        <div class="mt-2 text-[9px] text-[#7a6652] font-bold">فتح ←</div>
+      </div>
+
+      <div class="card-3d group" onclick="location.href='wardy.html'">
+        <div class="icon-box">🔄</div>
+        <h3 class="font-bold mt-3 text-[12.5px]">فروقات بدل الورادى</h3>
+        <p class="text-[11px] mt-1">حساب فروقات الورديات الإضافية</p>
+        <div class="mt-2 text-[9px] text-[#7a6652] font-bold">فتح ←</div>
+      </div>
+
+      <div class="card-3d group" onclick="location.href='retire.html'">
+        <div class="icon-box">👴</div>
+        <h3 class="font-bold mt-3 text-[12.5px]">المحاليين للمعاش</h3>
+        <p class="text-[11px] mt-1">قائمة الموظفين المحالين للتقاعد</p>
+        <div class="mt-2 text-[9px] text-[#7a6652] font-bold">فتح ←</div>
+      </div>
+
+      <div class="card-3d group" onclick="location.href='phone.html'">
+        <div class="icon-box">📱</div>
+        <h3 class="font-bold mt-3 text-[12.5px]">تعديل رقم الهاتف</h3>
+        <p class="text-[11px] mt-1">تحديث أرقام التواصل الخاصة بك</p>
+        <div class="mt-2 text-[9px] text-[#7a6652] font-bold">فتح ←</div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="sidebar_admin.js"></script>
+
+<script>
+  // قراءة اسم العامل من index - logged_user - وعرضه بدلا من Admin
+  try{
+    const u = JSON.parse(localStorage.getItem('logged_user')||'{}');
+    const name = u.name || u.full_name || u["اسم_العامل"] || u["الاسم"] || u.username || u.cardNumber || 'Admin';
+    const role = u.role || u.type || 'Admin';
+    
+    // مرحبا + اسم العامل
+    const welcomeEl = document.getElementById('welcomeText');
+    if(welcomeEl){
+      welcomeEl.textContent = `مرحبا ${name}`;
+      welcomeEl.style.color = '#2c241c';
+    }
+    const roleEl = document.getElementById('welcomeRole');
+    if(roleEl) roleEl.textContent = role;
+
+    // لوحة المدير - اسم العامل
+    const panelTitle = document.getElementById('adminPanelTitle');
+    if(panelTitle){
+      panelTitle.innerHTML = `لوحة المدير<br><span style="font-size:11px;color:#7a6652;font-weight:800">${name}</span>`;
+    }
+    const badge = document.getElementById('adminNameBadge');
+    if(badge){
+      badge.textContent = `👤 ${name} - ${role}`;
+    }
+    const sidebarName = document.getElementById('sidebarUserName');
+    if(sidebarName) sidebarName.textContent = name;
+
+  }catch(e){ console.log('name error', e); }
+
+  // تأثير 3D يتبع الماوس - مع لون بيج
+  document.querySelectorAll('.card-3d').forEach(card=>{
+    card.addEventListener('mousemove', (e)=>{
+      const rect = card.getBoundingClientRect();
+      const x = ((e.clientX - rect.left)/rect.width)*100;
+      const y = ((e.clientY - rect.top)/rect.height)*100;
+      card.style.setProperty('--x', x+'%');
+      card.style.setProperty('--y', y+'%');
+    });
+  });
+
+  // طي القائمة - يشتغل على الديسكتوب والموبايل
+  const sidebar = document.getElementById('sidebar');
+  const toggleBtn = document.getElementById('toggleSidebar');
+  const mobileBtn = document.getElementById('mobileMenuBtn');
+  
+  if(toggleBtn){
+    toggleBtn.addEventListener('click', ()=>{
+      if(window.innerWidth <= 768){
+        // في الموبايل: إظهار/إخفاء القائمة السفلية
+        sidebar.style.display = sidebar.style.display === 'none' ? 'flex' : 'none';
+      }else{
+        sidebar.classList.toggle('collapsed');
+      }
+    });
+  }
+  if(mobileBtn){
+    mobileBtn.addEventListener('click', ()=>{
+      sidebar.style.display = sidebar.style.display === 'none' ? 'flex' : 'flex';
+      sidebar.style.transform = 'translateX(0)';
+      sidebar.classList.remove('collapsed');
+      // في الموبايل القائمة السفلية دائما ظاهرة
+      if(window.innerWidth <= 768){
+        sidebar.style.display = 'flex';
+      }
+    });
+  }
+
+  function logout(){
+    localStorage.clear();
+    window.location.href='login.html';
+  }
+
+  // تأكد أن القائمة السفلية ظاهرة في الموبايل عند التحميل
+  if(window.innerWidth <= 768){
+    sidebar.style.display='flex';
+  }
+</script>
+</body>
+</html>
