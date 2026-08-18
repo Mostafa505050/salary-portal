@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تسجيل دخول - نظام التوجيه - توجيه_المستخدمين</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;font-family:'Cairo',Tahoma;margin:0;padding:0}
+body{
+  background: #8b7a62;
+  background-image: 
+    radial-gradient(900px 500px at 20% 10%, rgba(255,251,243,0.30), transparent 60%),
+    radial-gradient(700px 500px at 80% 85%, rgba(60,50,35,0.30), transparent 60%),
+    radial-gradient(500px 400px at 50% 40%, rgba(255,251,243,0.15), transparent 70%);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:14px;
+  color:#3a2f24;
+}
+.top-strip{
+  width:100%;max-width:480px;
+  background: linear-gradient(180deg, rgba(255,251,243,0.62), rgba(255,251,243,0.28));
+  backdrop-filter:blur(20px);
+  border:1px solid rgba(120,100,80,0.22);
+  border-right:6px solid #7a6652;
+  border-radius:16px;
+  padding:12px 16px;
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:16px;
+  box-shadow:0 8px 0 rgba(60,50,35,0.12), 0 16px 32px rgba(60,50,35,0.14);
+}
+.login-card{
+  width:100%;max-width:480px;
+  background: linear-gradient(145deg, rgba(255,251,243,0.82), rgba(255,251,243,0.38));
+  backdrop-filter:blur(22px);
+  border:1px solid rgba(120,100,80,0.22);
+  border-right:6px solid #7a6652;
+  border-bottom:6px solid rgba(60,50,35,0.15);
+  border-radius:20px;
+  padding:22px 20px;
+  box-shadow:0 14px 0 rgba(60,50,35,0.13), 0 28px 60px rgba(60,50,35,0.18);
+  transform-style:preserve-3d;
+  transition:.4s;
+}
+.login-card:hover{transform:translateY(-4px) rotateX(2deg) rotateY(-2deg); box-shadow:0 18px 0 rgba(60,50,35,0.13), 0 36px 70px rgba(60,50,35,0.20);}
+.input-3d{
+  width:100%;padding:12px 14px;border-radius:12px;
+  border:1.5px solid rgba(120,100,80,0.24);
+  background:rgba(255,251,243,0.88);
+  color:#2c241c;font-size:14px;font-weight:800;outline:none;
+  box-shadow:0 4px 0 rgba(60,50,35,0.08) inset, 0 2px 8px rgba(60,50,35,0.06);
+  transition:.2s;
+}
+.input-3d:focus{border-color:#7a6652; background:#fff; box-shadow:0 0 0 3px rgba(122,102,82,0.15), 0 4px 0 rgba(60,50,35,0.08) inset;}
+.label-3d{font-size:11px;font-weight:800;color:#4a3f32;margin-bottom:6px;display:block}
+.btn-3d{
+  width:100%;padding:13px;border-radius:12px;border:none;color:#fff;font-weight:900;cursor:pointer;
+  box-shadow:0 7px 0 rgba(60,50,35,0.22), 0 12px 24px rgba(60,50,35,0.16);
+  transition:.13s;font-size:14px;
+}
+.btn-3d:active{transform:translateY(7px);box-shadow:none}
+.btn-primary{background:linear-gradient(180deg,#7a6652,#4a3f32)}
+.btn-green{background:linear-gradient(180deg,#34d399,#065f46)}
+.btn-back{background:linear-gradient(180deg,#6b5e4d,#3f362b)}
+.status-box{
+  margin-top:12px;padding:10px 12px;border-radius:12px;
+  font-size:11px;font-weight:800;display:none;
+  border:1px solid rgba(120,100,80,0.18);
+}
+.status-box.show{display:block}
+.status-ok{background:linear-gradient(180deg,rgba(220,252,231,0.8),rgba(187,247,208,0.5));border-right:4px solid #10b981;color:#065f46}
+.status-err{background:linear-gradient(180deg,rgba(254,226,226,0.8),rgba(252,165,165,0.4));border-right:4px solid #ef4444;color:#7f1d1d}
+.status-info{background:linear-gradient(180deg,rgba(255,251,243,0.8),rgba(255,251,243,0.4));border-right:4px solid #7a6652;color:#4a3f32}
+.pages-preview{
+  display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;
+}
+.page-chip{
+  padding:4px 8px;border-radius:999px;
+  background:rgba(122,102,82,0.12);border:1px solid rgba(122,102,82,0.22);
+  font-size:9px;font-weight:800;color:#4a3f32;
+}
+.page-chip.allowed{background:linear-gradient(180deg,rgba(52,211,153,0.18),rgba(52,211,153,0.08));border-color:rgba(52,211,153,0.22);color:#065f46}
+.page-chip.denied{background:linear-gradient(180deg,rgba(239,68,68,0.12),rgba(239,68,68,0.06));border-color:rgba(239,68,68,0.18);color:#7f1d1d;text-decoration:line-through}
+.progress{width:100%;height:8px;background:rgba(120,100,80,0.15);border-radius:999px;overflow:hidden;margin:10px 0;display:none}
+.progress-bar{height:100%;background:linear-gradient(90deg,#7a6652,#4a3f32);width:0%;transition:.3s}
+</style>
+</head>
+<body>
+
+<div class="top-strip">
+  <img src="https://upload.wikimedia.org/wikipedia/ar/archive/8/85/20231203193514%21%D8%A7%D9%84%D8%B4%D8%B1%D9%83%D8%A9_%D8%A7%D9%84%D9%82%D8%A7%D8%A8%D8%B6%D8%A9_%D9%84%D9%83%D9%87%D8%B1%D8%A8%D8%A7%D8%A1_%D9%85%D8%B5%D8%B1.png" style="width:42px;height:42px;object-fit:contain;background:#fff;border-radius:10px;padding:3px;border:1px solid #e8ddd0">
+  <div>
+    <b style="font-size:14px;color:#2c241c">تسجيل دخول - نظام التوجيه الذكي</b>
+    <div style="font-size:10px;color:#7a6652;font-weight:700">توجيه_المستخدمين • الكود_البنكى = emptid = كود_العامل • Turso</div>
+  </div>
+</div>
+
+<div class="login-card" id="loginCard">
+  <div style="text-align:center;margin-bottom:16px">
+    <div style="width:64px;height:64px;margin:0 auto 10px;border-radius:16px;background:linear-gradient(135deg,#7a6652,#4a3f32);display:flex;align-items:center;justify-content:center;font-size:28px;color:#fff;box-shadow:0 6px 0 rgba(60,50,35,0.18),0 12px 24px rgba(60,50,35,0.18);transform:translateZ(20px)">🔐</div>
+    <h2 style="font-size:18px;font-weight:900;color:#2c241c">تسجيل الدخول الموجه</h2>
+    <p style="font-size:11px;color:#7a6652;font-weight:700;margin-top:4px">أدخل الرقم القومي 14 رقم - سيتم توجيهك تلقائياً حسب جدول <b>توجيه_المستخدمين</b></p>
+  </div>
+
+  <div style="margin-bottom:12px">
+    <label class="label-3d">🪪 الرقم القومي (14 رقم) *</label>
+    <input id="nationalId" class="input-3d" placeholder="28801082200973" maxlength="14" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+  </div>
+
+  <div style="margin-bottom:14px">
+    <label class="label-3d">🔑 كلمة المرور (اختيارية - لو موجودة في موظفين_مرتبات)</label>
+    <input id="password" class="input-3d" type="password" placeholder="اتركه فارغ لو لا يوجد">
+  </div>
+
+  <div class="progress" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
+
+  <button class="btn-3d btn-primary" onclick="doLogin()" id="loginBtn">🚀 تسجيل دخول وتوجيه تلقائي</button>
+
+  <div style="display:flex;gap:8px;margin-top:10px">
+    <button class="btn-3d btn-back" style="flex:1;font-size:11px;padding:10px" onclick="quickFill('28801082200973')">🧪 تجربة 2880...</button>
+    <button class="btn-3d btn-back" style="flex:1;font-size:11px;padding:10px;background:linear-gradient(180deg,#9c8c7a,#6b5e4d)" onclick="location.href='index.html'">🏠 صفحة الدخول القديمة</button>
+  </div>
+
+  <div id="status" class="status-box"></div>
+
+  <div id="routingInfo" style="display:none;margin-top:14px;background:rgba(255,251,243,0.6);border:1px solid rgba(120,100,80,0.18);border-radius:12px;padding:12px">
+    <div style="font-size:12px;font-weight:900;color:#2c241c">📍 نتيجة التوجيه:</div>
+    <div id="routingDetails" style="font-size:11px;font-weight:700;margin-top:6px;line-height:1.7;color:#4a3f32"></div>
+    <div id="pagesPreview" class="pages-preview"></div>
+    <button id="goBtn" class="btn-3d btn-green" style="margin-top:10px;display:none" onclick="goToDefault()">➡️ الانتقال للصفحة الافتراضية</button>
+  </div>
+
+  <div style="margin-top:14px;padding:8px 10px;background:rgba(122,102,82,0.08);border-radius:10px;border:1px solid rgba(122,102,82,0.15)">
+    <div style="font-size:10px;font-weight:800;color:#4a3f32">💡 كيف يعمل؟</div>
+    <div style="font-size:9px;color:#7a6652;line-height:1.6;margin-top:4px;font-weight:600">
+      1- يبحث في <b>توجيه_المستخدمين</b> بـ <b>الرقم_القومى</b><br>
+      2- لو موجود ومفعلة → يقرأ <b>الصفحة_الافتراضية</b> و <b>الصفحات_المسموحة</b><br>
+      3- يحفظ <b>logged_user + secure_token</b> ويوجهك تلقائياً<br>
+      4- لو مش موجود → يبحث في <b>موظفين_مرتبات</b> ويوجهك حسب <b>الصلاحية</b> (Admin/User)
+    </div>
+  </div>
+</div>
+
+<script>
+const WORKER_BASE_URL = "https://turso-api.mostafa-voic77729.workers.dev";
+let lastRouting = null;
+
+function showStatus(msg, type='info'){
+  const el = document.getElementById('status');
+  el.className = `status-box show status-${type}`;
+  el.innerHTML = msg;
+}
+function setProgress(p, show=true){
+  const wrap = document.getElementById('progressWrap');
+  const bar = document.getElementById('progressBar');
+  wrap.style.display = show ? 'block' : 'none';
+  bar.style.width = p+'%';
+}
+function quickFill(card){
+  document.getElementById('nationalId').value = card;
+  doLogin();
+}
+
+async function tursoExec(sql){
+  const res = await fetch(`${WORKER_BASE_URL}/api/turso`,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({sql})
+  });
+  const j = await res.json();
+  if(!j.ok) throw new Error(j.msg||'Turso error');
+  return j.rows || [];
+}
+
+async function doLogin(){
+  const nationalId = document.getElementById('nationalId').value.trim();
+  const password = document.getElementById('password').value.trim();
+  const loginBtn = document.getElementById('loginBtn');
+  
+  if(!/^\d{14}$/.test(nationalId)){
+    showStatus('❌ الرقم القومي يجب أن يكون 14 رقم', 'err');
+    return;
+  }
+
+  loginBtn.disabled=true;
+  loginBtn.textContent='⏳ جاري التحقق من جدول التوجيه...';
+  setProgress(10);
+  document.getElementById('routingInfo').style.display='none';
+
+  try{
+    // 1- البحث في جدول توجيه_المستخدمين
+    showStatus(`🔍 جاري البحث في جدول <b>توجيه_المستخدمين</b> عن <b>${nationalId}</b>...`, 'info');
+    setProgress(30);
+    
+    let routingRows = [];
+    try{
+      routingRows = await tursoExec(`SELECT * FROM "توجيه_المستخدمين" WHERE "الرقم_القومى"='${nationalId.replace(/'/g,"''")}' LIMIT 1`);
+    }catch(e){
+      // لو الجدول مش موجود
+      if(e.message.includes('no such table')){
+        showStatus(`❌ جدول <b>توجيه_المستخدمين</b> غير موجود - نفذ ملف user_routing_schema.sql أولا في Turso`, 'err');
+        setProgress(0,false);
+        loginBtn.disabled=false;
+        loginBtn.textContent='🚀 تسجيل دخول وتوجيه تلقائي';
+        return;
+      }
+      throw e;
+    }
+
+    let routing = null;
+    let employee = null;
+
+    if(routingRows.length){
+      routing = routingRows[0];
+      // تحقق مفعلة
+      if(String(routing["مفعلة"]) === '0' || routing["مفعلة"]===0){
+        showStatus(`🚫 المستخدم <b>${routing["اسم_العامل"]||nationalId}</b> موقوف في جدول التوجيه - تواصل مع المدير`, 'err');
+        setProgress(0,false);
+        loginBtn.disabled=false;
+        loginBtn.textContent='🚀 تسجيل دخول وتوجيه تلقائي';
+        return;
+      }
+      // تحقق تاريخ الانتهاء
+      if(routing["تاريخ_الانتهاء"]){
+        const end = new Date(routing["تاريخ_الانتهاء"]);
+        if(new Date() > end){
+          showStatus(`⏰ انتهت صلاحية التوجيه للمستخدم <b>${routing["اسم_العامل"]}</b> بتاريخ ${routing["تاريخ_الانتهاء"]}`, 'err');
+          setProgress(0,false);
+          loginBtn.disabled=false;
+          loginBtn.textContent='🚀 تسجيل دخول وتوجيه تلقائي';
+          return;
+        }
+      }
+      setProgress(60);
+      showStatus(`✅ وجد توجيه مخصص في <b>توجيه_المستخدمين</b>`, 'ok');
+    }else{
+      // 2- لو مش في جدول التوجيه، ابحث في موظفين_مرتبات
+      showStatus(`ℹ️ لا يوجد توجيه مخصص في <b>توجيه_المستخدمين</b> - جاري البحث في <b>موظفين_مرتبات</b>...`, 'info');
+      setProgress(50);
+      try{
+        const empRows = await tursoExec(`SELECT * FROM "موظفين_مرتبات" WHERE "الرقم_القومى"='${nationalId.replace(/'/g,"''")}' LIMIT 1`);
+        if(!empRows.length){
+          showStatus(`❌ الرقم القومي <b>${nationalId}</b> غير موجود لا في <b>توجيه_المستخدمين</b> ولا في <b>موظفين_مرتبات</b>`, 'err');
+          setProgress(0,false);
+          loginBtn.disabled=false;
+          loginBtn.textContent='🚀 تسجيل دخول وتوجيه تلقائي';
+          return;
+        }
+        employee = empRows[0];
+        // تحقق كلمة المرور لو موجودة
+        if(password && employee["كلمة_المرور"] && String(employee["كلمة_المرور"]).trim() !== '' && String(employee["كلمة_المرور"]).trim() !== password){
+          showStatus(`❌ كلمة المرور غير صحيحة`, 'err');
+          setProgress(0,false);
+          loginBtn.disabled=false;
+          loginBtn.textContent='🚀 تسجيل دخول وتوجيه تلقائي';
+          return;
+        }
+        // إنشاء توجيه افتراضي من صلاحية الموظف
+        const role = (employee["الصلاحيات"]||'User').toLowerCase();
+        const isAdmin = role.includes('admin');
+        routing = {
+          "الرقم_القومى": nationalId,
+          "الكود_البنكى": employee["الكود_البنكى"] || employee["كود_العامل"] || '',
+          "اسم_العامل": employee["اسم_العامل"] || employee["الاسم"] || nationalId,
+          "الصلاحية": isAdmin ? 'Admin' : 'User',
+          "الصفحة_الافتراضية": isAdmin ? 'pageAdmin1-FINAL-BEIGE-FIXED-AUTH.html' : 'pageUser1.html',
+          "الصفحات_المسموحة": isAdmin ? '["*"]' : '["my_data.html","family.html","salary.html","salary_log.html","tadarg.html","phone.html"]',
+          "الصفحات_الممنوعة": '[]',
+          "نوع_التوجيه": 'عام',
+          "سبب_التوجيه": 'توجيه افتراضي من موظفين_مرتبات - الصلاحية: '+role,
+          "مفعلة": 1
+        };
+        showStatus(`✅ وجد في <b>موظفين_مرتبات</b> - تم إنشاء توجيه افتراضي حسب الصلاحية <b>${role}</b>`, 'ok');
+      }catch(e){
+        showStatus(`❌ خطأ في البحث: ${e.message}`, 'err');
+        setProgress(0,false);
+        loginBtn.disabled=false;
+        loginBtn.textContent='🚀 تسجيل دخول وتوجيه تلقائي';
+        return;
+      }
+    }
+
+    // 3- حفظ بيانات تسجيل الدخول
+    setProgress(80);
+    lastRouting = routing;
+    
+    const loggedUser = {
+      cardNumber: nationalId,
+      national_id: nationalId,
+      "الرقم_القومى": nationalId,
+      code: routing["الكود_البنكى"] || '',
+      "الكود_البنكى": routing["الكود_البنكى"] || '',
+      emptid: routing["الكود_البنكى"] || '',
+      "كود_العامل": routing["الكود_البنكى"] || '',
+      name: routing["اسم_العامل"] || nationalId,
+      "اسم_العامل": routing["اسم_العامل"] || nationalId,
+      full_name: routing["اسم_العامل"] || nationalId,
+      role: routing["الصلاحية"] || 'User',
+      type: routing["الصلاحية"] || 'User',
+      defaultPage: routing["الصفحة_الافتراضية"],
+      allowedPages: routing["الصفحات_المسموحة"],
+      routingType: routing["نوع_التوجيه"],
+      routingReason: routing["سبب_التوجيه"],
+      loginTime: new Date().toISOString()
+    };
+
+    // حفظ secure_token + logged_user للتوافق مع صفحاتك القديمة
+    const fakeToken = btoa(JSON.stringify({card:nationalId, code:routing["الكود_البنكى"], role:routing["الصلاحية"], exp: Date.now()+ 365*24*60*60*1000}));
+    localStorage.setItem('secure_token', fakeToken);
+    localStorage.setItem('logged_user', JSON.stringify(loggedUser));
+    localStorage.setItem('cardNumber', nationalId);
+    localStorage.setItem('national_id', nationalId);
+
+    // عرض تفاصيل التوجيه
+    const detailsEl = document.getElementById('routingDetails');
+    detailsEl.innerHTML = `
+      👤 <b>الاسم:</b> ${routing["اسم_العامل"]||'-'}<br>
+      🪪 <b>الرقم القومي:</b> ${routing["الرقم_القومى"]}<br>
+      🔢 <b>الكود البنكي / emptid / كود العامل:</b> ${routing["الكود_البنكى"]}<br>
+      🛡 <b>الصلاحية:</b> ${routing["الصلاحية"]} - <b>النوع:</b> ${routing["نوع_التوجيه"]}<br>
+      📄 <b>الصفحة الافتراضية:</b> <code style="background:#7a6652;color:#fff;padding:2px 6px;border-radius:6px">${routing["الصفحة_الافتراضية"]}</code><br>
+      📝 <b>السبب:</b> ${routing["سبب_التوجيه"]||'-'}<br>
+      ✅ <b>مفعلة:</b> ${routing["مفعلة"]==1 ? 'نعم' : 'لا'} | <b>من:</b> ${routing["تاريخ_البداية"]||'-'} | <b>إلى:</b> ${routing["تاريخ_الانتهاء"]||'دائم'}
+    `;
+
+    // عرض الصفحات المسموحة
+    const pagesEl = document.getElementById('pagesPreview');
+    pagesEl.innerHTML='';
+    try{
+      let allowed = [];
+      let denied = [];
+      if(routing["الصفحات_المسموحة"]){
+        allowed = typeof routing["الصفحات_المسموحة"] === 'string' ? JSON.parse(routing["الصفحات_المسموحة"]) : routing["الصفحات_المسموحة"];
+      }
+      if(routing["الصفحات_الممنوعة"]){
+        denied = typeof routing["الصفحات_الممنوعة"] === 'string' ? JSON.parse(routing["الصفحات_الممنوعة"]) : routing["الصفحات_الممنوعة"];
+      }
+      if(allowed.includes('*') || allowed[0]==='*'){
+        pagesEl.innerHTML = '<span class="page-chip allowed">🌟 كل الصفحات مسموحة - Admin</span>';
+      }else{
+        allowed.forEach(p=>{
+          const chip = document.createElement('span');
+          chip.className='page-chip allowed';
+          chip.textContent='✅ '+p;
+          pagesEl.appendChild(chip);
+        });
+        denied.forEach(p=>{
+          const chip = document.createElement('span');
+          chip.className='page-chip denied';
+          chip.textContent='🚫 '+p;
+          pagesEl.appendChild(chip);
+        });
+      }
+    }catch(e){
+      pagesEl.innerHTML = `<span class="page-chip">${routing["الصفحات_المسموحة"]||''}</span>`;
+    }
+
+    document.getElementById('routingInfo').style.display='block';
+    document.getElementById('goBtn').style.display='block';
+    document.getElementById('goBtn').textContent = `➡️ الانتقال إلى ${routing["الصفحة_الافتراضية"]}`;
+
+    showStatus(`✅ تم تسجيل الدخول بنجاح - مرحبا <b>${routing["اسم_العامل"]}</b> - سيتم توجيهك الآن إلى <b>${routing["الصفحة_الافتراضية"]}</b>`, 'ok');
+    setProgress(100);
+
+    // توجيه تلقائي بعد 2 ثانية
+    setTimeout(()=>{
+      goToDefault();
+    }, 1800);
+
+  }catch(e){
+    showStatus(`❌ خطأ: ${e.message}`, 'err');
+    setProgress(0,false);
+    console.error(e);
+  }finally{
+    loginBtn.disabled=false;
+    loginBtn.textContent='🚀 تسجيل دخول وتوجيه تلقائي';
+  }
+}
+
+function goToDefault(){
+  if(!lastRouting){
+    alert('لا يوجد توجيه');
+    return;
+  }
+  const page = lastRouting["الصفحة_الافتراضية"] || 'pageUser1.html';
+  
+  // تأثير انتقال
+  const card = document.getElementById('loginCard');
+  card.style.transform='translateY(-20px) scale(0.95)';
+  card.style.opacity='0.7';
+  
+  setTimeout(()=>{
+    if(window.location.protocol === 'file:'){
+      // في حالة File:// جرب نفس المجلد
+      window.location.href = page;
+    }else{
+      // في workers.dev استخدم المسار النسبي
+      const base = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/')+1);
+      // لو الصفحة تبدأ بـ http اتركها كما هي
+      if(page.startsWith('http') || page.startsWith('/')){
+        window.location.href = page;
+      }else{
+        window.location.href = base + page;
+      }
+    }
+  }, 300);
+}
+
+// Enter للبحث
+document.getElementById('nationalId').addEventListener('keypress', (e)=>{
+  if(e.key==='Enter') doLogin();
+});
+document.getElementById('password').addEventListener('keypress', (e)=>{
+  if(e.key==='Enter') doLogin();
+});
+
+// لو فيه بطاقة في الرابط ?card=...
+window.addEventListener('load', ()=>{
+  const params = new URLSearchParams(window.location.search);
+  const card = params.get('card') || params.get('national');
+  if(card && /^\d{14}$/.test(card)){
+    document.getElementById('nationalId').value = card;
+    setTimeout(()=>doLogin(), 500);
+  }
+});
+</script>
+</body>
+</html>
