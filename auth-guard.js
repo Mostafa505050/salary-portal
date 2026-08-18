@@ -12,12 +12,12 @@
   
   const CONFIG = {
     INDEX_PAGE: 'index.html',
-    LOGIN_ROUTING_PAGE: 'login-routing.html',
+    LOGIN_ROUTING_PAGE: 'index.html',
     SMART_LOGIN_PAGE: 'login-smart-routing-FINAL.html',
     // الصفحات المسموح فتحها بدون حماية (صفحات الدخول نفسها)
     PUBLIC_PAGES: [
       'index.html', 'login.html', 'login_secure.html',
-      'login-routing.html', 'login-smart-routing-FINAL.html',
+      'index.html', 'login-smart-routing-FINAL.html',
       'login-gateway-28801082200973.html',
       'data:text/html'
     ],
