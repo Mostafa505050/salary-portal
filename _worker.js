@@ -1,4 +1,4 @@
-// _worker.js FINAL v6 - 404 Fix - يتعامل مع /pageAdmin1 و /pageAdmin1.html و pageAdmin1.html/ كلها
+// _worker.js FINAL v6 + Theme Global - 404 Fix + Global Theme API - لا يتم حذف أي دالة
 const API_CHECK_PRIMARY = "https://auth-api.mostafa-voic77729.workers.dev/api/check-page-status";
 const API_CHECK_FALLBACK = "https://turso-api.mostafa-voic77729.workers.dev/api/check-page-status";
 const TURSO_API_PRIMARY = "https://turso-api.mostafa-voic77729.workers.dev/api/turso";
@@ -40,10 +40,6 @@ async function checkPageBlocked(pageName) {
           if (typeof data.blocked === 'boolean') {
             if (data.blocked) {
               return { blocked: true, row: data, source: 'check-page-status', api: apiUrl, variant, enabled: data.enabled };
-            }
-            // اذا وجد الصفحة ومفعلة، احتفظ بالنتيجة لكن جرب باقي variants للبحث عن معطل
-            if (data.page && !data.blocked) {
-              // لا نرجع فورا، نستمر للبحث عن نسخة معطلة
             }
           }
         }
@@ -115,6 +111,75 @@ async function checkPageBlocked(pageName) {
   return { blocked: false, row: null, source: 'not-found', checkedVariants: variants };
 }
 
+// ==================== إضافة جديدة: Theme Global API - لا تحذف ما فوق ====================
+async function handleThemeAPI(request) {
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Content-Type': 'application/json; charset=utf-8'
+  };
+
+  if (request.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  if (request.method === 'GET') {
+    // جلب آخر ثيم محفوظ
+    for (const apiUrl of [TURSO_API_PRIMARY, TURSO_API_FALLBACK]) {
+      try {
+        const sql = `SELECT settings FROM themes ORDER BY id DESC LIMIT 1`;
+        const res = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sql })
+        });
+        if (!res.ok) continue;
+        const data = await res.json();
+        let rows = data.rows || [];
+        if (data.results && data.results[0]?.response?.result) {
+          const cols = data.results[0].response.result.cols.map(c=>c.name);
+          rows = data.results[0].response.result.rows.map(r=>{ let o={}; r.forEach((c,i)=>{o[cols[i]]=c.value ?? c.text ?? ""}); return o; });
+        }
+        if (rows.length > 0 && rows[0].settings) {
+          let settings = rows[0].settings;
+          try { settings = typeof settings === 'string' ? JSON.parse(settings) : settings; } catch {}
+          return new Response(JSON.stringify(settings), { headers: corsHeaders });
+        }
+      } catch(e) { continue; }
+    }
+    // لو لا يوجد ثيم - ارجع افتراضي فارغ
+    return new Response(JSON.stringify({}), { headers: corsHeaders });
+  }
+
+  if (request.method === 'POST') {
+    try {
+      const body = await request.json();
+      const settingsObj = body.settings || body;
+      const settingsStr = JSON.stringify(settingsObj).replace(/'/g, "''");
+      const updatedBy = (body.updated_by || 'admin').replace(/'/g, "''");
+      // تأكد أن الجدول موجود
+      const createSql = `CREATE TABLE IF NOT EXISTS themes (id INTEGER PRIMARY KEY AUTOINCREMENT, settings TEXT NOT NULL, updated_by TEXT, updated_at DATETIME DEFAULT CURRENT_TIMESTAMP)`;
+      const insertSql = `INSERT INTO themes (settings, updated_by) VALUES ('${settingsStr}', '${updatedBy}')`;
+
+      for (const apiUrl of [TURSO_API_PRIMARY, TURSO_API_FALLBACK]) {
+        try {
+          await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sql: createSql }) });
+          const res = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sql: insertSql }) });
+          if (res.ok) {
+            return new Response(JSON.stringify({ ok: true, saved: true }), { headers: corsHeaders });
+          }
+        } catch(e) { continue; }
+      }
+      return new Response(JSON.stringify({ ok: false, error: 'failed to save' }), { status: 500, headers: corsHeaders });
+    } catch(e) {
+      return new Response(JSON.stringify({ ok: false, error: e.message }), { status: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
+    }
+  }
+
+  return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers: corsHeaders });
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -122,9 +187,15 @@ export default {
     let pageName = pathname.split('/').pop() || 'index.html';
     if (pathname === '/' || pathname === '') pageName = 'index.html';
 
-    const skip = ['database-manager', 'test-control', 'turso-api', 'hafez-api', 'auth-api', 'auth', '/api/', 'favicon', '.js', '.css', '.json', '.png', '.jpg', '.jpeg', '.svg', '.ico', '.woff', '.woff2', '.webp', 'fonts.googleapis', 'sidebar_admin', 'sidebar'];
+    // ===== إضافة جديدة: معالجة API الثيمات قبل أي Skip - Global Theme =====
+    if (pathname === '/api/themes' || pathname === '/api/theme' || pathname.startsWith('/api/themes/')) {
+      return await handleThemeAPI(request);
+    }
+
+    const skip = ['database-manager', 'test-control', 'turso-api', 'hafez-api', 'auth-api', 'auth', 'favicon', '.js', '.css', '.json', '.png', '.jpg', '.jpeg', '.svg', '.ico', '.woff', '.woff2', '.webp', 'fonts.googleapis', 'sidebar_admin', 'sidebar'];
     const lowerPath = pathname.toLowerCase();
-    if (skip.some(s => lowerPath.includes(s.toLowerCase()))) {
+    // استثناء: لا تعمل skip لـ /api/themes لأنه تمت معالجته فوق
+    if (skip.some(s => lowerPath.includes(s.toLowerCase())) && !lowerPath.includes('/api/themes') && !lowerPath.includes('/api/theme')) {
       return await env.ASSETS.fetch(request);
     }
 
@@ -144,9 +215,7 @@ export default {
     let response;
     try { 
       response = await env.ASSETS.fetch(request);
-      // اذا الصفحة غير موجودة - ارجع 404 واضح
       if (response.status === 404) {
-        // للـ HTML - ارجع صفحة 404 مفيدة
         if (isHtml) {
           return new Response(`<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>404 - غير موجودة</title><style>body{margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#020a05;color:#e2e8f0;font-family:Cairo,Tajawal;direction:rtl} .card{text-align:center;background:rgba(255,255,255,0.05);backdrop-filter:blur(20px);padding:48px 32px;border-radius:20px;border:1px solid rgba(255,255,255,0.08);max-width:500px} h1{font-size:48px;margin:0} h2{margin:12px 0;font-size:20px} p{color:#94a3b8;font-size:13px} a{display:inline-block;margin:6px;padding:10px 18px;background:#10b981;color:white;border-radius:10px;text-decoration:none;font-size:13px} .list{text-align:right;margin-top:16px;background:rgba(0,0,0,0.2);padding:12px;border-radius:12px;font-size:11px;max-height:200px;overflow:auto}</style></head><body><div class="card"><h1>404</h1><h2>الصفحة غير موجودة</h2><p>${pageName} غير موجودة في الموقع</p><p style="font-size:11px;color:#64748b">المسار: ${pathname}</p><a href="/">🏠 الرئيسية</a><a href="/database-manager-FIXED.html" style="background:rgba(255,255,255,0.1)">🛠 لوحة التحكم</a><div class="list"><b>الصفحات المتاحة:</b><br>• index.html<br>• pageAdmin1.html<br>• pageUser1.html<br>• dashboard.html<br>• hafez.html<br>• Hafez-V35-Plus-40468.html<br>• salary.html<br>• employees.html<br>• tables.html<br>• database-manager-FIXED.html</div></div></body></html>`, {
             status: 404,
@@ -164,15 +233,16 @@ export default {
         let html = await response.text();
         const blockInfoJson = JSON.stringify(blockInfo).replace(/</g, '\\u003c').slice(0,3000);
         const variantsJson = JSON.stringify(normalizePageNameVariants(pageName));
-        // Guard محسن يتعامل مع الاسمين مع وبدون .html
-        const guardScript = `<script>console.log('%c[Worker] FINAL v6 - 404 Fix - variants:'+${variantsJson}, 'color: lime; background: black; padding: 4px 8px; font-weight: bold;'); console.log('[BlockInfo v5]', ${blockInfoJson}); (function(){const k='salary_portal_page_status';try{const d=JSON.parse(localStorage.getItem(k)||'{}');let p=(location.pathname.split('/').pop()||'index.html');if(p==='')p='index.html';let pn=p;let pnNoExt=p.replace(/\\.html$/,'');let pnWithExt=pnNoExt+'.html';console.log('[Guard v5] LS:',d,'Page:',pn,'noExt:',pnNoExt,'withExt:',pnWithExt);let blocked=false;let key='';if(d[pn]&&d[pn].enabled===false){blocked=true;key=pn;}else if(d[pnNoExt]&&d[pnNoExt].enabled===false){blocked=true;key=pnNoExt;}else if(d[pnWithExt]&&d[pnWithExt].enabled===false){blocked=true;key=pnWithExt;}if(blocked){console.log('[Guard v5] BLOCKED by',key);document.documentElement.innerHTML='<div style=display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f8f9fb;font-family:Tajawal;direction:rtl><div style=text-align:center;background:white;padding:40px;border-radius:16px;border:1px solid #e2e8f0;max-width:400px><div style=font-size:48px>⛔</div><h2>الصفحة معطلة</h2><p>'+key+' (localStorage)</p><a href=/database-manager-FIXED.html style=padding:8px 16px;background:#0f172a;color:white;border-radius:8px;text-decoration:none;display:inline-block;margin-top:12px>لوحة التحكم</a></div></div>';}}catch(e){console.log('[Guard v5] error',e);}})();</script>`;
-        if (html.includes('</head>')) html = html.replace('</head>', guardScript + '</head>');
-        else if (html.includes('<head>')) html = html.replace('<head>', '<head>' + guardScript);
-        else html = guardScript + html;
+        const guardScript = `<script>console.log('%c[Worker] FINAL v6 + Theme Global - variants:'+${variantsJson}, 'color: lime; background: black; padding: 4px 8px; font-weight: bold;'); console.log('[BlockInfo v5]', ${blockInfoJson}); (function(){const k='salary_portal_page_status';try{const d=JSON.parse(localStorage.getItem(k)||'{}');let p=(location.pathname.split('/').pop()||'index.html');if(p==='')p='index.html';let pn=p;let pnNoExt=p.replace(/\\.html$/,'');let pnWithExt=pnNoExt+'.html';console.log('[Guard v5] LS:',d,'Page:',pn,'noExt:',pnNoExt,'withExt:',pnWithExt);let blocked=false;let key='';if(d[pn]&&d[pn].enabled===false){blocked=true;key=pn;}else if(d[pnNoExt]&&d[pnNoExt].enabled===false){blocked=true;key=pnNoExt;}else if(d[pnWithExt]&&d[pnWithExt].enabled===false){blocked=true;key=pnWithExt;}if(blocked){console.log('[Guard v5] BLOCKED by',key);document.documentElement.innerHTML='<div style=display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f8f9fb;font-family:Tajawal;direction:rtl><div style=text-align:center;background:white;padding:40px;border-radius:16px;border:1px solid #e2e8f0;max-width:400px><div style=font-size:48px>⛔</div><h2>الصفحة معطلة</h2><p>'+key+' (localStorage)</p><a href=/database-manager-FIXED.html style=padding:8px 16px;background:#0f172a;color:white;border-radius:8px;text-decoration:none;display:inline-block;margin-top:12px>لوحة التحكم</a></div></div>';}}catch(e){console.log('[Guard v5] error',e);}})();<\/script>`;
+        // theme-loader auto injection for all pages (global)
+        const themeLoaderInjection = `<script src="/theme-loader.js"><\/script>`;
+        if (html.includes('</head>')) html = html.replace('</head>', guardScript + themeLoaderInjection + '</head>');
+        else if (html.includes('<head>')) html = html.replace('<head>', '<head>' + guardScript + themeLoaderInjection);
+        else html = guardScript + themeLoaderInjection + html;
 
         const newHeaders = new Headers(response.headers);
         newHeaders.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-        newHeaders.set('X-Worker-Active', 'FINAL-v6');
+        newHeaders.set('X-Worker-Active', 'FINAL-v6-Theme-Global');
         newHeaders.set('X-Block-Check', blockInfo.blocked ? 'blocked' : 'allowed');
         newHeaders.set('X-Block-Source', blockInfo.source || 'not-found');
         newHeaders.set('X-Block-Variant', blockInfo.variant || pageName);
