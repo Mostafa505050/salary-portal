@@ -160,8 +160,8 @@ function getRedirectFromRouting(routing, fallbackRole){
   }
   // fallback حسب الصلاحية
   const role = (fallbackRole||'').toLowerCase();
-  if(role.includes('admin')) return 'pageAdmin1-FINAL-BEIGE-FIXED-AUTH.html';
-  return 'pageUser1-FINAL-WITH-SALARY.html';
+  if(role.includes('admin')) return 'pageAdmin1';
+  return 'pageUser1';
 }
 
 async function checkByCard(){
