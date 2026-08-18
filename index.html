@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>الدخول الذكي - رقم البطاقة والبصمة</title>
+<title>الدخول الذكي - رقم البطاقة والبصمة - موجه من توجيه_المستخدمين</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -22,6 +22,36 @@ body{background:#020a05;min-height:100vh;display:flex;align-items:center;justify
 .msg-success{background:rgba(16,185,129,0.14);border-color:rgba(16,185,129,0.3);color:#a7f3d0}
 .msg-warn{background:rgba(245,158,11,0.14);border-color:rgba(245,158,11,0.3);color:#fde68a}
 .badge{font-size:9px;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.45)}
+/* اسم المستخدم ثلاثي الابعاد مبهر */
+.welcome-3d{
+  background: linear-gradient(145deg, rgba(16,185,129,0.18), rgba(139,92,246,0.12));
+  border:1px solid rgba(16,185,129,0.22);
+  border-right:4px solid #10b981;
+  border-bottom:4px solid rgba(16,185,129,0.18);
+  border-radius:16px;
+  padding:14px;
+  transform-style:preserve-3d;
+  box-shadow: 0 8px 0 rgba(0,0,0,0.25), 0 16px 32px rgba(0,0,0,0.3), 0 0 0 1px rgba(16,185,129,0.1) inset;
+  transition:.4s;
+  position:relative;
+  overflow:hidden;
+}
+.welcome-3d::before{
+  content:'';position:absolute;inset:0;
+  background: radial-gradient(400px 200px at 50% 0%, rgba(16,185,129,0.15), transparent 60%);
+  pointer-events:none;
+}
+.welcome-3d:hover{transform:translateY(-3px) rotateX(3deg) rotateY(-3deg) translateZ(10px); box-shadow: 0 12px 0 rgba(0,0,0,0.25), 0 24px 48px rgba(0,0,0,0.35);}
+.welcome-name{
+  font-size:15px;font-weight:900;color:#ecfdf5;
+  text-shadow: 0 2px 0 rgba(0,0,0,0.4), 0 0 20px rgba(16,185,129,0.4);
+  transform:translateZ(15px);
+  line-height:1.4;
+}
+.welcome-role{
+  font-size:11px;font-weight:700;color:#6ee7b7;
+  margin-top:4px;transform:translateZ(10px);
+}
 </style>
 </head>
 <body>
@@ -29,11 +59,7 @@ body{background:#020a05;min-height:100vh;display:flex;align-items:center;justify
   <div class="text-center mb-6">
     <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-700 flex items-center justify-center text-2xl shadow-xl shadow-emerald-900/40">🪪</div>
     <h1 class="text-[19px] font-black text-white mt-3 tracking-tight">الدخول الذكي برقم البطاقة</h1>
-    <p class="text-[11px] text-white/40 mt-1">الرقم القومي (14 رقم) + البصمة / النقش - مرة واحدة فقط</p>
-    <div class="flex justify-center gap-2 mt-3">
-      <span class="badge">Admin → pageAdmin1.html</span>
-      <span class="badge">User → pageUser1.html</span>
-    </div>
+    <p class="text-[11px] text-white/40 mt-1">الرقم القومي (14 رقم) + البصمة / النقش - موجه من جدول توجيه_المستخدمين</p>
   </div>
 
   <!-- STEP 1 -->
@@ -46,11 +72,15 @@ body{background:#020a05;min-height:100vh;display:flex;align-items:center;justify
 
   <!-- STEP REGISTER -->
   <div id="stepReg" class="hidden">
-    <div id="welcomeReg" class="msg msg-warn"></div>
+    <div id="welcomeReg" class="welcome-3d">
+      <div id="welcomeRegName" class="welcome-name"></div>
+      <div id="welcomeRegRole" class="welcome-role"></div>
+      <div style="font-size:9px;color:rgba(255,255,255,0.35);margin-top:6px">البصمة فارغة - سجل أول مرة (مرة واحدة فقط) - تحفظ في حقل بصمة بجدول موظفين_مرتبات</div>
+    </div>
     <div class="mt-4 space-y-3">
       <div class="grid grid-cols-2 gap-3">
         <div><label class="text-[10px] text-white/40">الاسم</label><input id="empName" class="input" disabled></div>
-        <div><label class="text-[10px] text-white/40">الكود البنكي</label><input id="empCode" class="input" disabled></div>
+        <div><label class="text-[10px] text-white/40">الكود البنكي = emptid</label><input id="empCode" class="input" disabled></div>
       </div>
       <input id="newPass" class="input" type="password" placeholder="كلمة مرور جديدة">
       <input id="confirmPass" class="input" type="password" placeholder="تأكيد كلمة المرور">
@@ -61,18 +91,19 @@ body{background:#020a05;min-height:100vh;display:flex;align-items:center;justify
       </select>
       <input id="patternVal" class="input" placeholder="قيمة النقش" value="1,2,3,6,9">
       <button onclick="registerByCard()" id="btnReg" class="btn btn-primary">💾 تسجيل البصمة لأول مرة</button>
-      <p class="text-[9px] text-white/25 text-center">يتم حفظ البصمة في عمود (بصمة) مرة واحدة ولا يمكن تغييرها إلا عبر Admin</p>
+      <p class="text-[9px] text-white/25 text-center">يتم حفظ البصمة في عمود (بصمة) مرة واحدة في موظفين_مرتبات</p>
     </div>
     <div id="msgReg"></div>
   </div>
 
   <!-- STEP LOGIN -->
   <div id="stepLogin" class="hidden">
-    <div id="welcomeLogin" class="msg msg-success"></div>
-    <div class="mt-3 p-3 rounded-xl bg-black/40 border border-white/5">
-      <p class="text-[11px] text-white/50">البصمة المحفوظة: <span id="bioInfo" class="text-emerald-300 font-bold"></span></p>
-      <p class="text-[10px] text-white/30 mt-1">التوجيه: <span id="redirectInfo" class="text-white/60"></span></p>
+    <div id="welcomeLogin" class="welcome-3d">
+      <div id="welcomeLoginName" class="welcome-name"></div>
+      <div id="welcomeLoginRole" class="welcome-role"></div>
+      <div style="font-size:9px;color:rgba(255,255,255,0.35);margin-top:6px">تم العثور على بصمة محفوظة - سيتم مقارنتها</div>
     </div>
+
     <div class="mt-4 space-y-3">
       <button onclick="loginWithBio()" class="btn btn-primary">🔓 دخول بالبصمة / النقش</button>
       <div class="flex gap-2">
@@ -92,6 +123,7 @@ body{background:#020a05;min-height:100vh;display:flex;align-items:center;justify
 <script>
 const API_BASE = "https://turso-api.mostafa-voic77729.workers.dev";
 let currentUser=null;
+let currentRouting=null;
 
 function showMsg(id, text, type='error'){
   const el=document.getElementById(id);
@@ -99,8 +131,37 @@ function showMsg(id, text, type='error'){
   const cls=type==='error'?'msg-error':type==='success'?'msg-success':'msg-warn';
   el.innerHTML=`<div class="msg ${cls}">${text}</div>`;
 }
-function getRedirect(role){
-  return (role||'').toLowerCase()==='admin' ? 'pageAdmin1.html' : 'pageUser1.html';
+
+// جلب توجيه المستخدم من جدول توجيه_المستخدمين حسب الرقم القومي أو الكود البنكي
+async function getRoutingFromTable(nationalId, code){
+  try{
+    const sql = `SELECT * FROM "توجيه_المستخدمين" WHERE ("الرقم_القومى"='${String(nationalId).replace(/'/g,"''")}' OR "الكود_البنكى"='${String(code).replace(/'/g,"''")}') AND "مفعلة"=1 LIMIT 1`;
+    const res = await fetch(API_BASE+'/api/turso',{method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({sql})});
+    const j = await res.json();
+    if(j.ok && j.rows && j.rows.length){
+      const r = j.rows[0];
+      // تحقق تاريخ الانتهاء
+      if(r["تاريخ_الانتهاء"]){
+        const end = new Date(r["تاريخ_الانتهاء"]);
+        if(new Date() > end){
+          console.log('انتهت صلاحية التوجيه');
+          return null;
+        }
+      }
+      return r;
+    }
+  }catch(e){ console.error('خطأ جلب التوجيه', e); }
+  return null;
+}
+
+function getRedirectFromRouting(routing, fallbackRole){
+  if(routing && routing["الصفحة_الافتراضية"]){
+    return routing["الصفحة_الافتراضية"];
+  }
+  // fallback حسب الصلاحية
+  const role = (fallbackRole||'').toLowerCase();
+  if(role.includes('admin')) return 'pageAdmin1-FINAL-BEIGE-FIXED-AUTH.html';
+  return 'pageUser1-FINAL-WITH-SALARY.html';
 }
 
 async function checkByCard(){
@@ -110,25 +171,33 @@ async function checkByCard(){
   try{
     const res=await fetch(API_BASE+'/api/check-by-card',{method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({cardNumber:card})});
     const data=await res.json();
-    console.log(data);
     if(!data.ok){ showMsg('msg1','❌ '+data.msg,'error'); return; }
     currentUser=data.user;
     const name=currentUser['اسم_العمل']||currentUser['اسم_العامل']||currentUser['الاسم']||'مستخدم';
     const code=currentUser['الكود_البنكى']||currentUser['الكود_البنكي']||'--';
     const bio=currentUser['بصمة'];
+    const role=currentUser['الصلاحيات']||currentUser['نوع_المستخدم']||'User';
     const isEmpty=!bio || String(bio).trim()==='' || String(bio).toLowerCase()==='null';
+
+    // جلب التوجيه من جدول توجيه_المستخدمين
+    currentRouting = await getRoutingFromTable(card, code);
+
     if(isEmpty){
       document.getElementById('step1').classList.add('hidden');
       document.getElementById('stepReg').classList.remove('hidden');
       document.getElementById('empName').value=name;
       document.getElementById('empCode').value=code;
-      document.getElementById('welcomeReg').textContent=`مرحبا ${name} - الكود ${code} - البصمة فارغة، سجل أول مرة (مرة واحدة فقط)`;
+      document.getElementById('welcomeRegName').textContent=`مرحبا ${name}`;
+      document.getElementById('welcomeRegRole').textContent=`الصلاحية ${role} - الكود ${code} - التوجيه: ${currentRouting ? currentRouting["الصفحة_الافتراضية"] : 'افتراضي'}`;
     }else{
       document.getElementById('step1').classList.add('hidden');
       document.getElementById('stepLogin').classList.remove('hidden');
-      document.getElementById('welcomeLogin').textContent=`مرحبا ${name} - الصلاحية ${currentUser['الصلاحيات']||currentUser['نوع_المستخدم']||'User'}`;
-      document.getElementById('redirectInfo').textContent=getRedirect(currentUser['الصلاحيات']||currentUser['نوع_المستخدم']);
-      try{ const b=JSON.parse(bio); document.getElementById('bioInfo').textContent=`${b.type} = ${b.value||'محفوظة'}`; }catch(e){ document.getElementById('bioInfo').textContent=bio.substring(0,30); }
+      // ثلاثي الأبعاد مبهر
+      document.getElementById('welcomeLoginName').textContent=`مرحبا ${name}`;
+      document.getElementById('welcomeLoginRole').textContent=`الصلاحية ${role} - مثال: مصطفى درويش سيد درويش - الصلاحية ${role}`;
+      if(currentRouting){
+        document.getElementById('welcomeLoginRole').textContent=`مرحبا ${name} - الصلاحية ${currentRouting["الصلاحية"]||role} - التوجيه من جدول توجيه_المستخدمين`;
+      }
     }
   }catch(e){ showMsg('msg1','خطأ اتصال: '+e.message,'error'); }
   finally{ btn.textContent='🔍 فحص برقم البطاقة'; btn.disabled=false; }
@@ -150,11 +219,11 @@ async function registerByCard(){
       bioJson=JSON.stringify({type:bioType, credId, created:Date.now()});
     }catch(err){ showMsg('msgReg','فشل بصمة الجهاز: '+err.message+' - استخدم النقش','error'); return; }
   }else{ bioJson=JSON.stringify({type:'pattern', value:bioVal, created:Date.now()}); }
-  const btn=document.getElementById('btnReg'); btn.textContent='⏳ يحفظ البصمة...'; btn.disabled=true;
+  const btn=document.getElementById('btnReg'); btn.textContent='⏳ يحفظ البصمة في حقل بصمة...'; btn.disabled=true;
   try{
     const res=await fetch(API_BASE+'/api/register-by-card',{method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({cardNumber:String(currentUser['الرقم_القومى']), bio:bioJson, password:newPass})});
     const data=await res.json(); if(!data.ok) throw new Error(data.msg);
-    showMsg('msgReg','✅ تم حفظ البصمة بنجاح! سيتم إعادة التحميل...','success');
+    showMsg('msgReg','✅ تم حفظ البصمة بنجاح في حقل بصمة بجدول موظفين_مرتبات! سيتم إعادة التحميل...','success');
     setTimeout(()=> location.reload(), 1500);
   }catch(e){ showMsg('msgReg','فشل: '+e.message,'error'); }
   finally{ btn.textContent='💾 تسجيل البصمة لأول مرة'; btn.disabled=false; }
@@ -162,37 +231,84 @@ async function registerByCard(){
 
 async function loginWithBio(){
   try{
-    const bio=currentUser['بصمة']; const saved=JSON.parse(bio);
+    const bio=currentUser['بصمة']; 
+    if(!bio){ showMsg('msgLogin','لا توجد بصمة محفوظة - سجل أولاً','error'); return; }
+    const saved=JSON.parse(bio);
     if(saved.type==='pattern'){
-      const input=prompt(`النقش المحفوظ: ${saved.value}\nأدخله:`); if(!input) return;
+      const input=prompt(`أدخل النقش المحفوظ لمقارنته:`); if(!input) return;
+      // مقارنة محلية أولا
+      if(input.trim() !== saved.value){
+        showMsg('msgLogin','❌ النقش غير مطابق - حاول مرة أخرى','error');
+        return;
+      }
       const res=await fetch(API_BASE+'/api/bio-login-by-card',{method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({cardNumber:String(currentUser['الرقم_القومى']), bioAttempt:input.trim()})});
-      const data=await res.json(); if(!data.ok) throw new Error(data.msg); doRedirect(data);
+      const data=await res.json(); if(!data.ok) throw new Error(data.msg); await doRedirect(data);
     }else{
       const challenge=new Uint8Array(32); crypto.getRandomValues(challenge);
       const credIdBytes=Uint8Array.from(atob(saved.credId), c=>c.charCodeAt(0));
       await navigator.credentials.get({publicKey:{challenge, allowCredentials:[{id:credIdBytes, type:'public-key'}], userVerification:"required", timeout:60000}});
       const res=await fetch(API_BASE+'/api/bio-login-by-card',{method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({cardNumber:String(currentUser['الرقم_القومى'])})});
-      const data=await res.json(); if(!data.ok) throw new Error(data.msg); doRedirect(data);
+      const data=await res.json(); if(!data.ok) throw new Error(data.msg); await doRedirect(data);
     }
-  }catch(e){ showMsg('msgLogin','فشل البصمة: '+e.message+' - جرب كلمة المرور','error'); }
+  }catch(e){ showMsg('msgLogin','فشل البصمة: '+e.message,'error'); }
 }
 
-function loginWithPass(){
+async function loginWithPass(){
   const pass=document.getElementById('loginPass').value.trim();
-  if(String(currentUser['كلمة_المرور']).trim()!==pass){ showMsg('msgLogin',`كلمة المرور خطأ. الصحيحة: ${currentUser['كلمة_المرور']}`,'error'); return; }
+  // ❌ تم إلغاء عرض كلمة المرور الصحيحة - رسالة عامة فقط
+  if(String(currentUser['كلمة_المرور']).trim()!==pass){ 
+    showMsg('msgLogin',`❌ كلمة المرور غير صحيحة - حاول مرة أخرى`,'error'); 
+    return; 
+  }
+  // جلب التوجيه من جدول توجيه_المستخدمين حسب الرقم القومي أو الكود البنكي
+  if(!currentRouting){
+    currentRouting = await getRoutingFromTable(String(currentUser['الرقم_القومى']), String(currentUser['الكود_البنكى']||''));
+  }
   const role=currentUser['الصلاحيات']||currentUser['نوع_المستخدم']||'User';
+  const redirectPage = getRedirectFromRouting(currentRouting, role);
+  
   localStorage.setItem('secure_token','card_'+Date.now()+'_'+currentUser['الرقم_القومى']);
-  localStorage.setItem('logged_user',JSON.stringify({card:currentUser['الرقم_القومى'], code:currentUser['الكود_البنكى'], name:currentUser['اسم_العمل'], role}));
-  showMsg('msgLogin',`✅ صحيح - ينتقل إلى ${getRedirect(role)}...`,'success');
-  setTimeout(()=>{ location.href=getRedirect(role); },800);
+  const loggedData = {
+    card:currentUser['الرقم_القومى'], 
+    cardNumber:currentUser['الرقم_القومى'],
+    code:currentUser['الكود_البنكى'], 
+    "الكود_البنكى":currentUser['الكود_البنكى'],
+    emptid:currentUser['الكود_البنكى'],
+    name:currentUser['اسم_العمل']||currentUser['اسم_العامل'], 
+    "اسم_العامل":currentUser['اسم_العمل']||currentUser['اسم_العامل'],
+    role: currentRouting ? currentRouting["الصلاحية"] : role,
+    defaultPage: redirectPage,
+    routing: currentRouting
+  };
+  localStorage.setItem('logged_user',JSON.stringify(loggedData));
+  showMsg('msgLogin',`✅ صحيح - مرحبا ${loggedData.name} - الصلاحية ${loggedData.role} - ينتقل إلى ${redirectPage}...`,'success');
+  setTimeout(()=>{ location.href=redirectPage; },800);
 }
 
-function doRedirect(apiData){
+async function doRedirect(apiData){
   const role=apiData.role || currentUser['الصلاحيات']||'User';
+  // جلب التوجيه من جدول توجيه_المستخدمين
+  if(!currentRouting){
+    currentRouting = await getRoutingFromTable(String(currentUser['الرقم_القومى']), String(currentUser['الكود_البنكى']||''));
+  }
+  const redirectPage = getRedirectFromRouting(currentRouting, role);
+  
   localStorage.setItem('secure_token',apiData.token);
-  localStorage.setItem('logged_user',JSON.stringify({card:currentUser['الرقم_القومى'], code:currentUser['الكود_البنكى'], name:currentUser['اسم_العمل'], role}));
-  showMsg('msgLogin',`✅ تم التحقق - ينتقل إلى ${apiData.redirect||getRedirect(role)}...`,'success');
-  setTimeout(()=>{ location.href=apiData.redirect||getRedirect(role); },800);
+  const loggedData = {
+    card:currentUser['الرقم_القومى'],
+    cardNumber:currentUser['الرقم_القومى'],
+    code:currentUser['الكود_البنكى'],
+    "الكود_البنكى":currentUser['الكود_البنكى'],
+    emptid:currentUser['الكود_البنكى'],
+    name:currentUser['اسم_العمل']||currentUser['اسم_العامل'],
+    "اسم_العامل":currentUser['اسم_العمل']||currentUser['اسم_العامل'],
+    role: currentRouting ? currentRouting["الصلاحية"] : role,
+    defaultPage: redirectPage,
+    routing: currentRouting
+  };
+  localStorage.setItem('logged_user',JSON.stringify(loggedData));
+  showMsg('msgLogin',`✅ تم التحقق بالبصمة - مرحبا ${loggedData.name} - الصلاحية ${loggedData.role} - ينتقل إلى ${redirectPage}...`,'success');
+  setTimeout(()=>{ location.href=redirectPage; },800);
 }
 </script>
 </body>
