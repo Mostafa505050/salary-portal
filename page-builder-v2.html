@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مولد الصفحات - قائمة حقول منسدلة احترافية</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="page-builder-style-v2.css">
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h2>🧩 مولد الصفحات</h2>
+  </div>
+  <div class="sidebar-content">
+    <button class="sidebar-btn active" onclick="switchTab('builder')">➕ إنشاء صفحة</button>
+    <button class="sidebar-btn" onclick="switchTab('pages')">📄 الصفحات المنشأة</button>
+    <button class="sidebar-btn" onclick="switchTab('tables')">🗃️ الجداول</button>
+    <div style="margin-top:20px; padding-top:16px; border-top:1px solid #334155;">
+      <div style="font-size:11px; color:#94a3b8; font-weight:700; margin-bottom:8px;">قاعدة البيانات:</div>
+      <div style="background:#0f172a; padding:10px; border-radius:8px; font-size:11px; font-family:monospace; color:#34d399;">company-alldata-mostafadarwish</div>
+      <div id="dbStatus" style="margin-top:8px; font-size:11px; color:#94a3b8;">⏳ جاري الاتصال...</div>
+    </div>
+  </div>
+</aside>
+
+<div class="main-wrapper">
+  <div id="tab-builder">
+    <div class="card">
+      <div class="card-header">
+        <h2>⚙️ إنشاء صفحة جديدة مرتبطة بجدول</h2>
+        <span class="badge" id="tablesCount">⏳ تحميل الجداول...</span>
+      </div>
+
+      <div class="builder-grid">
+        <div class="field">
+          <label>📝 اسم الصفحة *</label>
+          <input id="pageName" type="text" placeholder="مثال: صفحة مفردات مرتب">
+        </div>
+        <div class="field">
+          <label>🔗 رابط الصفحة (تلقائي)</label>
+          <input id="pageSlug" type="text" readonly style="background:#f1f5f9;" placeholder="سيتم إنشاؤه تلقائياً">
+        </div>
+
+        <div class="field">
+          <label>🗃️ اختر الجدول *</label>
+          <div class="select" id="selTable" onclick="toggleDrop('Table')">
+            <span id="txtTable">جاري تحميل الجداول من Turso...</span><span>▼</span>
+            <div class="options" id="optTable"></div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>🎨 نوع العرض</label>
+          <div class="select" id="selDisplay" onclick="toggleDrop('Display')">
+            <span id="txtDisplay">📊 جدول احترافي</span><span>▼</span>
+            <div class="options" id="optDisplay">
+              <div onclick="selectDisplay('table','📊 جدول احترافي')">📊 جدول احترافي</div>
+              <div onclick="selectDisplay('cards','🃏 بطاقات')">🃏 بطاقات</div>
+              <div onclick="selectDisplay('list','📋 قائمة مفصلة')">📋 قائمة مفصلة</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- قائمة الحقول المنسدلة الاحترافية - الحل لمشكلتك -->
+        <div class="field full">
+          <label>📋 اختر الحقول المراد عرضها * (قائمة منسدلة متعددة)</label>
+          
+          <div class="fields-dropdown" id="fieldsDropdown">
+            <div class="fields-dropdown-btn" onclick="toggleFieldsDropdown()">
+              <span id="fieldsBtnText">اختر الحقول من الجدول المختار...</span>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span class="count" id="fieldsBtnCount">0</span>
+                <span>▼</span>
+              </div>
+            </div>
+            
+            <div class="fields-dropdown-panel" id="fieldsPanel">
+              <div class="fields-search">
+                <input id="fieldsSearchInput" type="text" placeholder="🔍 ابحث عن حقل..." oninput="filterFieldsSearch(this.value)">
+              </div>
+              <div class="fields-actions">
+                <button onclick="selectAllFields()">✅ تحديد الكل</button>
+                <button onclick="deselectAllFields()">❌ إلغاء الكل</button>
+                <button onclick="selectCommonFields()">⭐ الحقول المهمة</button>
+              </div>
+              <div class="fields-options" id="fieldsOptions">
+                <div style="text-align:center; padding:20px; color:#94a3b8;">اختر جدول أولاً</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tags للحقول المختارة -->
+          <div class="selected-tags" id="selectedTags">
+            <span style="color:#94a3b8; font-size:11px;">لم يتم اختيار حقول بعد - اضغط على القائمة أعلاه لاختيار الحقول</span>
+          </div>
+        </div>
+
+        <div class="field full" style="display:flex; flex-direction:row; gap:12px; margin-top:10px;">
+          <button class="btn btn-primary" style="flex:1;" onclick="createPage()">✨ إنشاء الصفحة</button>
+          <button class="btn btn-blue" onclick="previewTable()">👁️ معاينة البيانات</button>
+          <button class="btn btn-dark" onclick="clearBuilder()">🗑 مسح</button>
+        </div>
+      </div>
+
+      <div id="logBox" class="log" style="display:none;"></div>
+    </div>
+
+    <div class="card" id="previewCard" style="display:none;">
+      <div class="card-header">
+        <h2>معاينة البيانات</h2>
+        <span class="badge" id="previewInfo">0 سجل</span>
+      </div>
+      <div class="preview-frame">
+        <div class="preview-header">
+          <span id="previewTableName">الجدول</span>
+          <span id="previewFields">الحقول</span>
+        </div>
+        <div class="preview-body" id="previewBody"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-pages" style="display:none;">
+    <div class="card">
+      <div class="card-header">
+        <h2>الصفحات المنشأة</h2>
+        <span class="badge" id="pagesCount">0 صفحة</span>
+      </div>
+      <div class="pages-grid" id="pagesGrid"></div>
+    </div>
+  </div>
+
+  <div id="tab-tables" style="display:none;">
+    <div class="card">
+      <div class="card-header">
+        <h2>الجداول في القاعدة</h2>
+        <span class="badge" id="tablesListCount">0 جدول</span>
+      </div>
+      <div id="tablesList"></div>
+    </div>
+  </div>
+</div>
+
+<script src="page-builder-v2.js"></script>
+</body>
+</html>
