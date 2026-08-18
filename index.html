@@ -281,10 +281,14 @@ async function loginWithPass(){
     routing: currentRouting
   };
   localStorage.setItem('logged_user',JSON.stringify(loggedData));
+  
+  // ✅ ضيف دول هنا - السطرين المطلوبين - قبل التوجيه
+  localStorage.setItem('entry_via_index', String(Date.now()));
+  if(window.markEntryViaIndex) window.markEntryViaIndex();
+
   showMsg('msgLogin',`✅ صحيح - مرحبا ${loggedData.name} - الصلاحية ${loggedData.role} - ينتقل إلى ${redirectPage}...`,'success');
   setTimeout(()=>{ location.href=redirectPage; },800);
 }
-
 async function doRedirect(apiData){
   const role=apiData.role || currentUser['الصلاحيات']||'User';
   // جلب التوجيه من جدول توجيه_المستخدمين
@@ -307,6 +311,8 @@ async function doRedirect(apiData){
     routing: currentRouting
   };
   localStorage.setItem('logged_user',JSON.stringify(loggedData));
+  localStorage.setItem('entry_via_index', String(Date.now()));
+if(window.markEntryViaIndex) window.markEntryViaIndex();
   showMsg('msgLogin',`✅ تم التحقق بالبصمة - مرحبا ${loggedData.name} - الصلاحية ${loggedData.role} - ينتقل إلى ${redirectPage}...`,'success');
   setTimeout(()=>{ location.href=redirectPage; },800);
 }
