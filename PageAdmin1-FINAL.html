@@ -1,45 +1,12 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+  <script src="auth-guard.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>لوحة المدير - Admin - بيج غامق</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-
-<!-- 1- كود حماية التوكن -->
-<script>
-  (function(){
-    const token = localStorage.getItem('secure_token');
-    if(!token){
-      alert('يجب تسجيل الدخول أولا');
-      window.location.href='login_secure.html';
-    }
-  })();
-</script>
-
-<!-- 2- كود حماية من المستخدمين العاديين - فقط Admin -->
-<script>
-  (function(){
-    try{
-      const userStr = localStorage.getItem('logged_user');
-      if(!userStr){
-        window.location.href='login.html';
-        return;
-      }
-      const user = JSON.parse(userStr);
-      const role = (user.role || user.type || '').toLowerCase();
-      if(role !== 'admin'){
-        alert('هذه الصفحة للمدير فقط');
-        window.location.href='pageUser1.html';
-      }
-    }catch(e){
-      console.error('خطأ في التحقق من الصلاحية', e);
-      window.location.href='login.html';
-    }
-  })();
-</script>
-
 <style>
   *{font-family:'Cairo',sans-serif}
   /* تغيير لون الصفحة الى بيج غامق مع نص واضح */
