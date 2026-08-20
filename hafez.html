@@ -162,17 +162,17 @@ body.light .send-label{color:#000!important}
     <div class="col-doc"><input type="text" id="incentiveName" placeholder="اسم الحافز / المستند *" oninput="updatePreview()"></div>
   </div>
   <div class="row" style="justify-content:center; margin-top:12px; gap:6px; flex-wrap:wrap">
-      <button class="btn btn-add" onclick="addToTable()">Insert</button>
-      <button class="btn btn-query" id="btnInfo" onclick="queryByNumber()">Information</button>
-      <button class="btn btn-edit" id="btnEdit" onclick="editDisclosure()">Update</button>
-      <button class="btn btn-nav" id="btnPrev" onclick="navigateDisclosure(-1)">Back</button>
-      <button class="btn btn-nav" id="btnNext" onclick="navigateDisclosure(1)">Next</button>
-      <button class="btn btn-save" onclick="saveLocal()">SaveExcel</button>
-      <button class="btn btn-save" id="btnSaveTurso" style="background:linear-gradient(180deg,#fbbf24,#f59e0b);color:#000" onclick="saveToTurso()">SaveDataBase</button>
-      <button class="btn btn-print" onclick="printTable()">PrintData</button>
-      <button class="btn btn-clear" onclick="clearAll()">ClearTable</button>
-      <button class="btn btn-delete" id="btnDelete" onclick="deleteDisclosure()">Delete</button>
-      <button class="btn btn-send" onclick="showSendModal3D()">Send</button>
+    <button class="btn btn-add" onclick="addToTable()">➕ Insert</button>
+    <button class="btn btn-query" id="btnInfo" onclick="queryByNumber()">ℹ️ Information</button>
+    <button class="btn btn-edit" id="btnEdit" onclick="editDisclosure()">✏️ Update</button>
+    <button class="btn btn-nav" id="btnPrev" onclick="navigateDisclosure(-1)">⏪ Back</button>
+    <button class="btn btn-nav" id="btnNext" onclick="navigateDisclosure(1)">Next ⏩</button>
+    <button class="btn btn-save" onclick="saveLocal()">📊 SaveExcel</button>
+    <button class="btn btn-save" id="btnSaveTurso" style="background:linear-gradient(180deg,#fbbf24,#f59e0b);color:#000" onclick="saveToTurso()">💾 SaveDataBase</button>
+    <button class="btn btn-print" onclick="printTable()">🖨️ PrintData</button>
+    <button class="btn btn-clear" onclick="clearAll()">🗑️ ClearTable</button>
+    <button class="btn btn-delete" id="btnDelete" onclick="deleteDisclosure()">❌ Delete</button>
+    <button class="btn btn-send" onclick="showSendModal3D()">📤 Send</button>
   </div>
   <div id="previewBar" class="preview-bar" style="display:none"><span id="previewText"></span><span class="sep" id="sepSave" style="display:none"></span><span id="saveResult" style="display:none"></span></div>
 </div>
