@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مفردات مرتب - بيج 3D - شهر حالي فقط</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+*{box-sizing:border-box;font-family:'Cairo',Tahoma;margin:0;padding:0}
+body{ background:#f5f5dc; background-image: radial-gradient(800px 400px at 20% 10%, #fffaf0, transparent 60%); padding:12px; display:flex; flex-direction:column; align-items:center; min-height:100vh; color:#000; }
+.top-strip{ width:100%; max-width:900px; background: linear-gradient(180deg, #fffef5, #f5e6c8); border:2px solid #000; border-right:6px solid #8B4513; border-radius:16px; padding:12px 14px; display:flex; align-items:center; gap:10px; margin-bottom:12px; box-shadow: 0 6px 0 #8B4513, 0 12px 24px rgba(0,0,0,.2); }
+.nav-strip{ width:100%; max-width:900px; background:#fffef5; border:2px solid #000; border-radius:12px; padding:8px 12px; display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; box-shadow: 0 4px 0 #000; }
+.btn-nav{ padding:8px 18px; border-radius:10px; border:2px solid #000; background:linear-gradient(180deg,#fff,#f5e6c8); font-weight:900; cursor:pointer; box-shadow:0 4px 0 #000; }
+.btn-nav:active{ transform:translateY(4px); box-shadow:none }
+.main-card{ width:100%; max-width:900px; background: linear-gradient(180deg,#fffef5,#fdf6e3); border:2px solid #000; border-radius:18px; padding:16px; box-shadow: 0 8px 0 #d2b48c; }
+.input-3d{ width:100%; padding:10px 12px; border-radius:12px; border:2px solid #000; background:#fff; color:#000; font-weight:800; }
+#printArea{background:#fff!important;border:2px solid #000;border-radius:10px;padding:6px;width:100%;max-width:900px;margin:0 auto;font-weight:700;}
+.btn-3d{ padding:10px 14px; border-radius:12px; border:2px solid #000; font-weight:900; cursor:pointer; box-shadow:0 6px 0 #000; }
+.btn-3d:active{transform:translateY(6px);box-shadow:none}
+</style>
+</head>
+<body>
+
+<div class="top-strip">
+  <div><b id="empNameHeader">مرحبا إبراهيم محمد سليم أحمد</b><div style="font-size:10px">تم الدخول برقم البطاقة والبصمة - pageUser1.html</div></div>
+  <div style="margin-right:auto;display:flex;gap:6px">
+    <button onclick="location.href='index.html'" style="border:2px solid #000;padding:5px 12px;border-radius:999px;font-weight:900;">🏠 خروج</button>
+    <div id="countInfo" style="background:#8B0000;color:#fff;padding:5px 10px;border-radius:999px;font-weight:900;border:2px solid #000">كود: <span id="headerCode">40006</span></div>
+  </div>
+</div>
+
+<div class="nav-strip">
+  <button class="btn-nav" onclick="changeMonth(-1)">>> السابق</button>
+  <div style="font-weight:900"><span id="currentMonthLabel">ديسمبر</span> - <span id="currentYearLabel">2025</span></div>
+  <button class="btn-nav" onclick="changeMonth(1)">التالي <<</button>
+</div>
+
+<div id="loader" style="display:none;text-align:center;font-weight:800;margin:10px;background:#fff;padding:10px;border:2px solid #000;border-radius:12px">⏳ جاري التحميل...</div>
+<div id="displayArea" style="width:100%;max-width:900px;"></div>
+
+<script>
+const WORKER_BASE_URL = "https://turso-api.mostafa-voic77729.workers.dev";
+function toArabicDigits(str){ var map={'0':'٠','1':'١','2':'٢','3':'٣','4':'٤','5':'٥','6':'٦','7':'٧','8':'٨','9':'٩'}; return String(str).replace(/[0-9]/g,d=>map[d]); }
+
+// نفس الدوال بدون تغيير
+let currentDate = new Date();
+let currentMonth = currentDate.getMonth()+1;
+let currentYear = currentDate.getFullYear();
+const monthNameMap = {"1":"يناير","2":"فبراير","3":"مارس","4":"أبريل","5":"مايو","6":"يونيو","7":"يوليو","8":"أغسطس","9":"سبتمبر","10":"أكتوبر","11":"نوفمبر","12":"ديسمبر"};
+
+function getEmpCodeFromHeader(){
+  // يجلب الكود من أعلى الصفحة فقط كما طلبت
+  let code = document.getElementById('headerCode').innerText || localStorage.getItem('empCode') || '40006';
+  return code.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).trim();
+}
+function getEmpNameFromHeader(){
+  return document.getElementById('empNameHeader').innerText.replace('مرحبا','').trim() || 'إبراهيم محمد سليم أحمد';
+}
+
+function changeMonth(dir){
+  currentMonth+=dir;
+  if(currentMonth>12){currentMonth=1;currentYear++}
+  if(currentMonth<1){currentMonth=12;currentYear--}
+  document.getElementById('currentMonthLabel').innerText = monthNameMap[currentMonth];
+  document.getElementById('currentYearLabel').innerText = toArabicDigits(currentYear);
+  executeSearch();
+}
+
+async function executeSearch(){
+  var emptid = getEmpCodeFromHeader();
+  var monthArabic = monthNameMap[currentMonth];
+  document.getElementById('loader').style.display='block';
+  try{
+    const url = WORKER_BASE_URL + "/api/salary-turso?year=" + encodeURIComponent(currentYear) + "&month=" + encodeURIComponent(monthArabic) + "&code=" + encodeURIComponent(emptid);
+    const res = await fetch(url);
+    const j = await res.json();
+    document.getElementById('loader').style.display='none';
+    if(!res.ok ||!j.found){
+      document.getElementById('displayArea').innerHTML='<div style="background:#fff;padding:20px;text-align:center;color:#7a0000;font-weight:800;border:2px solid #000;border-radius:12px">❌ لا يوجد مرتب للشهر الحالي<br>'+monthArabic+' - '+toArabicDigits(currentYear)+'</div>';
+      return;
+    }
+    renderForm(j.data);
+  }catch(err){
+    document.getElementById('loader').style.display='none';
+    alert("خطأ: "+err.message);
+  }
+}
+
+function getFormHtmlJS(real_emp_name, emp_code_val, financial_year_val, month_val, bankName, bankCode, table_rows_html){
+  // تم الغاء التوقيعات والملاحظات نهائيا
+  return '<div id="printArea">'
+    + '<div style="display:flex;align-items:center;gap:8px;border:2px solid #000;border-radius:8px;background:#fff;padding:6px;margin-bottom:6px">'
+    + '<div style="flex:1;text-align:center"><div style="font-size:16px;font-weight:900">شركة مصر الوسطى لتوزيع الكهرباء</div><div style="font-size:13px">قطاع الموارد البشرية - بيان مفردات مرتب</div></div></div>'
+    + '<table style="width:100%;border-collapse:collapse;font-weight:700;margin-bottom:4px"><tr><td style="border:1px solid #000;padding:4px;text-align:center;background:#fffde7">السنة: '+toArabicDigits(financial_year_val)+' - شهر: '+month_val+'</td><td style="border:1px solid #000;padding:4px;text-align:center;background:#fce4ec;color:red">كود الموظف: '+toArabicDigits(emp_code_val)+'</td></tr><tr><td style="border:1px solid #000;padding:4px;text-align:center">اسم الموظف: '+real_emp_name+'</td><td style="border:1px solid #000;padding:4px;text-align:center">البنك: '+(bankName||'--')+' - رقم الحساب: '+(bankCode||'--')+'</td></tr></table>'
+    + '<table style="width:100%;border-collapse:collapse;text-align:center;font-weight:700"><thead><tr><th colspan="2" style="background:#8B4513;color:#fff;border:1px solid #000;padding:5px">الاستحقاقات</th><th colspan="2" style="background:#8B0000;color:#fff;border:1px solid #000;padding:5px">الاستقطاعات</th></tr></thead><tbody style="background:#fff">'+table_rows_html+'</tbody></table></div>';
+}
+
+function renderForm(row){
+  let allKeys = Object.keys(row);
+  let startIdx = allKeys.findIndex(k => k.includes("مرتب_اساسي"));
+  let midIdx = allKeys.findIndex(k => k.includes("أجمالى_المستحق") || k.includes("اجمالى_المستحق"));
+  let endIdx = allKeys.findIndex(k => k.includes("الصافى"));
+  let instKeys, mustKeys, safyKey;
+  if(startIdx!==-1 && midIdx!==-1){ instKeys = allKeys.slice(startIdx, midIdx+1); mustKeys = allKeys.slice(midIdx+1, endIdx!==-1?endIdx:undefined); safyKey = endIdx!==-1?allKeys[endIdx]:null; }
+  else { let filtered = allKeys.filter(k=>!["السنه","الشهر","كود_العامل","الاسم","emptid","id"].includes(k) &&!isNaN(parseFloat(row[k]))); instKeys=filtered.slice(0, Math.ceil(filtered.length/2)); mustKeys=filtered.slice(Math.ceil(filtered.length/2)); }
+  let inst=[], must=[];
+  (instKeys||[]).forEach(k=>{ if(row[k] && parseFloat(row[k])!=0) inst.push({key:k.replace(/_/g," "), val:parseFloat(row[k]).toFixed(2)}); });
+  (mustKeys||[]).forEach(k=>{ if(row[k] && parseFloat(row[k])!=0) must.push({key:k.replace(/_/g," "), val:parseFloat(row[k]).toFixed(2)}); });
+  var max=Math.max(inst.length, must.length); var rowsHtml="";
+  for(var i=0;i<max;i++){ var a=inst[i]||{key:"",val:""}; var b=must[i]||{key:"",val:""}; rowsHtml+='<tr><td style="border:1px solid #000;padding:4px">'+(a.val?toArabicDigits(a.val):"")+'</td><td style="border:1px solid #000;padding:4px;text-align:right">'+a.key+'</td><td style="border:1px solid #000;padding:4px">'+(b.val?toArabicDigits(b.val):"")+'</td><td style="border:1px solid #000;padding:4px;text-align:right">'+b.key+'</td></tr>'; }
+  let safyVal = safyKey? row[safyKey] : row["الصافى"];
+  if(safyVal) rowsHtml+='<tr><td colspan="2" style="border:2px solid #000;background:#fff9c4;font-weight:900">الصافي</td><td colspan="2" style="border:2px solid #000;background:#fff176;color:#b71c1c;font-weight:900;font-size:16px">'+toArabicDigits(parseFloat(safyVal).toFixed(2))+'</td></tr>';
+  var formHtml=getFormHtmlJS(row["الاسم"]||getEmpNameFromHeader(), row["emptid"]||getEmpCodeFromHeader(), row["السنه"]||currentYear, row["الشهر"]||monthNameMap[currentMonth], row["اسم_البنك_المحول_و_الفرع_المحول_اليه"]||"", row["رقم_الحساب_البنكى"]||"", rowsHtml);
+  document.getElementById('displayArea').innerHTML = '<div style="display:flex;gap:8px;margin-bottom:8px"><button class="btn-3d" style="flex:1;background:#f5e6c8" onclick="window.print()">🖨 طباعة</button><button class="btn-3d" style="flex:1;background:#25D366;color:#fff" onclick="downloadImage()">📤 صورة</button></div>'+formHtml;
+}
+
+async function downloadImage(){ let area=document.getElementById('printArea'); let canvas=await html2canvas(area,{scale:2,backgroundColor:'#ffffff'}); let link=document.createElement('a'); link.download='مرتب-'+getEmpCodeFromHeader()+'.png'; link.href=canvas.toDataURL('image/png'); link.click(); }
+
+window.onload=()=>{
+  document.getElementById('currentMonthLabel').innerText = monthNameMap[currentMonth];
+  document.getElementById('currentYearLabel').innerText = toArabicDigits(currentYear);
+  executeSearch();
+};
+</script>
+</body>
+</html>
