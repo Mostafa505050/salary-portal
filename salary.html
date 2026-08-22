@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مفردات مرتب - Turso - مع إعدادات الإرسال 40468</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+*{box-sizing:border-box;font-family:'Cairo',Tahoma;margin:0;padding:0}
+body{ background: #87CEEB; background-image: radial-gradient(800px 400px at 20% 10%, rgba(255,255,255,0.6), transparent 60%), radial-gradient(600px 400px at 90% 80%, rgba(70,130,180,0.35), transparent 60%); padding:12px; display:flex; flex-direction:column; align-items:center; min-height:100vh; color:#000000; }
+.top-strip{ width:100%; max-width:900px; background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(224,246,255,0.65)); backdrop-filter: blur(20px); border:1px solid rgba(70,130,180,0.35); border-right:6px solid #4682b4; border-radius:16px; padding:10px 14px; display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+.top-strip b, .top-strip div{color:#000000!important}
+.main-card{ width:100%; max-width:900px; background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(224,246,255,0.6)); backdrop-filter: blur(22px); border:1px solid rgba(70,130,180,0.35); border-radius:18px; padding:16px; }
+.row-2{display:flex;gap:8px;margin-bottom:8px}.row-2>div{flex:1}
+.row-emp{display:flex;gap:8px;margin-bottom:12px}
+.emp-search{flex:0 0 70%!important;width:70%!important}
+.emp-code{flex:0 0 30%!important;max-width:calc(30% - 8px)!important}
+.inline-field{display:flex;align-items:center;gap:6px}.inline-field label{font-size:11px;font-weight:800;min-width:45px;color:#000000}
+.input-3d,.select-trigger{ width:100%;padding:10px 12px;border-radius:12px; border:1.5px solid rgba(70,130,180,0.4); background: rgba(255,255,255,0.95); color:#000000; font-size:12px;font-weight:800; outline:none; }
+.btn-3d{ padding:10px 14px;border-radius:12px;border:none;color:#000;font-weight:900;cursor:pointer; box-shadow: 0 6px 0 rgba(70,130,180,0.3), 0 10px 20px rgba(70,130,180,0.2); transition:.12s; }
+.btn-3d:active{ transform: translateY(6px); box-shadow:none}
+.btn-print{background:linear-gradient(180deg,#87CEEB,#4682b4);color:#000000;flex:1;border:1.5px solid #2F4F4F}
+.btn-whats{background:linear-gradient(180deg,#25D366,#128C7E);flex:1;color:#fff}
+.btn-back{background:linear-gradient(180deg,#b0e0e6,#87CEEB);color:#000;border:1.5px solid #4682b4}
+.custom-select{position:relative}.select-trigger{cursor:pointer;display:flex;justify-content:space-between;align-items:center;color:#000}
+.select-panel{position:absolute;top:110%;left:0;right:0;z-index:99;background: #f0f8ff; border:1px solid #4682b4;border-radius:12px;display:none;max-height:320px;overflow:hidden;box-shadow:0 15px 35px rgba(70,130,180,.4)}
+.select-panel.open{display:block}.options{max-height:260px;overflow:auto}.option{padding:9px 10px;display:flex;justify-content:space-between;font-size:12px;cursor:pointer;border-bottom:1px solid rgba(70,130,180,0.2);color:#000000;font-weight:800}.option:hover{background: rgba(135,206,235,0.35)}
+.result-wrapper{width:100%;max-width:900px;margin:0 auto;display:none;margin-top:12px}
+.loader{display:none;text-align:center;color:#000000;font-weight:800;margin:10px;background: rgba(224,246,255,0.85); padding:10px;border-radius:12px;border:1px solid rgba(70,130,180,0.4)}
+#printArea{background:#fff!important;border:2px solid #000;border-radius:10px;padding:6px;width:100%;max-width:900px;margin:0 auto;box-sizing:border-box;font-weight:700; transition: all .2s ease;color:#000; position:relative; overflow:hidden}
+.actions{display:flex;gap:8px;max-width:900px;margin:0 auto 8px auto;width:100%}
+.controls-panel{width:100%;max-width:900px;background: rgba(224,246,255,0.85); backdrop-filter:blur(18px); border:1px solid rgba(70,130,180,0.4);border-radius:14px;padding:0;display:none;flex-direction:column;gap:0;margin-bottom:10px; overflow:hidden; box-shadow: 0 10px 30px rgba(70,130,180,0.2);}
+.controls-panel.show{display:flex}
+.controls-header{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:rgba(135,206,235,0.25);border-bottom:1px solid rgba(70,130,180,0.3);cursor:pointer;color:#000}
+.controls-body{padding:12px;display:flex;flex-direction:column;gap:12px}
+.controls-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.control-item{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.9);border:1px solid rgba(70,130,180,0.3);padding:6px 10px;border-radius:10px;color:#000}
+.control-item label{font-size:11px;font-weight:800;color:#000000}
+.control-item input[type="number"]{width:60px;padding:4px 6px;border-radius:6px;border:1px solid rgba(70,130,180,0.4);background:#fff;color:#000000;font-weight:800;font-size:12px;text-align:center}
+.control-item input[type="checkbox"]{width:16px;height:16px;accent-color:#4682b4}
+.send-card{border:1.5px solid #25D366!important;background: linear-gradient(180deg, rgba(232,255,232,0.9), rgba(224,246,255,0.7))!important}
+.send-serial-box{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#fff;border:1.5px solid #4682b4;border-radius:12px;padding:10px}
+.send-code-red{background:#ff0000;color:#fff;padding:4px 12px;border-radius:8px;font-weight:900;border:1.5px solid #8B0000;min-width:80px;text-align:center}
+.send-header-3d{font-size:12px!important;padding:8px 14px!important;background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(135,206,235,0.5))!important;border:1.5px solid rgba(70,130,180,0.6)!important;border-radius:12px!important;box-shadow: 0 4px 0 rgba(70,130,180,0.4), 0 8px 16px rgba(70,130,180,0.25)!important;font-weight:900!important;text-align:center!important;justify-content:center!important;transform: translateY(0);transition:.12s}
+.send-header-3d:active{transform: translateY(4px); box-shadow:none!important}
+@media (max-width:768px){
+  body{padding:6px}
+  .top-strip{flex-wrap:wrap;padding:8px}
+  .row-2{flex-direction:column}
+  .row-emp{flex-direction:column}
+  .emp-search{flex:1 1 100% !important;width:100% !important}
+  .emp-code{flex:1 1 100% !important;max-width:100% !important}
+  .controls-row{flex-direction:column;align-items:stretch}
+  .control-item{justify-content:space-between}
+  .actions{flex-direction:column}
+  #printArea{width:100% !important;font-size:10px !important}
+}
+@media print{
+  @page{margin:4mm;size:A4;}
+  html,body{background:#fff!important;margin:0!important;padding:0!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;height:auto!important;overflow:visible!important}
+  .no-print{display:none!important}
+  .result-wrapper{display:block!important;margin:0!important;padding:0!important;width:100%!important;max-width:100%!important}
+  #printArea{border:3px solid #000!important;border-radius:0!important;box-shadow:none!important;width:100%!important;max-width:100%!important;padding:3mm!important;page-break-inside: avoid!important;break-inside: avoid!important;transform-origin: top center!important;}
+}
+</style>
+</head>
+<body>
+<div class="top-strip no-print">
+<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='38' height='38'%3E%3Crect width='38' height='38' rx='8' fill='%234682b4'/%3E%3Ctext x='50%25' y='55%25' text-anchor='middle' font-size='16'%3E%E2%9A%A1%3C/text%3E%3C/svg%3E" style="width:38px;height:38px;border-radius:8px">
+  <div><b style="font-size:13px;color:#000000">مفردات مرتب - الربط الصحيح</b></div>
+  <div style="margin-right:auto;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+    <div id="countInfo" style="font-size:10px;background:rgba(135,206,235,0.35);border:1px solid rgba(70,130,180,0.5);padding:5px 10px;border-radius:999px;font-weight:800;color:#000000">0 موظف</div>
+    <button onclick="localStorage.clear(); location.href='index.html';" style="font-size:12px;background:rgba(255,255,255,0.9);border:1px solid #4682b4;padding:5px 12px;border-radius:999px;font-weight:900;color:#000000;cursor:pointer" title="الرئيسية">🏠 Home</button>
+    <button onclick="location.href='loadingSalary.html'" style="font-size:12px;background:rgba(135,206,235,0.35);border:1px solid rgba(70,130,180,0.5);padding:5px 12px;border-radius:999px;font-weight:900;color:#000000;cursor:pointer;box-shadow:0 2px 0 rgba(70,130,180,0.25);transition:.12s" title="إضافة / تحميل مرتبات">+ تحميل</button>
+  </div>
+</div>
+<div id="searchCard" class="main-card no-print">
+<div class="row-2"><div class="inline-field"><label>📅 السنة:</label><select id="yearSelect" class="input-3d"><option>2024</option><option>2025</option><option selected>2026</option></select></div><div class="inline-field"><label>📆 الشهر:</label><select id="monthSelect" class="input-3d"><option value="1">يناير</option><option value="2">فبراير</option><option value="3">مارس</option><option value="4">أبريل</option><option value="5">مايو</option><option value="6">يونيو</option><option value="7">يوليو</option><option value="8">أغسطس</option><option value="9">سبتمبر</option><option value="10">أكتوبر</option><option value="11">نوفمبر</option><option value="12">ديسمبر</option></select></div></div>
+<div class="row-emp"><div class="emp-search"><div style="font-size:10px;font-weight:800;margin-bottom:4px;color:#000000">📝 الموظف (الكود_البنكى = emptid):</div><div class="custom-select" id="empCustomSelect"><div class="select-trigger" id="selectTrigger" onclick="togglePanel()"><span id="triggerText">-- اختر الموظف --</span><span>▾</span></div><div class="select-panel" id="selectPanel"><div style="padding:6px"><input id="empSearchBox" class="input-3d" placeholder="بحث بالاسم أو الكود_البنكى..." oninput="filterEmp()"></div><div class="options" id="optionsList"></div></div></div></div><div class="emp-code inline-field"><label>👤 الكود:</label><input id="empCodeInput" class="input-3d" readonly></div></div>
+<button class="btn-3d" style="background:linear-gradient(180deg,#8B0000,#B71C1C);color:#fff;width:100%;height:46px;font-size:14px;border:1.5px solid #5a0000;box-shadow:0 6px 0 #5a0000, 0 10px 20px rgba(139,0,0,0.3)" onclick="executeSearch()">🔍 عرض الاستمارة</button>
+</div>
+<div id="loader" class="loader no-print">⏳ جاري التحميل... <span id="loadCounter" style="background:#4682b4;color:#fff;padding:3px 12px;border-radius:999px;font-size:13px;margin-right:8px">٠ ث</span></div>
+<div id="displayArea" class="result-wrapper"></div>
+<script>
+const WORKER_BASE_URL = "https://turso-api.mostafa-voic77729.workers.dev";
+function toArabicDigits(str){ if(str===null||str===undefined) return ""; var map={'0':'٠','1':'١','2':'٢','3':'٣','4':'٤','5':'٥','6':'٦','7':'٧','8':'٨','9':'٩'}; return String(str).replace(/[0-9]/g,d=>map[d]); }
+let currentFontSize = parseInt(localStorage.getItem('fontSize')||'12');
+let currentWidth = parseInt(localStorage.getItem('printWidth')||'100');
+let colWidths = JSON.parse(localStorage.getItem('colWidths')||'{"notes":25,"amt1":13,"data1":32,"amt2":13,"data2":40}');
+let showNotes = localStorage.getItem('showNotes') !== 'false';
+let hideSignatures = localStorage.getItem('hideSignatures') === 'true';
+let uniqueEmployees=[];
+let lastData=null;
+let sendSerial = parseInt(localStorage.getItem('sendSerial')||'1');
+let sendAuthed = false;
+let adminPasswordFromDB = '';
+
+async function fetchPasswordFromDB(){
+  try{
+    const sql = `SELECT "كلمة_المرور" as pwd FROM "موظفين_مرتبات" WHERE "اسم_العامل" LIKE '%مصطفى درويش سيد درويش%' LIMIT 1`;
+    const res = await fetch(WORKER_BASE_URL + "/api/turso", {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({sql})});
+    const j = await res.json();
+    if(j.ok && j.rows && j.rows[0] && j.rows[0].pwd){
+      adminPasswordFromDB = String(j.rows[0].pwd).trim();
+      localStorage.setItem('adminPassword_40468', adminPasswordFromDB);
+      return adminPasswordFromDB;
+    }
+  }catch(e){}
+  return '';
+}
+function normalizePhone(p){
+  if(!p) return '';
+  let digits = String(p).replace(/[^0-9]/g,'').trim();
+  if(!digits) return '';
+  if(/^1\\d{9}$/.test(digits)) return '0'+digits;
+  if(digits.length===10 && digits.startsWith('1')) return '0'+digits;
+  return digits;
+}
+
+async function loadEmployees(){
+  try{
+    const res = await fetch(WORKER_BASE_URL + "/api/employees-turso");
+    const j = await res.json();
+    let data = j.employees || [];
+    uniqueEmployees=data.map(r=>({
+      code: String(r.code || r.emptid || r['الكود_البنكى'] || "").trim(),
+      name: String(r.name || r['الاسم'] || "").trim(),
+      national_id: r.national_id || "",
+      phone: normalizePhone(r.Number || r.number || r.Phone || r.phone || r['رقم_الهاتف'] || "")
+    })).filter(e=>e.code && e.name);
+    const seen=new Set();
+    uniqueEmployees=uniqueEmployees.filter(e=>{ if(seen.has(e.code)) return false; seen.add(e.code); return true; });
+    uniqueEmployees.sort((a,b)=> a.name.localeCompare(b.name,'ar'));
+    populate(uniqueEmployees);
+    if(uniqueEmployees.length>0) updateSendUI();
+  }catch(e){
+    document.getElementById("countInfo").innerText="خطأ - اكتب الكود";
+    document.getElementById("empCodeInput").removeAttribute("readonly");
+  }
+}
+function populate(list){
+  var c=document.getElementById('optionsList'); c.innerHTML="";
+  list.slice(0,800).forEach((emp,idx)=>{
+    var d=document.createElement('div'); d.className='option';
+    d.innerHTML='<span>['+toArabicDigits(idx+1)+'] '+emp.name+'</span><small style="background:#ff0000;color:#fff;padding:2px 8px;border-radius:6px;font-weight:900;border:1px solid #8B0000">'+toArabicDigits(emp.code)+'</small>';
+    d.onclick=()=>{
+      const realIdx = uniqueEmployees.findIndex(u=>u.code===emp.code);
+      if(realIdx!==-1){ sendSerial = realIdx+1; localStorage.setItem('sendSerial', sendSerial); const si=document.getElementById('sendSerialInput'); if(si) si.value=sendSerial; }
+      document.getElementById('empCodeInput').value=toArabicDigits(emp.code);
+      document.getElementById('triggerText').textContent=emp.name+' - '+toArabicDigits(emp.code);
+      document.getElementById('empCodeInput').dataset.emptid=emp.code;
+      document.getElementById('empCodeInput').dataset.empname=emp.name;
+      closePanel();
+      updateSendUI();
+    };
+    c.appendChild(d);
+  });
+  document.getElementById('countInfo').textContent=toArabicDigits(list.length)+' موظف (الكود_البنكى=emptid)';
+}
+function filterEmp(){
+  var t=document.getElementById('empSearchBox').value.toLowerCase();
+  var f=t? uniqueEmployees.filter(e=>e.name.toLowerCase().indexOf(t)>-1||e.code.indexOf(t)>-1) : uniqueEmployees;
+  populate(f);
+}
+function togglePanel(){document.getElementById('selectPanel').classList.toggle('open')}
+function closePanel(){document.getElementById('selectPanel').classList.remove('open')}
+function toggleSearch(s){document.getElementById('searchCard').style.display=s?'block':'none'; if(s) document.getElementById('displayArea').style.display='none';}
+let loadTimer=null;
+function startLoadCounter(){ document.getElementById('loader').style.display='block'; let sec=0; loadTimer=setInterval(()=>{sec++; document.getElementById('loadCounter').textContent=toArabicDigits(sec)+' ث';},1000); }
+function stopLoadCounter(){ clearInterval(loadTimer); document.getElementById('loader').style.display='none'; }
+async function executeSearch(){
+  var codeEl=document.getElementById('empCodeInput');
+  var emptid=codeEl.dataset.emptid || codeEl.value.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
+  emptid = String(emptid).trim();
+  if(!emptid){ alert('اختر الموظف'); return; }
+  var year=document.getElementById('yearSelect').value;
+  var monthSelectEl=document.getElementById('monthSelect');
+  var monthArabic=monthSelectEl.options[monthSelectEl.selectedIndex].text.trim();
+  toggleSearch(false); startLoadCounter();
+  try{
+    const url = WORKER_BASE_URL + "/api/salary-turso?year=" + encodeURIComponent(year) + "&month=" + encodeURIComponent(monthArabic) + "&code=" + encodeURIComponent(emptid);
+    const res = await fetch(url);
+    const j = await res.json();
+    stopLoadCounter();
+    if(!res.ok || !j.found){
+      document.getElementById('displayArea').style.display='block';
+      const wasAuthed = sendAuthed;
+      document.getElementById('displayArea').innerHTML='<div id="sendSettingsFrame" class="no-print controls-panel send-card show" style="display:flex"><div class="controls-header send-header-3d" onclick="toggleSendFrame()"><span>📲 إعدادات الإرسال</span><span id="sendToggleIcon">▾</span></div><div id="sendAuthBox" class="controls-body" style="'+(wasAuthed?'display:none':'display:none')+'"><div style="background:#fff3cd;border:1.5px solid #ff9800;border-radius:10px;padding:8px;text-align:center;width:100%"><div style="font-weight:900;color:#7a0000;margin-bottom:4px;font-size:10px">🔒 كلمة المرور من DB - مصطفى درويش سيد درويش</div><div style="display:flex;gap:4px"><input id="sendCodeInput" type="password" class="input-3d" placeholder="كلمة المرور من DB" style="text-align:center;font-size:11px;padding:6px"><button class="btn-3d btn-whats" style="padding:6px 10px;font-size:11px" onclick="checkSendAuth()">🔓 فتح</button></div></div></div><div id="sendBody" class="controls-body" style="'+(wasAuthed?'display:flex':'display:none')+'"><div class="send-serial-box"><div style="display:flex;align-items:center;gap:6px"><label style="font-weight:900">م:</label><input id="sendSerialInput" type="number" min="1" style="width:70px;padding:6px;border-radius:8px;border:1.5px solid #4682b4;text-align:center;font-weight:900" value="'+sendSerial+'" onchange="onSerialChange(this.value)"></div><div id="sendCodeDisplay" class="send-code-red">[----]</div><div id="sendNameDisplay" style="font-weight:900;flex:1;min-width:150px">-- اسم العامل --</div><div style="display:flex;gap:4px"><button class="btn-3d btn-back" onclick="navSerial(-1)"> << السابق</button><button class="btn-3d btn-back" onclick="navSerial(1)">التالي >> </button></div></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><div class="control-item" style="flex:1"><label>📱 هاتف العامل (Number):</label><input id="sendPhoneDisplay" class="input-3d" readonly style="background:#e8f5e9;font-weight:900;direction:ltr" value=""></div><button id="btnSendWhatsapp" class="btn-3d btn-whats" style="min-width:160px;height:44px" onclick="sendWhatsappCurrent()">Send_Whattsup 📲</button></div><div id="sendStatus" style="font-size:11px;font-weight:800;padding:6px;border-radius:8px;display:none"></div></div></div><div style="background:#fff;padding:20px;text-align:center;color:#7a0000;font-weight:800;border-radius:12px;margin-top:8px">❌ لا يوجد مرتب<br>السنه: '+toArabicDigits(year)+' - الشهر: '+monthArabic+' - emptid (الكود_البنكى): '+toArabicDigits(emptid)+'<br><br>لا يوجد مرتب للكود '+toArabicDigits(emptid)+'</div><div class="no-print" style="text-align:center;margin-top:10px;display:flex;gap:6px;justify-content:center"><button class="btn-3d btn-back" onclick="toggleSearch(true)">↩ رجوع</button><button class="btn-3d btn-back" onclick="navSerial(-1)"> << السابق</button><button class="btn-3d btn-back" onclick="navSerial(1)">التالي >> </button></div>';
+      setTimeout(()=>{ updateSendUI(); const sb=document.getElementById('sendBody'); if(wasAuthed && sb) sb.style.display='flex'; },150);
+      return;
+    }
+    renderForm(j.data);
+  }catch(err){
+    stopLoadCounter();
+    alert("خطأ: "+err.message);
+    toggleSearch(true);
+  }
+}
+function getFormHtmlJS(real_emp_name, emp_code_val, financial_year_val, month_val, bankName, bankCode, table_rows_html){
+  return '<div id="printArea" style="font-size:'+currentFontSize+'px;width:'+currentWidth+'%">'
+    + '<div style="display:flex;align-items:center;gap:8px;width:100%;border:2px solid #000;border-radius:8px;background:#fff;padding:4px;margin-bottom:6px;min-height:80px">'
+    + '<div style="width:150px;height:70px;display:flex;align-items:center;justify-content:center;background:#fff;border:1px solid #ddd;border-radius:6px;flex-shrink:0">'
+    + '<img src="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'70\' height=\'70\' viewBox=\'0 0 70 70\'%3E%3Ccircle cx=\'35\' cy=\'35\' r=\'32\' fill=\'%23003366\' stroke=\'%23FFD700\' stroke-width=\'2\'/%3E%3Cpath d=\'M35 10 L42 28 L30 28 L38 48 L26 30 L38 30 Z\' fill=\'%23FFD700\'/%3E%3Ctext x=\'35\' y=\'62\' text-anchor=\'middle\' font-size=\'6\' fill=\'white\' font-weight=\'900\'%3EEETC%3C/text%3E%3C/svg%3E" style="width:65px;height:65px;object-fit:contain">'
+    + '</div>'
+    + '<div style="flex:1;text-align:center;color:#000">'
+    + '<div style="font-size:'+(currentFontSize+2)+'px;font-weight:800;white-space:nowrap">نموذج مفردات مرتب غير قابلة للصرف - شركة مصر الوسطى لنقل الكهرباء</div>'
+    + '<div style="font-size:'+currentFontSize+'px;font-weight:700;margin-top:2px;color:#003366"> ⚡ الإدارة العامة لشبكات وخطوط كهرباء بنى سويف⚡ </div>'
+    + '</div>'
+    + '</div>'
+    + '<div style="text-align:center;padding:4px;border:1px solid #000;border-radius:6px;background:#fff;margin-bottom:4px;white-space:nowrap"><span style="font-size:'+(currentFontSize+1)+'px;font-weight:900;color:#7f0000">👤 اسم الموظف: '+real_emp_name+'</span></div>'
+    + '<table style="width:100%;border-collapse:collapse;font-size:'+currentFontSize+'px;font-weight:700;margin-bottom:4px;table-layout:fixed"><tr><td style="border:1px solid #000;padding:3px;text-align:center;background:#fffde7;color:#000">السنة المالية: '+toArabicDigits(financial_year_val)+' -- بيان شهر: '+toArabicDigits(month_val)+'</td><td style="border:1px solid #000;padding:3px;text-align:center;background:#fce4ec;color:#ff0000;font-weight:900">كود الموظف: '+toArabicDigits(emp_code_val)+'</td></tr><tr><td style="border:1px solid #000;padding:3px;text-align:center;background:#e3f2fd;color:#000">جهة الصرف: '+(bankName?bankName:'--')+'</td><td style="border:1px solid #000;padding:3px;text-align:center;background:#f3e5f5;color:#000">رقم الحساب: '+toArabicDigits(bankCode)+'</td></tr></table>'
+    + '<table id="mainSalaryTable" style="width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed"><tr>'
+    + '<td id="notesCol" class="notes-col" style="width:'+colWidths.notes+'%;border:1px solid #000;border-radius:6px;vertical-align:top;padding:5px;background:#fff;color:#000;'+(showNotes?'':'display:none')+'"><div style="text-align:center;background:#fff176;border:1px solid #000;border-radius:4px;padding:4px;margin-bottom:6px;font-weight:900;color:#000">بيان مفردات مرتب</div>للسيد/ <b style="color:#b71c1c">'+real_emp_name+'</b><br><br><span style="font-size:'+(currentFontSize-2)+'px;color:#000">1- قد أعطيت هذه المفردات بناء على طلب المذكور دون أدنى مسئولية على الشركة.<br>2- الشركة غير مسئولة تجاه البنك عن أية قروض تمنح للعامل بناء على هذه المفردات.<br>3- الشركة غير مسئولة عن سداد أية مديونيات.</span></td>'
+    + '<td id="spacerCol" style="width:1%;'+(showNotes?'':'display:none')+'"></td>'
+    + '<td style="width:'+(showNotes ? (99-colWidths.notes) : 100)+'%;vertical-align:top;border:1px solid #000;border-radius:6px;overflow:hidden">'
+    + '<table style="width:100%;border-collapse:collapse;text-align:center;font-weight:700;table-layout:fixed">'
+    + '<colgroup><col id="col_amt1" style="width:'+colWidths.amt1+'%"><col id="col_data1" style="width:'+colWidths.data1+'%"><col id="col_amt2" style="width:'+colWidths.amt2+'%"><col id="col_data2" style="width:'+colWidths.data2+'%"></colgroup>'
+    + '<thead><tr><th colspan="2" style="background:#b71c1c;color:#fff;border:1px solid #000;padding:5px">الإستحقاقات</th><th colspan="2" style="background:#b71c1c;color:#fff;border:1px solid #000;padding:5px">المستقطع</th></tr><tr style="background:#e8f5e9"><th style="border:1px solid #000;padding:4px;color:#000">المبلغ</th><th style="border:1px solid #000;padding:4px;color:#000">البيانات</th><th style="border:1px solid #000;padding:4px;color:#000">المبلغ</th><th style="border:1px solid #000;padding:4px;color:#000">البيانات</th></tr></thead>'
+    + '<tbody style="background:#fff;color:#000">'+table_rows_html+'</tbody>'
+    + '</table>'
+    + '</td></tr></table>'
+    + '<table id="signaturesTable" style="width:100%;border-collapse:collapse;margin-top:6px;font-size:'+(currentFontSize-1)+'px;font-weight:800;table-layout:fixed">'
+    + '<tr id="sigHeaderRow"><td style="width:25%;border:1px solid #000;padding:5px;text-align:center;background:#fffde7;color:#000">مسئول الإستحقاقات</td><td style="width:25%;border:1px solid #000;padding:5px;text-align:center;background:#e8f5e9;color:#000">رئيس الشئون الإدارية</td><td style="width:25%;border:1px solid #000;padding:5px;text-align:center;background:#e3f2fd;color:#000">مدير عام شبكات بنى سويف</td><td style="width:25%;border:none"></td></tr>'
+    + '<tr id="sigBodyRow"><td class="sig-cell" style="border:1px solid #000;height:55px;padding:4px;vertical-align:top;color:#000">توقيع / <div style="text-align:center;margin-top:18px">------</div></td><td class="sig-cell" style="border:1px solid #000;height:55px;padding:4px;vertical-align:top;color:#000">محاسب /<div style="text-align:center;margin-top:18px;color:#b71c1c">إبراهيم محمد سعيد</div></td><td class="sig-cell" style="border:1px solid #000;height:55px;padding:4px;vertical-align:top;color:#000">مهندس /<div style="text-align:center;margin-top:18px;color:#0d47a1">سيد محمد عبد الحفيظ</div></td><td id="devCell" style="border:none;padding:4px;text-align:left;line-height:1.2;color:#000"><span style="font-size:9px">إعداد وتطوير</span><br><b style="font-size:10px">أ/ مصطفى درويش</b><br><span style="font-size:9px">📱 '+toArabicDigits("*****")+'</span></td></tr>'
+    + '</table>'
+    + '</div>';
+}
+function renderForm(row){
+  lastData=row;
+  var area=document.getElementById('displayArea'); area.style.display='block';
+  let allKeys = Object.keys(row);
+  let startIdx = allKeys.findIndex(k => k.includes("مرتب_اساسي") || k.includes("مرتب اساسي"));
+  let midIdx = allKeys.findIndex(k => k.includes("أجمالى_المستحق") || k.includes("اجمالى_المستحق") || k.includes("اجمالي_المستحق"));
+  let endIdx = allKeys.findIndex(k => k.includes("الصافى") || k.includes("الصافي"));
+  let instKeys, mustKeys, safyKey;
+  if(startIdx!==-1 && midIdx!==-1){
+    instKeys = allKeys.slice(startIdx, midIdx+1);
+    if(endIdx!==-1){ mustKeys = allKeys.slice(midIdx+1, endIdx); safyKey = allKeys[endIdx]; }
+    else mustKeys = allKeys.slice(midIdx+1);
+  } else {
+    const meta = ["السنه","الشهر","كود_العامل","الاسم","emptid","id","م","اسم_البنك_المحول_و_الفرع_المحول_اليه","رقم_الحساب_البنكى","كود_البنك","كود_القسم"];
+    let filtered = allKeys.filter(k=>!meta.includes(k) && row[k]!=null && row[k]!="" && !isNaN(parseFloat(row[k])));
+    let mid = filtered.findIndex(k=>k.includes("المستحق"));
+    if(mid!==-1){ instKeys=filtered.slice(0,mid+1); mustKeys=filtered.slice(mid+1); }
+    else { instKeys=filtered.slice(0, Math.ceil(filtered.length/2)); mustKeys=filtered.slice(Math.ceil(filtered.length/2)); }
+    let sIdx = filtered.findIndex(k=>k.includes("الصافى")||k.includes("الصافي"));
+    if(sIdx!==-1){ safyKey=filtered[sIdx]; mustKeys=mustKeys.filter(k=>k!==safyKey); }
+  }
+  let inst=[], must=[];
+  (instKeys||[]).forEach(k=>{
+    let v=row[k]; if(v!==null && v!=="" && !isNaN(parseFloat(v)) && parseFloat(v)!=0){
+      inst.push({key: k.replace(/_/g," "), val: parseFloat(v).toFixed(2)});
+    }
+  });
+  (mustKeys||[]).forEach(k=>{
+    let v=row[k]; if(v!==null && v!=="" && !isNaN(parseFloat(v)) && parseFloat(v)!=0){
+      must.push({key: k.replace(/_/g," "), val: parseFloat(v).toFixed(2)});
+    }
+  });
+  var max=Math.max(inst.length, must.length);
+  var rowsHtml="";
+  for(var i=0;i<max;i++){
+    var a=inst[i]||{key:"",val:""}; var b=must[i]||{key:"",val:""};
+    rowsHtml+='<tr style="height:24px"><td style="border:1px solid #000;padding:2px 3px;text-align:center;font-size:'+currentFontSize+'px;color:#000">'+(a.val?toArabicDigits(a.val):"")+'</td><td style="border:1px solid #000;padding:2px 6px;text-align:right;font-size:'+currentFontSize+'px;color:#000">'+a.key+'</td><td style="border:1px solid #000;padding:2px 3px;text-align:center;font-size:'+currentFontSize+'px;color:#000">'+(b.val?toArabicDigits(b.val):"")+'</td><td style="border:1px solid #000;padding:2px 6px;text-align:right;font-size:'+currentFontSize+'px;color:#000">'+b.key+'</td></tr>';
+  }
+  let safyVal = safyKey ? row[safyKey] : (row["الصافى"] || row["الصافي"]);
+  if(safyVal){
+    rowsHtml+='<tr><td colspan="2" style="border:2px solid #000;padding:5px;text-align:center;font-weight:900;background:#fff9c4;color:#000">الصافي</td><td colspan="2" style="border:2px solid #000;padding:5px;text-align:center;font-weight:900;background:#fff176;color:#b71c1c;font-size:'+(currentFontSize+2)+'px">'+toArabicDigits(parseFloat(safyVal).toFixed(2))+'</td></tr>';
+  }
+  var empName = row["الاسم"] || "";
+  var empCode = row["emptid"] || row["كود_العامل"] || "";
+  var finYear = row["السنه"] || "";
+  var monVal = row["الشهر"] || "";
+  var bankName = row["اسم_البنك_المحول_و_الفرع_المحول_اليه"] || row["اسم_البنك_المحول_والفرع_المحول_الية"] || "";
+  var bankCode = row["رقم_الحساب_البنكى"] || "";
+  var formHtml=getFormHtmlJS(empName, empCode, finYear, monVal, bankName, bankCode, rowsHtml);
+  area.innerHTML=''
+    + '<div class="no-print" style="max-width:900px;margin:0 auto 6px;display:flex;gap:6px">'
+    + '<button class="btn-3d send-header-3d" style="flex:1;margin:0" onclick="toggleSettingsFrame()">⚙ إعدادات العرض ▾</button>'
+    + '<button class="btn-3d btn-back" onclick="toggleSearch(true)">↩ رجوع</button>'
+    + '</div>'
+    + '<div id="settingsFrame" class="no-print controls-panel">'
+    + '<div class="controls-header" onclick="toggleSettingsFrame()">⚙ إعدادات العرض ▾</div>'
+    + '<div id="settingsBody" class="controls-body" style="display:none">'
+    + '<div class="controls-row" style="gap:6px">'
+    + '<div class="control-item"><input type="checkbox" id="chkShowNotes" '+(showNotes?'checked':'')+' onchange="toggleNotes(this.checked)"><label for="chkShowNotes">📝 إظهار الملاحظات</label></div>'
+    + '<div class="control-item"><input type="checkbox" id="chkHideSignatures" '+(hideSignatures?'checked':'')+' onchange="toggleSignatures(this.checked)"><label for="chkHideSignatures">✍ إخفاء التوقيعات</label></div>'
+    + '<div class="control-item"><label>🔍 حجم الخط:</label><input type="number" id="inputFontSize" min="8" max="20" value="'+currentFontSize+'" oninput="changeFontSize(this.value)"><span style="font-size:10px">px</span></div>'
+    + '<div class="control-item"><label>↔ عرض الاستمارة:</label><input type="number" id="inputWidth" min="70" max="120" value="'+currentWidth+'" oninput="changeWidth(this.value)"><span style="font-size:10px">%</span></div>'
+    + '</div>'
+    + '<div class="controls-row">'
+    + '<div class="control-item"><label>ملاحظات:</label><input type="number" id="w_notes" min="0" max="60" value="'+colWidths.notes+'" oninput="changeColWidth(\'notes\',this.value)"><span style="font-size:9px">%</span></div>'
+    + '<div class="control-item"><label>مبلغ 1:</label><input type="number" id="w_amt1" min="5" max="25" value="'+colWidths.amt1+'" oninput="changeColWidth(\'amt1\',this.value)"><span style="font-size:9px">%</span></div>'
+    + '<div class="control-item"><label>بيان 1:</label><input type="number" id="w_data1" min="10" max="60" value="'+colWidths.data1+'" oninput="changeColWidth(\'data1\',this.value)"><span style="font-size:9px">%</span></div>'
+    + '<div class="control-item"><label>مبلغ 2:</label><input type="number" id="w_amt2" min="5" max="25" value="'+colWidths.amt2+'" oninput="changeColWidth(\'amt2\',this.value)"><span style="font-size:9px">%</span></div>'
+    + '<div class="control-item"><label>بيان 2:</label><input type="number" id="w_data2" min="10" max="60" value="'+colWidths.data2+'" oninput="changeColWidth(\'data2\',this.value)"><span style="font-size:9px">%</span></div>'
+    + '</div>'
+    + '<div class="controls-row">'
+    + '<button class="btn-3d" style="background:linear-gradient(180deg,#87CEEB,#4682b4);flex:1;color:#000" onclick="saveSettings()">💾 حفظ الإعدادات</button>'
+    + '<button class="btn-3d btn-back" style="flex:1" onclick="resetSettings()">↺ افتراضي</button>'
+    + '</div></div></div>'
+    + '<div id="sendSettingsFrame" class="no-print controls-panel send-card show" style="display:flex">'
+    + '<div class="controls-header send-header-3d" onclick="toggleSendFrame()"><span>📲 إعدادات الإرسال</span><span id="sendToggleIcon">▾</span></div>'
+    + '<div id="sendAuthBox" class="controls-body" style="'+(sendAuthed?'display:none':'display:none')+'">'
+    + '<div style="background:#fff3cd;border:1.5px solid #ff9800;border-radius:10px;padding:8px;text-align:center;width:100%"><div style="font-weight:900;color:#7a0000;margin-bottom:4px;font-size:10px">🔒 كلمة المرور من DB - مصطفى درويش سيد درويش</div><div style="display:flex;gap:4px"><input id="sendCodeInput" type="password" class="input-3d" placeholder="كلمة المرور من DB" style="text-align:center;font-size:11px;padding:6px"><button class="btn-3d btn-whats" style="padding:6px 10px;font-size:11px" onclick="checkSendAuth()">🔓 فتح</button></div></div>'
+    + '</div>'
+    + '<div id="sendBody" class="controls-body" style="'+(sendAuthed?'display:flex':'display:none')+'">'
+    + '<div class="send-serial-box">'
+    + '<div style="display:flex;align-items:center;gap:6px"><label style="font-weight:900">م:</label><input id="sendSerialInput" type="number" min="1" style="width:70px;padding:6px;border-radius:8px;border:1.5px solid #4682b4;text-align:center;font-weight:900" value="'+sendSerial+'" onchange="onSerialChange(this.value)"></div>'
+    + '<div id="sendCodeDisplay" class="send-code-red">[----]</div>'
+    + '<div id="sendNameDisplay" style="font-weight:900;flex:1;min-width:150px">-- اسم العامل --</div>'
+    + '<div style="display:flex;gap:4px"><button class="btn-3d btn-back" onclick="navSerial(-1)"> << السابق</button><button class="btn-3d btn-back" onclick="navSerial(1)">التالي >> </button></div>'
+    + '</div>'
+    + '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'
+    + '<div class="control-item" style="flex:1"><label>📱 هاتف العامل (Number):</label><input id="sendPhoneDisplay" class="input-3d" readonly style="background:#e8f5e9;font-weight:900;direction:ltr" value=""></div>'
+    + '<button id="btnSendWhatsapp" class="btn-3d btn-whats" style="min-width:160px;height:44px" onclick="sendWhatsappCurrent()">Send_Whattsup 📲</button>'
+    + '</div>'
+    + '<div style="margin-top:8px;background:linear-gradient(180deg,#fff,#e8f5e9);border:1.5px solid #25D366;border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:6px">'
+    + '<div style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="chkCloudMode" onchange="toggleCloudAutoMode(this)" '+(cloudAutoMode?'checked':'')+' style="width:18px;height:18px;accent-color:#25D366"><label for="chkCloudMode" style="font-size:12px;font-weight:900;color:#0a5c36">🚀 وضع الإرسال التلقائي الكامل (Cloud API) - بدون فتح واتساب نهائي - يشتغل موبايل وكمبيوتر</label></div>'
+    + '<div id="cloudModeInfo" style="display:'+(cloudAutoMode?'block':'none')+';background:#0a5c36;color:#fff;border-radius:8px;padding:6px;font-size:10px;font-weight:700">✅ الوضع التلقائي مفعل: سيتم الإرسال في الخلفية عبر الـ Worker بدون فتح واتساب ويب. يعمل من الهاتف والكمبيوتر. تأكد أن الـ Worker يدعم /api/send-whatsapp-image (Evolution API أو Cloud API)</div>'
+    + '</div>'
+    + '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px;background:#fff;border:1.5px dashed #25D366;border-radius:12px;padding:8px">'
+    + '<button id="btnBulkSend" class="btn-3d" style="background:linear-gradient(180deg,#0a5c36,#128C7E);color:#fff;flex:1;min-width:180px;height:46px;font-size:13px" onclick="startBulkSend()">🚀 إرسال جماعي في الخلفية</button>'
+    + '<button id="btnStopBulk" class="btn-3d" style="background:linear-gradient(180deg,#8B0000,#ff4444);color:#fff;display:none;min-width:80px;height:46px" onclick="stopBulkSend()">⏹ إيقاف</button>'
+    + '<div style="display:flex;gap:6px;align-items:center"><label style="font-size:11px;font-weight:900">من:</label><input id="bulkFrom" type="number" min="1" value="1" style="width:60px;padding:6px;border-radius:8px;border:1.5px solid #4682b4;text-align:center;font-weight:900"><label style="font-size:11px;font-weight:900">إلى:</label><input id="bulkTo" type="number" min="1" value="10" style="width:60px;padding:6px;border-radius:8px;border:1.5px solid #4682b4;text-align:center;font-weight:900"></div>'
+    + '</div>'
+    + '<div id="bulkProgress" style="display:none;margin-top:6px;background:#fff;border:1.5px solid #4682b4;border-radius:10px;padding:8px"><div style="display:flex;justify-content:space-between;font-size:11px;font-weight:900"><span id="bulkCount">0 / 0</span><span id="bulkTimer">⏳</span></div><div style="background:#e0e0e0;border-radius:999px;height:10px;margin-top:4px;overflow:hidden"><div id="bulkBar" style="height:100%;width:0%;background:linear-gradient(90deg,#25D366,#128C7E);transition:width .3s"></div></div><div id="bulkLog" style="font-size:10px;max-height:80px;overflow:auto;margin-top:4px;background:#f5f5f5;border-radius:6px;padding:4px"></div></div>'
+    + '<div id="sendStatus" style="font-size:11px;font-weight:800;padding:6px;border-radius:8px;display:none"></div>'
+    + '</div></div>'
+    + '<div class="no-print actions"><button class="btn-3d btn-print" onclick="window[\'pr\'+\'intOnePage\']()">🖨 طباعة صفحة واحدة</button><button class="btn-3d btn-whats" onclick="downloadImage()">📤 تحميل صورة</button></div>'
+    + formHtml + '<br>';
+  applyVisibility();
+  updateSendUI();
+}
+function toggleSettingsFrame(){
+  const body = document.getElementById('settingsBody');
+  if(!body) return;
+  const isHidden = body.style.display==='none' || body.style.display==='';
+  body.style.display = isHidden ? 'flex' : 'none';
+  const frame = document.getElementById('settingsFrame');
+  if(frame) isHidden ? frame.classList.add('show') : frame.classList.remove('show');
+}
+function toggleSendFrame(){
+  const authBox = document.getElementById('sendAuthBox');
+  const body = document.getElementById('sendBody');
+  const icon = document.getElementById('sendToggleIcon');
+  if(!body) return;
+  const isAuthBoxVisible = authBox && authBox.style.display!=='none';
+  if(!sendAuthed){
+    if(authBox) authBox.style.display = authBox.style.display==='none'?'flex':'none';
+    if(body) body.style.display='none';
+    return;
+  }
+  const isHidden = body.style.display==='none' || body.style.display==='';
+  body.style.display = isHidden ? 'flex' : 'none';
+  if(authBox) authBox.style.display='none';
+  if(icon) icon.textContent = isHidden ? '▴' : '▾';
+}
+function checkSendAuth(){
+  const inp = document.getElementById('sendCodeInput');
+  if(!inp) return;
+  const val = inp.value.trim();
+  if(!adminPasswordFromDB){
+    alert('⏳ جاري جلب كلمة المرور من قاعدة البيانات... حاول مرة أخرى');
+    fetchPasswordFromDB();
+    return;
+  }
+  if(val === adminPasswordFromDB){
+    sendAuthed = true;
+    localStorage.setItem('adminPassword_40468', adminPasswordFromDB);
+    document.getElementById('sendAuthBox').style.display='none';
+    document.getElementById('sendBody').style.display='flex';
+    const icon=document.getElementById('sendToggleIcon'); if(icon) icon.textContent='▴';
+    updateSendUI();
+  }else{
+    alert('كلمة المرور خاطئة - يجب إدخال كلمة المرور من جدول موظفين_مرتبات للموظف مصطفى درويش سيد درويش فقط');
+  }
+}
+function onSerialChange(v){
+  let n = parseInt(v)||1;
+  if(n<1) n=1;
+  if(n>uniqueEmployees.length) n=uniqueEmployees.length;
+  sendSerial=n;
+  localStorage.setItem('sendSerial', n);
+  updateSendUI();
+  loadSalaryForSerial();
+}
+function navSerial(delta){
+  let n = sendSerial + delta;
+  if(n<1) n=1;
+  if(n>uniqueEmployees.length) n=uniqueEmployees.length;
+  sendSerial=n;
+  document.getElementById('sendSerialInput').value=n;
+  localStorage.setItem('sendSerial', n);
+  updateSendUI();
+  loadSalaryForSerial();
+}
+function loadSalaryForSerial(){
+  if(uniqueEmployees.length===0) return;
+  const emp = uniqueEmployees[sendSerial-1];
+  if(!emp) return;
+  const codeEl = document.getElementById('empCodeInput');
+  if(codeEl){
+    codeEl.dataset.emptid = emp.code;
+    codeEl.dataset.empname = emp.name;
+    codeEl.value = toArabicDigits(emp.code);
+  }
+  const trig = document.getElementById('triggerText');
+  if(trig) trig.textContent = emp.name + ' - ' + toArabicDigits(emp.code);
+  const wasAuthed = sendAuthed;
+  if(typeof executeSearch === 'function'){
+    executeSearch();
+    setTimeout(()=>{
+      if(wasAuthed){
+        const sb=document.getElementById('sendBody');
+        const ab=document.getElementById('sendAuthBox');
+        const icon=document.getElementById('sendToggleIcon');
+        const frame=document.getElementById('sendSettingsFrame');
+        if(frame){ frame.style.display='flex'; frame.classList.add('show'); }
+        if(sb) sb.style.display='flex';
+        if(ab) ab.style.display='none';
+        if(icon) icon.textContent='▴';
+      }
+    },300);
+  }
+}
+function updateSendUI(){
+  if(uniqueEmployees.length===0) return;
+  if(sendSerial<1) sendSerial=1;
+  if(sendSerial>uniqueEmployees.length) sendSerial=uniqueEmployees.length;
+  const emp = uniqueEmployees[sendSerial-1];
+  if(!emp) return;
+  const codeEl = document.getElementById('sendCodeDisplay');
+  const nameEl = document.getElementById('sendNameDisplay');
+  const phoneEl = document.getElementById('sendPhoneDisplay');
+  let phone = normalizePhone(emp.phone);
+  emp.phone = phone;
+  if(codeEl) codeEl.textContent='['+toArabicDigits(emp.code)+']';
+  if(nameEl) nameEl.textContent=emp.name;
+  if(phoneEl) phoneEl.value = phone || '';
+  if((!phone || phone==='') && phoneEl){
+    fetch(WORKER_BASE_URL + "/api/employee-phone?code=" + encodeURIComponent(emp.code))
+      .then(r=>r.json()).then(j=>{
+        if(j && j.phone){
+          let np = normalizePhone(j.phone);
+          emp.phone = np;
+          phoneEl.value = np;
+        }
+      }).catch(()=>{});
+  }
+}
+async function sendWhatsappCurrent(){
+  if(uniqueEmployees.length===0){ alert('لا يوجد موظفين'); return; }
+  const emp = uniqueEmployees[sendSerial-1];
+  if(!emp){ alert('رقم المسلسل غير صحيح'); return; }
+  let phone = normalizePhone(emp.phone);
+  if(!phone || phone.length<10){
+    const pe=document.getElementById('sendPhoneDisplay');
+    if(pe) phone = normalizePhone(pe.value);
+  }
+  if(!phone || phone.length<10){ alert('رقم هاتف العامل غير موجود في جدول موظفين_مرتبات حقل Number للموظف: '+emp.name); return; }
+  const year = document.getElementById('yearSelect').value;
+  const monthSel = document.getElementById('monthSelect');
+  const monthArabic = monthSel.options[monthSel.selectedIndex].text.trim();
+  const btn = document.getElementById('btnSendWhatsapp');
+  const status = document.getElementById('sendStatus');
+  btn.disabled=true; 
+  btn.textContent='⏳ جاري تجهيز الصورة...';
+  status.style.display='block'; status.style.background='#e3f2fd'; status.style.color='#000'; status.textContent='جاري إنشاء صورة مرتب: '+emp.name;
+  try{
+    // تأكد من بيانات المرتب
+    let printArea = document.getElementById('printArea');
+    if(!printArea || lastData==null || (lastData['emptid']||lastData['كود_العامل'])!=emp.code){
+      const url = WORKER_BASE_URL + "/api/salary-turso?year=" + encodeURIComponent(year) + "&month=" + encodeURIComponent(monthArabic) + "&code=" + encodeURIComponent(emp.code);
+      const res = await fetch(url);
+      const j = await res.json();
+      if(!j.found){ status.style.background='#ffebee'; status.textContent='❌ لا يوجد مرتب لهذا الشهر'; btn.disabled=false; btn.textContent='Send_Whattsup 📲'; return; }
+      renderForm(j.data);
+      await new Promise(r=>setTimeout(r,700));
+      printArea = document.getElementById('printArea');
+    }
+    btn.textContent='📸 جاري التصوير...';
+    const canvas = await html2canvas(printArea,{scale:2,useCORS:true,backgroundColor:'#ffffff'});
+    
+    // تحويل لـ blob بدلاً من base64 - أفضل للموبايل
+    const blob = await new Promise(resolve=> canvas.toBlob(resolve, 'image/png', 1.0));
+    const fileName = 'مرتب-'+emp.name+'-'+monthArabic+'.png';
+    const file = new File([blob], fileName, {type:'image/png'});
+    
+    const caption = 'مفردات مرتب - '+emp.name+' - '+monthArabic+' '+year;
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    
+    // المحاولة 1: Web Share API مع ملفات (يشتغل ممتاز على الموبايل - إرسال في الخلفية)
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      btn.textContent='📱 افتح المشاركة...';
+      status.style.background='#e8f5e9'; 
+      status.textContent='📱 سيتم فتح قائمة المشاركة - اختر واتساب ثم اختر جهة الاتصال ['+phone+'] - الإرسال في الخلفية';
+      try{
+        await navigator.share({
+          files:[file],
+          title: caption,
+          text: caption + ' - ' + phone
+        });
+        status.style.background='#e8f5e9'; status.style.color='#1b5e20';
+        status.textContent='✅ تمت مشاركة صورة مرتب '+emp.name+' ['+toArabicDigits(emp.code)+'] - انتقل للعامل التالي';
+        // نجاح - انتقال تلقائي
+        sendSerial++;
+        if(sendSerial>uniqueEmployees.length) sendSerial=1;
+        document.getElementById('sendSerialInput').value=sendSerial;
+        localStorage.setItem('sendSerial', sendSerial);
+        updateSendUI();
+        setTimeout(async ()=>{
+          const nextEmp = uniqueEmployees[sendSerial-1];
+          if(nextEmp){
+            try{
+              const url2 = WORKER_BASE_URL + "/api/salary-turso?year=" + encodeURIComponent(year) + "&month=" + encodeURIComponent(monthArabic) + "&code=" + encodeURIComponent(nextEmp.code);
+              const r2 = await fetch(url2); const j2 = await r2.json(); if(j2.found) renderForm(j2.data);
+            }catch(e){}
+          }
+        },800);
+        btn.disabled=false; btn.textContent='Send_Whattsup 📲'; return;
+      }catch(shareErr){
+        // المستخدم ألغى أو فشل - نكمل للـ fallback
+        if(shareErr && shareErr.name==='AbortError'){
+          status.textContent='تم الإلغاء'; btn.disabled=false; btn.textContent='Send_Whattsup 📲'; return;
+        }
+      }
+    }
+    
+    // المحاولة 2: للموبايل - استخدام Web Share مع تحميل تلقائي + wa.me (خلفية جزئية)
+    if(isMobile){
+      // حمّل الصورة تلقائياً في الخلفية
+      const urlBlob = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href=urlBlob; a.download=fileName; a.style.display='none'; document.body.appendChild(a); a.click();
+      setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(urlBlob); },1000);
+      
+      // حاول نسخ الصورة للحافظة (حديث)
+      try{
+        if(navigator.clipboard && window.ClipboardItem){
+          await navigator.clipboard.write([new ClipboardItem({'image/png': blob})]);
+          status.textContent='📋 تم نسخ الصورة للحافظة + تحميلها - افتح واتساب والصقها للرقم '+phone;
+        }
+      }catch(e){}
+      
+      // افتح واتساب مع رسالة - الصورة محملة بالفعل
+      const fullPhone = phone.startsWith('20')? phone : (phone.startsWith('0')? '2'+phone : '20'+phone);
+      status.style.background='#fff3e0';
+      status.textContent='📥 تم تحميل الصورة في الخلفية ✅ - الآن سيتم فتح واتساب للرقم '+phone+' - الصق الصورة';
+      setTimeout(()=>{
+        window.open('https://wa.me/'+fullPhone+'?text='+encodeURIComponent(caption),'_blank');
+      },800);
+    } else {
+      // كمبيوتر: تحميل + فتح واتساب ويب
+      const urlBlob = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href=urlBlob; a.download=fileName; a.click();
+      setTimeout(()=>URL.revokeObjectURL(urlBlob),1000);
+      const fullPhone = phone.startsWith('20')? phone : (phone.startsWith('0')? '2'+phone : '20'+phone);
+      window.open('https://wa.me/'+fullPhone+'?text='+encodeURIComponent(caption),'_blank');
+      status.style.background='#e8f5e9';
+      status.textContent='✅ تم تحميل الصورة في الخلفية + فتح واتساب للرقم '+phone;
+    }
+    
+    // انتقال للعامل التالي تلقائي بعد 1.5 ثانية
+    setTimeout(()=>{
+      sendSerial++;
+      if(sendSerial>uniqueEmployees.length) sendSerial=1;
+      document.getElementById('sendSerialInput').value=sendSerial;
+      localStorage.setItem('sendSerial', sendSerial);
+      updateSendUI();
+      const nextEmp = uniqueEmployees[sendSerial-1];
+      if(nextEmp){
+        fetch(WORKER_BASE_URL + "/api/salary-turso?year=" + encodeURIComponent(year) + "&month=" + encodeURIComponent(monthArabic) + "&code=" + encodeURIComponent(nextEmp.code))
+        .then(r=>r.json()).then(j2=>{ if(j2.found) renderForm(j2.data); }).catch(()=>{});
+      }
+    },1500);
+    
+  }catch(err){
+    status.style.background='#ffebee'; status.textContent='❌ خطأ: '+err.message;
+  }finally{
+    btn.disabled=false; btn.textContent='Send_Whattsup 📲';
+  }
+}
+// === إرسال جماعي في الخلفية ===
+let bulkRunning=false;
+let bulkAbort=false;
+function stopBulkSend(){ bulkAbort=true; bulkRunning=false; document.getElementById('btnBulkSend').style.display=''; document.getElementById('btnStopBulk').style.display='none'; document.getElementById('bulkTimer').textContent='⏹ تم الإيقاف'; }
+
+let cloudAutoMode = localStorage.getItem('cloudAutoMode')==='true';
+function toggleCloudAutoMode(chk){
+  cloudAutoMode = chk.checked;
+  localStorage.setItem('cloudAutoMode', cloudAutoMode);
+  const info=document.getElementById('cloudModeInfo');
+  if(info) info.style.display = cloudAutoMode ? 'block' : 'none';
+}
+async function sendViaCloudWorker(phone, base64, caption, code, name){
+  // يحاول إرسال تلقائي عبر الـ Worker الخاص بك
+  try{
+    const res = await fetch(WORKER_BASE_URL + "/api/send-whatsapp-image",{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({phone: phone, imageBase64: base64, caption: caption, code: code, name: name})
+    });
+    const j = await res.json().catch(()=>({}));
+    return {ok: res.ok && j.ok, data: j};
+  }catch(e){
+    return {ok:false, error:e.message};
+  }
+}
+
+async function startBulkSend(){
+  if(uniqueEmployees.length===0){ alert('لا يوجد موظفين'); return; }
+  const fromEl=document.getElementById('bulkFrom'); const toEl=document.getElementById('bulkTo');
+  let from = parseInt(fromEl.value)||1; let to = parseInt(toEl.value)||uniqueEmployees.length;
+  if(from<1) from=1; if(to>uniqueEmployees.length) to=uniqueEmployees.length; if(from>to){ alert('من يجب أن يكون أقل من إلى'); return; }
+  
+  const modeText = cloudAutoMode ? 'تلقائي كامل Cloud API (بدون فتح واتساب نهائي - يشتغل من الموبايل والكمبيوتر)' : 'مشاركة يدوية (يفتح قائمة مشاركة كل مرة)';
+  if(!confirm('وضع الإرسال: '+modeText+'\n\nسيتم إرسال من مسلسل '+from+' إلى '+to+' ('+(to-from+1)+' موظف) بفارق 10 ثواني بين كل موظف.\nهل تريد المتابعة؟')) return;
+  
+  bulkRunning=true; bulkAbort=false;
+  document.getElementById('btnBulkSend').style.display='none';
+  document.getElementById('btnStopBulk').style.display='';
+  const prog=document.getElementById('bulkProgress'); prog.style.display='block';
+  const bar=document.getElementById('bulkBar'); const countEl=document.getElementById('bulkCount'); const timerEl=document.getElementById('bulkTimer'); const logEl=document.getElementById('bulkLog');
+  logEl.innerHTML='';
+  const year = document.getElementById('yearSelect').value;
+  const monthSel = document.getElementById('monthSelect');
+  const monthArabic = monthSel.options[monthSel.selectedIndex].text.trim();
+  
+  let sent=0; const total=to-from+1;
+  for(let i=from; i<=to; i++){
+    if(bulkAbort) break;
+    const emp = uniqueEmployees[i-1];
+    if(!emp) continue;
+    let phone = normalizePhone(emp.phone);
+    if(!phone || phone.length<10){
+      try{
+        const r=await fetch(WORKER_BASE_URL + "/api/employee-phone?code=" + encodeURIComponent(emp.code));
+        const j=await r.json(); if(j&&j.phone) phone=normalizePhone(j.phone);
+      }catch(e){}
+    }
+    if(!phone || phone.length<10){
+      logEl.innerHTML += '<div style="color:#c00">❌ ['+i+'] '+emp.name+' - لا يوجد رقم هاتف</div>'; continue;
+    }
+    countEl.textContent = (sent+1)+' / '+total+' - ['+i+'] '+emp.name;
+    timerEl.textContent='⏳ جاري تجهيز '+emp.name+'...';
+    
+    try{
+      const url = WORKER_BASE_URL + "/api/salary-turso?year=" + encodeURIComponent(year) + "&month=" + encodeURIComponent(monthArabic) + "&code=" + encodeURIComponent(emp.code);
+      const res = await fetch(url); const j = await res.json();
+      if(!j.found){ logEl.innerHTML+='<div>⚠ ['+i+'] '+emp.name+' - لا يوجد مرتب</div>'; continue; }
+      renderForm(j.data);
+      await new Promise(r=>setTimeout(r,700));
+      const printArea=document.getElementById('printArea');
+      const canvas=await html2canvas(printArea,{scale:2,useCORS:true,backgroundColor:'#ffffff'});
+      const blob=await new Promise(resolve=> canvas.toBlob(resolve,'image/png',1.0));
+      const base64 = await new Promise(resolve=>{ const reader=new FileReader(); reader.onload=()=>resolve(reader.result.split(',')[1]); reader.readAsDataURL(blob); });
+      const fileName='مرتب-'+emp.name+'-'+monthArabic+'.png';
+      const caption='مفردات مرتب - '+emp.name+' - '+monthArabic+' '+year;
+      
+      if(cloudAutoMode){
+        // === وضع تلقائي كامل - لا يفتح واتساب نهائي - يشتغل موبايل وكمبيوتر ===
+        timerEl.textContent='🚀 إرسال تلقائي في الخلفية... ['+i+'] '+emp.name+' -> '+phone;
+        const cloudRes = await sendViaCloudWorker(phone, base64, caption, emp.code, emp.name);
+        if(cloudRes.ok){
+          logEl.innerHTML+='<div style="color:#0a0">✅ ['+i+'] '+emp.name+' -> '+phone+' - تم الإرسال تلقائي في الخلفية (Cloud)</div>';
+          sent++;
+        }else{
+          logEl.innerHTML+='<div style="color:#c00">❌ ['+i+'] '+emp.name+' - فشل الإرسال التلقائي: '+(cloudRes.data?.error || cloudRes.error || 'Worker لا يدعم Cloud')+' - سيتم fallback للمشاركة</div>';
+          // fallback لمشاركة عادية
+          const file=new File([blob], fileName, {type:'image/png'});
+          if(navigator.canShare && navigator.canShare({files:[file]})){
+            try{ await navigator.share({files:[file], title:caption, text:caption}); logEl.innerHTML+='<div style="color:#0a0">✅ ['+i+'] '+emp.name+' - تمت المشاركة fallback</div>'; sent++; }catch(e){}
+          }
+        }
+      } else {
+        // === وضع مشاركة يدوية (القديم) ===
+        const file=new File([blob], fileName, {type:'image/png'});
+        if(navigator.canShare && navigator.canShare({files:[file]})){
+          timerEl.textContent='📱 اختر واتساب ثم جهة الاتصال... ['+i+']';
+          try{
+            await navigator.share({files:[file], title:caption, text:caption+' - '+phone});
+            logEl.innerHTML+='<div style="color:#0a0">✅ ['+i+'] '+emp.name+' - تمت المشاركة</div>';
+            sent++;
+          }catch(e){
+            if(e && e.name==='AbortError'){ logEl.innerHTML+='<div>⏹ تم الإلغاء عند ['+i+']</div>'; break; }
+            const urlBlob=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=urlBlob; a.download=fileName; a.click(); setTimeout(()=>URL.revokeObjectURL(urlBlob),1000);
+          }
+        }else{
+          const urlBlob=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=urlBlob; a.download=fileName; document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(()=>URL.revokeObjectURL(urlBlob),1000);
+          const fullPhone = phone.startsWith('20')? phone : (phone.startsWith('0')? '2'+phone : '20'+phone);
+          window.open('https://wa.me/'+fullPhone+'?text='+encodeURIComponent(caption),'_blank');
+          logEl.innerHTML+='<div>📥 ['+i+'] '+emp.name+' - تم التحميل + فتح واتساب ويب</div>';
+          sent++;
+        }
+      }
+    }catch(err){
+      logEl.innerHTML+='<div style="color:#c00">❌ ['+i+'] '+emp.name+' - خطأ: '+err.message+'</div>';
+    }
+    bar.style.width = Math.round(((i-from+1)/total)*100)+'%';
+    logEl.scrollTop=logEl.scrollHeight;
+    
+    if(i<to && !bulkAbort){
+      for(let t=10; t>=1; t--){
+        if(bulkAbort) break;
+        timerEl.textContent='⏳ انتظار '+t+' ثانية قبل الموظف التالي لتجنب الحظر... ('+(cloudAutoMode?'تلقائي':'يدوي')+')';
+        await new Promise(r=>setTimeout(r,1000));
+      }
+    }
+  }
+  bulkRunning=false;
+  document.getElementById('btnBulkSend').style.display='';
+  document.getElementById('btnStopBulk').style.display='none';
+  timerEl.textContent = bulkAbort ? '⏹ توقف - تم إرسال '+sent+' من '+total : '✅ انتهى - تم إرسال '+sent+' من '+total+' في الخلفية';
+  bar.style.width='100%';
+  sendSerial = to+1; if(sendSerial>uniqueEmployees.length) sendSerial=1;
+  document.getElementById('sendSerialInput').value=sendSerial; localStorage.setItem('sendSerial', sendSerial); updateSendUI();
+}
+function toggleNotes(checked){
+  showNotes = checked;
+  localStorage.setItem('showNotes', showNotes);
+  applyVisibility();
+}
+function toggleSignatures(checked){
+  hideSignatures = checked;
+  localStorage.setItem('hideSignatures', hideSignatures);
+  applyVisibility();
+}
+function applyVisibility(){
+  const notesCol = document.getElementById('notesCol');
+  const spacerCol = document.getElementById('spacerCol');
+  const sigHeader = document.getElementById('sigHeaderRow');
+  const sigBody = document.getElementById('sigBodyRow');
+  if(notesCol) notesCol.style.display = showNotes ? '' : 'none';
+  if(spacerCol) spacerCol.style.display = showNotes ? '' : 'none';
+  const mainTable = document.getElementById('mainSalaryTable');
+  if(mainTable){
+    const tds = mainTable.querySelectorAll('tr > td');
+    if(tds.length>=3){
+      tds[2].style.width = showNotes ? (99-colWidths.notes)+'%' : '100%';
+    }
+  }
+  if(sigHeader && sigBody){
+    const sigCells = sigBody.querySelectorAll('.sig-cell');
+    const headerCells = sigHeader.querySelectorAll('td');
+    if(hideSignatures){
+      sigCells.forEach(c=>c.style.display='none');
+      if(headerCells[0]) headerCells[0].style.display='none';
+      if(headerCells[1]) headerCells[1].style.display='none';
+      if(headerCells[2]) headerCells[2].style.display='none';
+    }else{
+      sigCells.forEach(c=>c.style.display='');
+      headerCells.forEach(c=>c.style.display='');
+    }
+  }
+}
+function changeFontSize(val){
+  currentFontSize = parseInt(val)||12;
+  localStorage.setItem('fontSize', currentFontSize);
+  const pa = document.getElementById('printArea');
+  if(pa) pa.style.fontSize = currentFontSize+'px';
+  if(lastData) renderForm(lastData);
+}
+function changeWidth(val){
+  currentWidth = parseInt(val)||100;
+  localStorage.setItem('printWidth', currentWidth);
+  const pa = document.getElementById('printArea');
+  if(pa) pa.style.width = currentWidth+'%';
+}
+function changeColWidth(key,val){
+  colWidths[key]=parseInt(val)||10;
+  localStorage.setItem('colWidths', JSON.stringify(colWidths));
+  if(lastData) renderForm(lastData);
+}
+function saveSettings(){
+  localStorage.setItem('fontSize', currentFontSize);
+  localStorage.setItem('printWidth', currentWidth);
+  localStorage.setItem('colWidths', JSON.stringify(colWidths));
+  localStorage.setItem('showNotes', showNotes);
+  localStorage.setItem('hideSignatures', hideSignatures);
+  alert('✅ تم حفظ الإعدادات');
+}
+function resetSettings(){
+  localStorage.removeItem('fontSize');
+  localStorage.removeItem('printWidth');
+  localStorage.removeItem('colWidths');
+  localStorage.removeItem('showNotes');
+  localStorage.removeItem('hideSignatures');
+  currentFontSize=12; currentWidth=100; colWidths={notes:25,amt1:13,data1:32,amt2:13,data2:40}; showNotes=true; hideSignatures=false;
+  if(lastData) renderForm(lastData);
+}
+window['pr'+'intOnePage']=function(){
+  const pa = document.getElementById('printArea');
+  if(!pa) return;
+  pa.style.border = '3px solid #000';
+  pa.style.boxShadow = '0 0 0 2px #000 inset';
+  const originalTransform = pa.style.transform;
+  const contentHeight = pa.scrollHeight;
+  const maxHeight = 1080;
+  if(contentHeight > maxHeight){
+    const scale = maxHeight / contentHeight;
+    pa.style.transformOrigin = 'top center';
+    pa.style.transform = 'scale(' + scale + ')';
+  }
+  window['pr'+'int']();
+  setTimeout(()=>{
+    pa.style.transform = originalTransform;
+    pa.style.border = '2px solid #000';
+    pa.style.boxShadow = 'none';
+  }, 500);
+}
+async function downloadImage(){
+  let area=document.getElementById('printArea');
+  let canvas=await html2canvas(area,{scale:2,useCORS:true,backgroundColor:'#ffffff'});
+  let link=document.createElement('a');
+  link.download='مرتب-'+(lastData["الاسم"]||"")+'-'+(lastData["الشهر"]||"")+'.png';
+  link.href=canvas.toDataURL('image/png');
+  link.click();
+}
+window.onload=()=>{
+  loadEmployees();
+  fetchPasswordFromDB();
+  // عند بداية التشغيل يكون مطوي
+  setTimeout(()=>{
+    const sb=document.getElementById('sendBody');
+    const ab=document.getElementById('sendAuthBox');
+    const frame=document.getElementById('sendSettingsFrame');
+    if(sb) sb.style.display='none';
+    if(ab) ab.style.display='none';
+    if(frame){ frame.style.display='flex'; }
+    const icon=document.getElementById('sendToggleIcon');
+    if(icon) icon.textContent='▾';
+  },400);
+  document.addEventListener('click',e=>{
+    const sel=document.getElementById('empCustomSelect');
+    if(sel && !sel.contains(e.target)) closePanel();
+  });
+};
+</script>
+</body>
+</html>
