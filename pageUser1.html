@@ -417,7 +417,7 @@ function stopLoadCounter(){
 }
 
 function getFormHtmlJS(real_emp_name, emp_code_val, financial_year_val, month_val, bankName, bankCode, table_rows_html, currentFontSize){
-  currentFontSize = 9;
+  currentFontSize = 14;
   return '<div style="font-size:'+currentFontSize+'px;width:100%">'
     + '<div style="display:flex;align-items:center;gap:8px;width:100%;border:2px solid #000;border-radius:8px;background:#fff;padding:4px;margin-bottom:6px;min-height:80px">'
     + '<div style="width:150px;height:70px;display:flex;align-items:center;justify-content:center;background:#fff;border:1px solid #ddd;border-radius:6px;flex-shrink:0;overflow:hidden">'
@@ -621,16 +621,16 @@ function renderForm(row){
     const aRed = isRedItem(a.key);
     const bRed = isRedItem(b.key);
     rowsHtml+='<tr style="height:28px">'
-      +'<td class="nowrap-cell" style="border:1px solid #000;padding:4px 3px;text-align:center;font-size:14px;white-space:nowrap;'+(aRed?'color:#b71c1c;font-weight:900;background:#fff1f1;':'color:#000')+'">'+(a.val?toArabicDigits(a.val):"")+'</td>'
-      +'<td class="nowrap-cell" style="border:1px solid #000;padding:4px 6px;text-align:right;font-size:14px;white-space:nowrap;'+(aRed?'color:#b71c1c;font-weight:900;background:#fff1f1;':'color:#000')+'">'+a.key+'</td>'
-      +'<td class="nowrap-cell" style="border:1px solid #000;padding:4px 3px;text-align:center;font-size:14px;white-space:nowrap;'+(bRed?'color:#b71c1c;font-weight:900;background:#fff1f1;':'color:#000')+'">'+(b.val?toArabicDigits(b.val):"")+'</td>'
-      +'<td class="nowrap-cell" style="border:1px solid #000;padding:4px 6px;text-align:right;font-size:14px;white-space:nowrap;'+(bRed?'color:#b71c1c;font-weight:900;background:#fff1f1;':'color:#000')+'">'+b.key+'</td>'
+      +'<td class="nowrap-cell" style="border:1px solid #000;padding:4px 3px;text-align:center;font-size:9px;white-space:nowrap;'+(aRed?'color:#b71c1c;font-weight:900;background:#fff1f1;':'color:#000')+'">'+(a.val?toArabicDigits(a.val):"")+'</td>'
+      +'<td class="nowrap-cell" style="border:1px solid #000;padding:4px 6px;text-align:right;font-size:9px;white-space:nowrap;'+(aRed?'color:#b71c1c;font-weight:900;background:#fff1f1;':'color:#000')+'">'+a.key+'</td>'
+      +'<td class="nowrap-cell" style="border:1px solid #000;padding:4px 3px;text-align:center;font-size:9px;white-space:nowrap;'+(bRed?'color:#b71c1c;font-weight:900;background:#fff1f1;':'color:#000')+'">'+(b.val?toArabicDigits(b.val):"")+'</td>'
+      +'<td class="nowrap-cell" style="border:1px solid #000;padding:4px 6px;text-align:right;font-size:9px;white-space:nowrap;'+(bRed?'color:#b71c1c;font-weight:900;background:#fff1f1;':'color:#000')+'">'+b.key+'</td>'
       +'</tr>';
   }
 
   let safyVal = safyKey ? row[safyKey] : (row["الصافى"] || row["الصافي"] || row["الصافي_النهائي"]);
   if(safyVal){
-    rowsHtml+='<tr><td colspan="2" class="nowrap-cell" style="border:2px solid #000;padding:6px;text-align:center;font-weight:900;background:#fff9c4;color:#000;white-space:nowrap">الصافي</td><td colspan="2" class="nowrap-cell" style="border:2px solid #000;padding:6px;text-align:center;font-weight:900;background:#fff176;color:#b71c1c;font-size:16px;white-space:nowrap">'+toArabicDigits(parseFloat(safyVal).toFixed(2))+'</td></tr>';
+    rowsHtml+='<tr><td colspan="2" class="nowrap-cell" style="border:2px solid #000;padding:6px;text-align:center;font-weight:900;background:#fff9c4;color:#000;white-space:nowrap">الصافي</td><td colspan="2" class="nowrap-cell" style="border:2px solid #000;padding:6px;text-align:center;font-weight:900;background:#fff176;color:#b71c1c;font-size:18px;white-space:nowrap">'+toArabicDigits(parseFloat(safyVal).toFixed(2))+'</td></tr>';
   }
 
   const empName = row["الاسم"] || row["اسم_العامل"] || getEmpNameFromHeader() || "";
