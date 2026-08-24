@@ -71,26 +71,92 @@ body{
   text-shadow: 0 1px 0 #fff;
 }
 .btn-3d{
-  height:40px;
-  padding:0 14px;
-  border-radius:12px;
-  border:2px solid #000;
-  font-weight:800;
-  font-size:12px;
+  height:42px;
+  padding:0 16px;
+  border-radius:14px;
+  border:2.5px solid #000;
+  font-weight:900;
+  font-size:13px;
   cursor:pointer;
-  transition:.1s;
+  transition:.12s;
   display:inline-flex;
   align-items:center;
   justify-content:center;
   gap:6px;
   white-space:nowrap;
+  position:relative;
+  transform: perspective(600px) rotateX(2deg);
+  text-shadow: 0 1px 0 rgba(255,255,255,0.8);
 }
-.btn-logout{ background:#fff1f1; color:#b91c1c; box-shadow: 0 4px 0 #e8a0a0, 0 2px 0 #000; }
-.btn-logout:active{ transform:translateY(3px); box-shadow: 0 1px 0 #e8a0a0, 0 1px 0 #000; }
-.btn-nav{ background:linear-gradient(180deg,#ffffff,#f5e6c8); color:#000; box-shadow: 0 5px 0 #d2b48c, 0 3px 0 #000; min-width:88px; }
-.btn-nav:active{ transform:translateY(3px); box-shadow: 0 2px 0 #d2b48c, 0 1px 0 #000; }
-.btn-main{ background:linear-gradient(180deg,#ffefc3,#f0c98a); color:#000; box-shadow: 0 5px 0 #c19a6b, 0 3px 0 #000; }
-.btn-main:active{ transform:translateY(3px); box-shadow: 0 2px 0 #c19a6b, 0 1px 0 #000; }
+.btn-logout{
+  background:linear-gradient(180deg,#fff5f5,#ffd0d0) !important;
+  color:#8B0000;
+  box-shadow: 0 6px 0 #c47a7a, 0 4px 0 #000, inset 0 1px 0 #fff !important;
+}
+.btn-logout:active{ transform: perspective(600px) rotateX(2deg) translateY(4px); box-shadow: 0 2px 0 #c47a7a, 0 1px 0 #000, inset 0 1px 0 #fff !important; }
+.btn-nav{
+  background:linear-gradient(180deg,#ffffff,#fff8e7 40%,#f5e6c8 100%) !important;
+  color:#000;
+  box-shadow: 0 6px 0 #a08060, 0 4px 0 #000, inset 0 1px 0 #fff !important;
+  min-width:88px;
+}
+.btn-nav:active{ transform: perspective(600px) rotateX(2deg) translateY(4px); box-shadow: 0 2px 0 #a08060, 0 1px 0 #000, inset 0 1px 0 #fff !important; }
+.btn-main{
+  background:linear-gradient(180deg,#fff8e7,#ffefc3 30%,#f0c98a 100%) !important;
+  color:#5a2a00;
+  box-shadow: 0 6px 0 #c19a6b, 0 4px 0 #000, inset 0 1px 0 #fff !important;
+}
+.btn-main:active{ transform: perspective(600px) rotateX(2deg) translateY(4px); box-shadow: 0 2px 0 #c19a6b, 0 1px 0 #000, inset 0 1px 0 #fff !important; }
+
+/* شاشة كاملة للاستمارة */
+#fullscreenModal{
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100vw;
+  height:100vh;
+  background:rgba(0,0,0,0.85);
+  z-index:99999;
+  overflow:auto;
+  padding:10px;
+  box-sizing:border-box;
+}
+#fullscreenModal.active{ display:flex !important; flex-direction:column; align-items:center; justify-content:flex-start; }
+#fullscreenModal .modal-header{
+  width:100%;
+  max-width:1000px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:linear-gradient(180deg,#fff,#f5e6c8);
+  border:2px solid #000;
+  border-radius:12px;
+  padding:8px 12px;
+  margin-bottom:10px;
+  box-shadow: 0 4px 0 #a08060, 0 2px 0 #000;
+}
+#fullscreenModal .modal-content{
+  width:95vw;
+  max-width:1000px;
+  height:auto;
+  min-height:90vh;
+  background:#fff;
+  border:3px solid #000;
+  border-radius:10px;
+  padding:8px;
+  overflow:auto;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+#fullscreenModal .close-btn{
+  background:linear-gradient(180deg,#fff1f1,#ffb0b0);
+  border:2px solid #000;
+  border-radius:10px;
+  padding:6px 14px;
+  font-weight:900;
+  cursor:pointer;
+  box-shadow: 0 3px 0 #c47a7a, 0 2px 0 #000;
+}
 .nav-strip{
   display:flex;
   justify-content:space-between;
@@ -153,7 +219,9 @@ body{
 .loader{ margin-top:16px; padding:18px; text-align:center; font-weight:700; color:#7a6652; display:none; }
 .displayArea{ margin-top:16px; }
 .printArea-real{
-  background:#fff!important;
+  background:transparent !important;
+  background-color:transparent !important;
+  background-image:none !important;
   border:2px solid #000;
   border-radius:10px;
   padding:6px;
@@ -163,6 +231,14 @@ body{
   color:#000;
   overflow:hidden;
   position:relative;
+}
+body{
+  background:#fdf6e3 !important;
+  background-image: radial-gradient(900px 500px at 50% 0%, rgba(210,180,140,0.25), transparent 70%), linear-gradient(180deg,#fdf6e3,#f5f5dc) !important;
+}
+/* الغاء الخلفية البيضاء للصفحة - جعلها شفافة */
+.printArea-real > div{
+  background:transparent !important;
 }
 /* علامة مائية حقيقية - حل جذري - الأرقام فوق الحروف في الوسط */
 #realWatermark{
@@ -285,6 +361,72 @@ body{
     margin: 8mm;
   }
 }
+
+/* قائمة الأزرار أسفل شاشة الهاتف مع رمز لكل زر */
+#mobileBottomMenu{
+  display:none;
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:linear-gradient(180deg,#ffffff 0%,#fff8e7 40%,#f5e6c8 100%);
+  border-top:3px solid #000;
+  border-radius:18px 18px 0 0;
+  padding:8px 6px 10px 6px;
+  z-index:9998;
+  justify-content:space-around;
+  align-items:center;
+  box-shadow: 0 -4px 0 #a08060, 0 -2px 0 #000, 0 -8px 16px rgba(0,0,0,0.15);
+  gap:4px;
+}
+#mobileBottomMenu .mob-btn{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+  height:56px;
+  background:linear-gradient(180deg,#ffffff,#fff8e7 40%,#f5e6c8 100%);
+  border:2px solid #000;
+  border-radius:14px;
+  font-weight:900;
+  font-size:10px;
+  color:#000;
+  cursor:pointer;
+  box-shadow: 0 4px 0 #a08060, 0 2px 0 #000, inset 0 1px 0 #fff;
+  transform: perspective(600px) rotateX(2deg);
+  transition:.1s;
+  min-width:0;
+  padding:4px 2px;
+}
+#mobileBottomMenu .mob-btn:active{
+  transform: perspective(600px) rotateX(2deg) translateY(3px);
+  box-shadow: 0 1px 0 #a08060, 0 1px 0 #000, inset 0 1px 0 #fff;
+}
+#mobileBottomMenu .mob-btn .mob-icon{
+  font-size:20px;
+  line-height:1;
+}
+#mobileBottomMenu .mob-btn .mob-label{
+  font-size:9px;
+  font-weight:800;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:100%;
+}
+#mobileBottomMenu .mob-btn-main{
+  background:linear-gradient(180deg,#fff8e7,#ffefc3 30%,#f0c98a 100%) !important;
+  color:#5a2a00;
+}
+
+@media (max-width: 768px){
+  #mobileBottomMenu{ display:flex !important; }
+  .nav-strip{ display:none !important; }
+  body{ padding-bottom:80px !important; }
+  .displayArea{ margin-bottom:20px; }
+}
 </style>
 </head>
 <body>
@@ -312,10 +454,11 @@ body{
       <div id="currentMonthLabel" class="label-month">--</div>
       <div id="currentYearLabel" class="label-year">--</div>
     </div>
-    <!-- اليمين: طباعة وتحميل في نفس سطر الشهر -->
+    <!-- اليمين: طباعة وتحميل وصورة بكامل الشاشة في نفس سطر الشهر - ثلاثي الأبعاد -->
     <div style="display:flex; gap:6px; align-items:center;">
       <button class="btn-3d btn-main" onclick="printWithBackground()">🖨 طباعة</button>
-      <button class="btn-3d btn-nav" onclick="downloadImage()">📷 صورة</button>
+      <button class="btn-3d btn-nav" onclick="openFullscreenView()">📷 صورة</button>
+      <button class="btn-3d btn-nav" onclick="downloadImage()" style="min-width:60px;">💾</button>
     </div>
   </div>
 
@@ -333,13 +476,53 @@ body{
 
   <div id="displayArea" class="displayArea" style="display:none;">
     <div id="printArea" class="printArea-real"></div>
-    <!-- تم نقل أزرار الطباعة والتحميل لسطر الشهر - هذا الـ div مخفي -->
     <div class="actions no-print" style="display:none;">
-      <button class="btn-3d btn-main" onclick="printWithBackground()">🖨 طباعة صفحة واحدة</button>
-      <button class="btn-3d btn-nav" onclick="downloadImage()">📷 تحميل كصورة</button>
+      <button class="btn-3d btn-main" onclick="printWithBackground()">🖨 طباعة</button>
+      <button class="btn-3d btn-nav" onclick="downloadImage()">📷 صورة</button>
     </div>
   </div>
 
+</div>
+
+<!-- شاشة كاملة للاستمارة فقط بكامل محيط الشاشة - تظهر عند الضغط على زر صورة -->
+<div id="fullscreenModal">
+  <div class="modal-header no-print">
+    <div style="display:flex; gap:8px;">
+      <button class="close-btn" onclick="closeFullscreenView()">✕ إغلاق</button>
+      <button class="btn-3d btn-nav" onclick="downloadImage()" style="height:36px;">💾 حفظ</button>
+      <button class="btn-3d btn-main" onclick="printWithBackground()" style="height:36px;">🖨 طباعة</button>
+    </div>
+    <div style="font-weight:900; color:#8B0000; font-size:14px;">إستمارة المرتب - عرض كامل</div>
+  </div>
+  <div class="modal-content" id="fullscreenContent"></div>
+</div>
+
+<!-- قائمة الأزرار أسفل شاشة الهاتف مع رمز لكل زر -->
+<div id="mobileBottomMenu" class="no-print">
+  <button class="mob-btn" onclick="changeMonth(-1)">
+    <span class="mob-icon">⏮️</span>
+    <span class="mob-label">السابق</span>
+  </button>
+  <button class="mob-btn" onclick="changeMonth(1)">
+    <span class="mob-icon">⏭️</span>
+    <span class="mob-label">التالي</span>
+  </button>
+  <button class="mob-btn mob-btn-main" onclick="printWithBackground()">
+    <span class="mob-icon">🖨️</span>
+    <span class="mob-label">طباعة</span>
+  </button>
+  <button class="mob-btn mob-btn-main" onclick="openFullscreenView()">
+    <span class="mob-icon">📷</span>
+    <span class="mob-label">صورة</span>
+  </button>
+  <button class="mob-btn" onclick="downloadImage()">
+    <span class="mob-icon">💾</span>
+    <span class="mob-label">حفظ</span>
+  </button>
+  <button class="mob-btn" onclick="logout()">
+    <span class="mob-icon">🚪</span>
+    <span class="mob-label">خروج</span>
+  </button>
 </div>
 
 <script>
@@ -784,6 +967,46 @@ function openFullscreenView(){
   modal.classList.add('active');
   document.body.style.overflow = 'hidden';
   setTimeout(ensureRealWatermarkFullscreen, 100);
+  
+  // نسخ الإستمارة وحفظها تلقائيا في الجهاز (هاتف أو كمبيوتر) بعد عرضها بكامل الشاشة
+  setTimeout(async ()=>{
+    try{
+      // انتظار تحميل الخطوط
+      if(document.fonts && document.fonts.ready){
+        await document.fonts.ready;
+      }
+      // تحويل الاستمارة لصورة وحفظها
+      const canvas = await html2canvas(content, {
+        scale: 3,
+        backgroundColor: "#ffffff",
+        useCORS: true,
+        allowTaint: true,
+        logging: false
+      });
+      
+      // حفظ في الجهاز
+      const link = document.createElement('a');
+      link.download = 'مرتب-'+currentYear+'-'+monthNameMap[currentMonth]+'-'+getEmpCodeFromHeader()+'.png';
+      link.href = canvas.toDataURL('image/png', 1.0);
+      link.click();
+      
+      // نسخ للكليب بورد إن أمكن (للهاتف)
+      if(navigator.clipboard && window.ClipboardItem){
+        try{
+          canvas.toBlob(async (blob)=>{
+            if(blob){
+              const item = new ClipboardItem({ 'image/png': blob });
+              await navigator.clipboard.write([item]);
+            }
+          });
+        }catch(e){}
+      }
+    }catch(e){
+      console.log('Auto save error:', e);
+      // في حالة فشل الحفظ التلقائي، يتم التحميل بالطريقة العادية
+      downloadImage();
+    }
+  }, 800);
 }
 
 function closeFullscreenView(){
