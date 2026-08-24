@@ -122,7 +122,7 @@ body{
   <!-- تم التعديل: في منتصف الصفحة بدون نص ثانوي -->
   <div class="card top-strip no-print">
     <div style="flex:1; text-align:center;">
-      <h1 id="userName">مرحبا User</h1>
+      <h1 id="userName">مرحبآ بك أ/  User</h1>
     </div>
     <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
       <span id="headerCode" class="code-badge">الكود: --</span>
@@ -139,17 +139,7 @@ body{
     <button class="btn-3d btn-nav" onclick="changeMonth(1)">التالي <<</button>
   </div>
 
-  <div id="loader" class="card no-print" style="display:none; margin-top:16px; padding:24px 18px; text-align:center; background:linear-gradient(180deg,#ffffff 0%,#fefcf6 50%,#f5e6c8 100%); border:3px solid #000; border-radius:18px; box-shadow: 0 8px 0 #d2b48c, 0 5px 0 #000, 0 16px 24px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.9); transform: perspective(700px) rotateX(1deg);">
-    <div style="font-size:20px; font-weight:900; color:#000; text-shadow: 0 2px 0 #fff, 0 4px 0 #d2b48c, 0 6px 10px rgba(0,0,0,0.25);">⏳ إنتظر من فضلك جارى التحميل</div>
-    <div style="margin-top:10px; font-size:13px; font-weight:700; color:#7a6652;">
-      <span id="loadCounter" style="background:linear-gradient(180deg,#ffefc3,#f0c98a); border:2px solid #000; padding:4px 12px; border-radius:999px; box-shadow: 0 3px 0 #c19a6b, 0 2px 0 #000; color:#000;">٠ ث</span>
-      <span style="margin-right:8px;">جاري جلب البيانات من Turso...</span>
-    </div>
-    <div style="margin-top:12px; height:8px; background:#f5e6c8; border:1.5px solid #000; border-radius:999px; overflow:hidden;">
-      <div style="height:100%; width:100%; background:linear-gradient(90deg,#f0c98a,#d2b48c); animation: loadingBar 1.2s infinite linear;"></div>
-    </div>
-  </div>
-  <style>@keyframes loadingBar{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}</style>
+  <div id="loader" class="card loader no-print">⏳ جاري تحميل بيانات الراتب من قاعدة البيانات Turso... <span id="loadCounter">0 ث</span></div>
 
   <div id="displayArea" class="displayArea" style="display:none;">
     <div id="printArea" class="printArea-real"></div>
@@ -312,7 +302,22 @@ async function executeSearch(){
     
     stopLoadCounter();
 
-    if(!res.ok || !j.found || !j.data){
+    // إصلاح Bug يناير/سبتمبر: التأكد أن البيانات الراجعة هي لنفس الشهر المطلوب
+    // لو API رجع يناير وانت طالب سبتمبر، نعتبره غير موجود
+    let dataMonth = j.data ? (j.data["الشهر"] || "") : "";
+    let dataYear = j.data ? String(j.data["السنه"] || "") : "";
+    
+    // تنظيف للمقارنة
+    const requestedMonth = monthArabic.trim();
+    const requestedYear = yearStr.trim();
+    const returnedMonth = String(dataMonth).trim();
+    const returnedYear = String(dataYear).trim();
+    
+    const isMonthMismatch = returnedMonth && requestedMonth && returnedMonth !== requestedMonth;
+    const isYearMismatch = returnedYear && requestedYear && returnedYear !== requestedYear;
+    
+    // لو الشهر أو السنة مختلفة، نعتبرها غير موجودة
+    if(!res.ok || !j.found || !j.data || isMonthMismatch || isYearMismatch){
       const area = document.getElementById('displayArea');
       const printArea = document.getElementById('printArea');
       if(area) area.style.display='block';
