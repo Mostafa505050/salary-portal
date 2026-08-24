@@ -483,7 +483,7 @@ window.onload = function(){
   try{
     const u = JSON.parse(localStorage.getItem('logged_user')||'{}');
     const nameEl = document.getElementById('userName');
-    if(nameEl) nameEl.textContent = 'مرحبا ' + (u.name || getEmpNameFromHeader() || 'User');
+    if(nameEl) nameEl.textContent = 'مرحبآ بك أ / ' + (u.name || getEmpNameFromHeader() || 'User');
     const codeBadge = document.getElementById('headerCode');
     const code = getEmpCodeFromHeader();
     if(codeBadge) codeBadge.textContent = 'الكود: ' + (code ? toArabicDigits(code) : '--');
