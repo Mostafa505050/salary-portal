@@ -107,6 +107,10 @@ body{ background: #87CEEB; background-image: radial-gradient(800px 400px at 20% 
   #printArea{width:100% !important;font-size:10px !important}
   #mobileBottomMenu{ display:flex !important; }
   .result-wrapper{margin-top:2px !important;}
+  /* عند استخدام الهاتف لا تظهر ازرار الإعدادات العلوية لانها موجودة أسفل */
+  #topActionRow .top-settings-btn{display:none !important;}
+  #topActionRow{justify-content:flex-start !important;}
+  #topActionRow .btn-back{margin-right:auto;}
 }
 @media print{
   @page{margin:4mm;size:A4;}
@@ -130,7 +134,7 @@ body{ background: #87CEEB; background-image: radial-gradient(800px 400px at 20% 
   <div style="margin-right:auto;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
     <div id="countInfo" style="font-size:10px;background:rgba(135,206,235,0.35);border:1px solid rgba(70,130,180,0.5);padding:5px 10px;border-radius:999px;font-weight:800;color:#000000">0 موظف</div>
     <button onclick="localStorage.clear(); location.href='index.html';" style="font-size:12px;background:rgba(255,255,255,0.9);border:1px solid #4682b4;padding:5px 12px;border-radius:999px;font-weight:900;color:#000000;cursor:pointer" title="الرئيسية">🏠 Home</button>
-    <button onclick="location.href='loadingSalary'" style="font-size:12px;background:rgba(135,206,235,0.35);border:1px solid rgba(70,130,180,0.5);padding:5px 12px;border-radius:999px;font-weight:900;color:#000000;cursor:pointer;box-shadow:0 2px 0 rgba(70,130,180,0.25);transition:.12s" title="إضافة / تحميل مرتبات">+ تحميل</button>
+    <button onclick="location.href='loadingSalary.html'" style="font-size:12px;background:rgba(135,206,235,0.35);border:1px solid rgba(70,130,180,0.5);padding:5px 12px;border-radius:999px;font-weight:900;color:#000000;cursor:pointer;box-shadow:0 2px 0 rgba(70,130,180,0.25);transition:.12s" title="إضافة / تحميل مرتبات">+ تحميل</button>
   </div>
 </div>
 <div id="searchCard" class="main-card no-print">
@@ -168,7 +172,10 @@ body{ background: #87CEEB; background-image: radial-gradient(800px 400px at 20% 
 <script>
 const WORKER_BASE_URL = "https://turso-api.mostafa-voic77729.workers.dev";
 function toArabicDigits(str){ if(str===null||str===undefined) return ""; var map={'0':'٠','1':'١','2':'٢','3':'٣','4':'٤','5':'٥','6':'٦','7':'٧','8':'٨','9':'٩'}; return String(str).replace(/[0-9]/g,d=>map[d]); }
-let currentFontSize = parseInt(localStorage.getItem('fontSize')||'12');
+// عند استخدام الهاتف حجم الخط الافتراضي 10px لانها تتناسب
+let isMobileDefault = window.innerWidth <= 768;
+let defaultFontSize = isMobileDefault ? 10 : 12;
+let currentFontSize = parseInt(localStorage.getItem('fontSize')|| String(defaultFontSize));
 let currentWidth = parseInt(localStorage.getItem('printWidth')||'100');
 let colWidths = JSON.parse(localStorage.getItem('colWidths')||'{"notes":25,"amt1":13,"data1":32,"amt2":13,"data2":40}');
 let showNotes = localStorage.getItem('showNotes') !== 'false';
@@ -284,16 +291,22 @@ async function executeSearch(){
 function getFormHtmlJS(real_emp_name, emp_code_val, financial_year_val, month_val, bankName, bankCode, table_rows_html){
   return '<div id="printArea" style="font-size:'+currentFontSize+'px;width:'+currentWidth+'%">'
     + '<div style="display:flex;align-items:center;gap:8px;width:100%;border:2px solid #000;border-radius:8px;background:#fff;padding:4px;margin-bottom:6px;min-height:80px">'
-    + '<div style="width:150px;height:70px;display:flex;align-items:center;justify-content:center;background:#fff;border:1px solid #ddd;border-radius:6px;flex-shrink:0">'
-    + '<img src="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'70\' height=\'70\' viewBox=\'0 0 70 70\'%3E%3Ccircle cx=\'35\' cy=\'35\' r=\'32\' fill=\'%23003366\' stroke=\'%23FFD700\' stroke-width=\'2\'/%3E%3Cpath d=\'M35 10 L42 28 L30 28 L38 48 L26 30 L38 30 Z\' fill=\'%23FFD700\'/%3E%3Ctext x=\'35\' y=\'62\' text-anchor=\'middle\' font-size=\'6\' fill=\'white\' font-weight=\'900\'%3EEETC%3C/text%3E%3C/svg%3E" style="width:65px;height:65px;object-fit:contain">'
+    + '<div style="width:150px;height:70px;display:flex;align-items:center;justify-content:center;background:#fff;border:1px solid #ddd;border-radius:6px;flex-shrink:0;overflow:hidden">'
+    + '<img src="شعار.png" onerror="this.onerror=null; this.src=\'شعار.jpg\'; this.onerror=function(){this.onerror=null; this.src=\'شعار\';}" style="width:100%;height:100%;object-fit:fill;display:block;border-radius:6px" alt="شعار">'
     + '</div>'
     + '<div style="flex:1;text-align:center;color:#000">'
     + '<div style="font-size:'+(currentFontSize+2)+'px;font-weight:800;white-space:nowrap">نموذج مفردات مرتب غير قابلة للصرف - شركة مصر الوسطى لنقل الكهرباء</div>'
     + '<div style="font-size:'+currentFontSize+'px;font-weight:700;margin-top:2px;color:#003366"> ⚡ الإدارة العامة لشبكات وخطوط كهرباء بنى سويف⚡ </div>'
     + '</div>'
     + '</div>'
-    + '<div style="text-align:center;padding:4px;border:1px solid #000;border-radius:6px;background:#fff;margin-bottom:4px;white-space:nowrap"><span style="font-size:'+(currentFontSize+1)+'px;font-weight:900;color:#7f0000">👤 اسم الموظف: '+real_emp_name+'</span></div>'
-    + '<table style="width:100%;border-collapse:collapse;font-size:'+currentFontSize+'px;font-weight:700;margin-bottom:4px;table-layout:fixed"><tr><td style="border:1px solid #000;padding:3px;text-align:center;background:#fffde7;color:#000">السنة المالية: '+toArabicDigits(financial_year_val)+' -- بيان شهر: '+toArabicDigits(month_val)+'</td><td style="border:1px solid #000;padding:3px;text-align:center;background:#fce4ec;color:#ff0000;font-weight:900">كود الموظف: '+toArabicDigits(emp_code_val)+'</td></tr><tr><td style="border:1px solid #000;padding:3px;text-align:center;background:#e3f2fd;color:#000">جهة الصرف: '+(bankName?bankName:'--')+'</td><td style="border:1px solid #000;padding:3px;text-align:center;background:#f3e5f5;color:#000">رقم الحساب: '+toArabicDigits(bankCode)+'</td></tr></table>'
+    + '<table style="width:100%;border-collapse:collapse;font-size:'+currentFontSize+'px;font-weight:700;margin-bottom:4px;table-layout:fixed"><tr>'
+    + '<td style="border:1px solid #000;padding:3px;text-align:right;background:#fffde7;color:#000;width:40%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">👤 اسم الموظف: '+real_emp_name+'</td>'
+    + '<td style="border:1px solid #000;padding:3px;text-align:center;background:#fce4ec;color:#ff0000;font-weight:900;width:20%;white-space:nowrap">كود الموظف: '+toArabicDigits(emp_code_val)+'</td>'
+    + '<td style="border:1px solid #000;padding:3px;text-align:center;background:#fffde7;color:#000;width:40%;white-space:nowrap">السنة المالية: '+toArabicDigits(financial_year_val)+' -- بيان شهر: '+toArabicDigits(month_val)+'</td>'
+    + '</tr><tr>'
+    + '<td colspan="2" style="border:1px solid #000;padding:3px;text-align:center;background:#e3f2fd;color:#000;white-space:nowrap">جهة الصرف: '+(bankName?bankName:'--')+'</td>'
+    + '<td style="border:1px solid #000;padding:3px;text-align:center;background:#f3e5f5;color:#000;white-space:nowrap">رقم الحساب: '+toArabicDigits(bankCode)+'</td>'
+    + '</tr></table>'
     + '<table id="mainSalaryTable" style="width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed"><tr>'
     + '<td id="notesCol" class="notes-col" style="width:'+colWidths.notes+'%;border:1px solid #000;border-radius:6px;vertical-align:top;padding:5px;background:#fff;color:#000;'+(showNotes?'':'display:none')+'"><div id="notesTitle" style="text-align:center;background:#fff176;border:1px solid #000;border-radius:4px;padding:4px;margin-bottom:6px;font-weight:900;color:#000">بيان مفردات مرتب</div><div id="notesName">للسيد/ <b style="color:#b71c1c">'+real_emp_name+'</b></div><br><span id="notesText" style="font-size:'+(currentFontSize-2)+'px;color:#000;'+(hideNotesTextOnly?'display:none':'')+'">1- قد أعطيت هذه المفردات بناء على طلب المذكور دون أدنى مسئولية على الشركة.<br>2- الشركة غير مسئولة تجاه البنك عن أية قروض تمنح للعامل بناء على هذه المفردات.<br>3- الشركة غير مسئولة عن سداد أية مديونيات.</span></td>'
     + '<td id="spacerCol" style="width:1%;'+(showNotes?'':'display:none')+'"></td>'
@@ -359,10 +372,18 @@ function renderForm(row){
   var bankName = row["اسم_البنك_المحول_و_الفرع_المحول_اليه"] || row["اسم_البنك_المحول_والفرع_المحول_الية"] || "";
   var bankCode = row["رقم_الحساب_البنكى"] || "";
   var formHtml=getFormHtmlJS(empName, empCode, finYear, monVal, bankName, bankCode, rowsHtml);
+  // توليد قوائم منسدلة من 7 الى 60
+  function genOpts(sel){ let h=''; for(let i=7;i<=60;i++){ h+='<option value="'+i+'" '+(parseInt(sel)===i?'selected':'')+'>'+toArabicDigits(i)+'</option>'; } return h; }
+  let fontOpts = genOpts(currentFontSize);
+  let notesOpts = genOpts(colWidths.notes);
+  let amt1Opts = genOpts(colWidths.amt1);
+  let data1Opts = genOpts(colWidths.data1);
+  let amt2Opts = genOpts(colWidths.amt2);
+  let data2Opts = genOpts(colWidths.data2);
   area.innerHTML=''
-    + '<div class="no-print" style="max-width:900px;margin:0 auto 4px;display:flex;gap:6px;align-items:center;flex-wrap:nowrap">'
-    + '<button class="btn-3d send-header-3d" style="flex:1;margin:0" onclick="toggleSettingsFrame()">⚙ إعدادات العرض ▾</button>'
-    + '<button class="btn-3d send-header-3d" style="flex:1;margin:0" onclick="toggleSendFrame()">📲 إعدادات الإرسال ▾</button>'
+    + '<div id="topActionRow" class="no-print" style="max-width:900px;margin:0 auto 4px;display:flex;gap:6px;align-items:center;flex-wrap:nowrap">'
+    + '<button class="btn-3d send-header-3d top-settings-btn" style="flex:1;margin:0" onclick="toggleSettingsFrame()">⚙ إعدادات العرض ▾</button>'
+    + '<button class="btn-3d send-header-3d top-settings-btn" style="flex:1;margin:0" onclick="toggleSendFrame()">📲 إعدادات الإرسال ▾</button>'
     + '<button class="btn-3d btn-back" style="min-width:90px" onclick="toggleSearch(true)">↩ رجوع</button>'
     + '</div>'
     + '<div id="settingsFrame" class="no-print controls-panel">'
@@ -371,15 +392,15 @@ function renderForm(row){
     + '<div class="control-item"><input type="checkbox" id="chkShowNotes" '+(showNotes?'checked':'')+' onchange="toggleNotes(this.checked)"><label for="chkShowNotes">📝 إظهار الملاحظات</label></div>'
     + '<div class="control-item"><input type="checkbox" id="chkHideNotesTextOnly" '+(hideNotesTextOnly?'checked':'')+' onchange="toggleNotesTextOnly(this.checked)"><label for="chkHideNotesTextOnly">📝 إخفاء نص الملاحظات فقط</label></div>'
     + '<div class="control-item"><input type="checkbox" id="chkHideSignatures" '+(hideSignatures?'checked':'')+' onchange="toggleSignatures(this.checked)"><label for="chkHideSignatures">✍ إخفاء التوقيعات</label></div>'
-    + '<div class="control-item"><label>🔍 حجم الخط:</label><input type="number" id="inputFontSize" min="8" max="20" value="'+currentFontSize+'" oninput="changeFontSize(this.value)"><span style="font-size:10px">px</span></div>'
+    + '<div class="control-item"><label>🔍 حجم الخط:</label><select id="inputFontSize" onchange="changeFontSize(this.value)" style="padding:4px 6px;border-radius:6px;border:1px solid rgba(70,130,180,0.4);background:#fff;color:#000;font-weight:800;font-size:12px;text-align:center;min-width:70px">'+fontOpts+'</select><span style="font-size:10px">px</span></div>'
     + '<div class="control-item"><label>↔ عرض الاستمارة:</label><input type="number" id="inputWidth" min="70" max="120" value="'+currentWidth+'" oninput="changeWidth(this.value)"><span style="font-size:10px">%</span></div>'
     + '</div>'
     + '<div class="controls-row">'
-    + '<div class="control-item"><label>ملاحظات:</label><input type="number" id="w_notes" min="0" max="60" value="'+colWidths.notes+'" oninput="changeColWidth(\'notes\',this.value)"><span style="font-size:9px">%</span></div>'
-    + '<div class="control-item"><label>مبلغ 1:</label><input type="number" id="w_amt1" min="5" max="25" value="'+colWidths.amt1+'" oninput="changeColWidth(\'amt1\',this.value)"><span style="font-size:9px">%</span></div>'
-    + '<div class="control-item"><label>بيان 1:</label><input type="number" id="w_data1" min="10" max="60" value="'+colWidths.data1+'" oninput="changeColWidth(\'data1\',this.value)"><span style="font-size:9px">%</span></div>'
-    + '<div class="control-item"><label>مبلغ 2:</label><input type="number" id="w_amt2" min="5" max="25" value="'+colWidths.amt2+'" oninput="changeColWidth(\'amt2\',this.value)"><span style="font-size:9px">%</span></div>'
-    + '<div class="control-item"><label>بيان 2:</label><input type="number" id="w_data2" min="10" max="60" value="'+colWidths.data2+'" oninput="changeColWidth(\'data2\',this.value)"><span style="font-size:9px">%</span></div>'
+    + '<div class="control-item"><label>ملاحظات:</label><select id="w_notes" onchange="changeColWidth(\'notes\',this.value)" style="padding:4px 6px;border-radius:6px;border:1px solid rgba(70,130,180,0.4);background:#fff;color:#000;font-weight:800;font-size:12px;text-align:center;min-width:70px">'+notesOpts+'</select><span style="font-size:9px">%</span></div>'
+    + '<div class="control-item"><label>مبلغ 1:</label><select id="w_amt1" onchange="changeColWidth(\'amt1\',this.value)" style="padding:4px 6px;border-radius:6px;border:1px solid rgba(70,130,180,0.4);background:#fff;color:#000;font-weight:800;font-size:12px;text-align:center;min-width:70px">'+amt1Opts+'</select><span style="font-size:9px">%</span></div>'
+    + '<div class="control-item"><label>بيان 1:</label><select id="w_data1" onchange="changeColWidth(\'data1\',this.value)" style="padding:4px 6px;border-radius:6px;border:1px solid rgba(70,130,180,0.4);background:#fff;color:#000;font-weight:800;font-size:12px;text-align:center;min-width:70px">'+data1Opts+'</select><span style="font-size:9px">%</span></div>'
+    + '<div class="control-item"><label>مبلغ 2:</label><select id="w_amt2" onchange="changeColWidth(\'amt2\',this.value)" style="padding:4px 6px;border-radius:6px;border:1px solid rgba(70,130,180,0.4);background:#fff;color:#000;font-weight:800;font-size:12px;text-align:center;min-width:70px">'+amt2Opts+'</select><span style="font-size:9px">%</span></div>'
+    + '<div class="control-item"><label>بيان 2:</label><select id="w_data2" onchange="changeColWidth(\'data2\',this.value)" style="padding:4px 6px;border-radius:6px;border:1px solid rgba(70,130,180,0.4);background:#fff;color:#000;font-weight:800;font-size:12px;text-align:center;min-width:70px">'+data2Opts+'</select><span style="font-size:9px">%</span></div>'
     + '</div>'
     + '<div class="controls-row">'
     + '<button class="btn-3d" style="background:linear-gradient(180deg,#87CEEB,#4682b4);flex:1;color:#000" onclick="saveSettings()">💾 حفظ الإعدادات</button>'
@@ -887,11 +908,112 @@ window['pr'+'intOnePage']=function(){
 }
 async function downloadImage(){
   let area=document.getElementById('printArea');
-  let canvas=await html2canvas(area,{scale:2,useCORS:true,backgroundColor:'#ffffff'});
-  let link=document.createElement('a');
-  link.download='مرتب-'+(lastData["الاسم"]||"")+'-'+(lastData["الشهر"]||"")+'.png';
-  link.href=canvas.toDataURL('image/png');
-  link.click();
+  if(!area) return;
+  // حفظ الأنماط الأصلية
+  const origBorder = area.style.border;
+  const origBoxShadow = area.style.boxShadow;
+  const origTransform = area.style.transform;
+  const origWidth = area.style.width;
+  const origMaxWidth = area.style.maxWidth;
+  
+  // نفس معاينة الطباعة بالظبط ولكن بدون حدود الطباعة فقط
+  area.style.border = 'none';
+  area.style.boxShadow = 'none';
+  area.style.transform = '';
+  area.style.width = '100%';
+  area.style.maxWidth = '900px';
+  
+  if(document.fonts && document.fonts.ready){
+    try{ await document.fonts.ready; }catch(e){}
+  }
+  
+  try{
+    let canvas=await html2canvas(area,{
+      scale:2,
+      useCORS:true,
+      backgroundColor:'#ffffff',
+      allowTaint:true,
+      logging:false,
+      windowWidth: 900,
+      onclone:(clonedDoc)=>{
+        const clonedArea = clonedDoc.getElementById('printArea');
+        if(clonedArea){
+          clonedArea.style.width='100%';
+          clonedArea.style.maxWidth='900px';
+          clonedArea.style.border='none';
+          clonedArea.style.boxShadow='none';
+          clonedArea.style.transform='';
+          clonedArea.style.background='#fff';
+          // نفس معاينة الطباعة - إصلاح تداخل الكلمات العربية
+          const st = clonedDoc.createElement('style');
+          st.textContent=`
+            #printArea{ 
+              font-family:'Cairo',Tahoma,sans-serif !important; 
+              direction:rtl !important;
+              background:#fff !important;
+              border:none !important;
+              box-shadow:none !important;
+            }
+            #printArea *{ 
+              letter-spacing:normal !important; 
+              word-spacing:normal !important; 
+              text-rendering:auto !important;
+              -webkit-font-smoothing:antialiased !important;
+            }
+            #printArea table{ 
+              table-layout:fixed !important; 
+              border-collapse:collapse !important; 
+              width:100% !important;
+              direction:rtl !important;
+            }
+            #printArea td, #printArea th{
+              direction:rtl !important;
+              text-align:right !important;
+              white-space:nowrap !important;
+              overflow:hidden !important;
+              text-overflow:ellipsis !important;
+              line-height:1.6 !important;
+              padding:4px 6px !important;
+              font-family:'Cairo',Tahoma,sans-serif !important;
+            }
+            #printArea td:nth-child(1), #printArea td:nth-child(3),
+            #printArea th:nth-child(1), #printArea th:nth-child(3){
+              text-align:center !important;
+              white-space:nowrap !important;
+            }
+            #printArea td:nth-child(2), #printArea td:nth-child(4),
+            #printArea th:nth-child(2), #printArea th:nth-child(4){
+              text-align:right !important;
+              white-space:nowrap !important;
+              overflow:hidden !important;
+            }
+            #printArea #notesCol{ 
+              white-space:normal !important; 
+              word-break:break-word !important;
+              line-height:1.6 !important;
+            }
+            #printArea #notesTitle, #printArea #notesName{
+              white-space:nowrap !important;
+            }
+          `;
+          clonedDoc.head.appendChild(st);
+        }
+      }
+    });
+    let link=document.createElement('a');
+    link.download='مرتب-'+(lastData["الاسم"]||"")+'-'+(lastData["الشهر"]||"")+'.png';
+    link.href=canvas.toDataURL('image/png',1.0);
+    link.click();
+  }catch(e){
+    console.error(e);
+    alert('تعذر تحميل الصورة: '+e.message);
+  }finally{
+    area.style.border = origBorder || '2px solid #000';
+    area.style.boxShadow = origBoxShadow || 'none';
+    area.style.transform = origTransform;
+    area.style.width = origWidth;
+    area.style.maxWidth = origMaxWidth;
+  }
 }
 window.onload=()=>{
   loadEmployees();
