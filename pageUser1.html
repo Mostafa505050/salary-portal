@@ -87,11 +87,10 @@ body{
 <body>
 <div class="max-w-4xl mx-auto">
 
-  <!-- top-strip - نفس دوال اسم العامل وكود الموظف بدون تعديل -->
-  <div class="card top-strip no-print">
-    <div>
-      <h1 id="userName">مرحبا User</h1>
-      <p>تم الدخول برقم البطاقة والبصمة - بيانات حقيقية من Turso</p>
+  <!-- top-strip - تم التعديل: في منتصف الصفحة بدون نص ثانوي -->
+  <div class="card top-strip no-print" style="justify-content:center; text-align:center;">
+    <div style="flex:1; text-align:center;">
+      <h1 id="userName" style="text-align:center; width:100%; font-size:20px;">مرحبا User</h1>
     </div>
     <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
       <span id="headerCode" class="code-badge">الكود: --</span>
@@ -209,35 +208,28 @@ function stopLoadCounter(){
   if(l) l.style.display='none';
 }
 
-// نفس تصميم استمارة المرتب من الكود الأول - بكل الدوال
+// نفس تصميم استمارة المرتب من الكود الأول - بكل الدوال - تم إلغاء Header واسم الموظف وعمود الملاحظات والتوقيعات مع الاحتفاظ باسم المطور
 function getFormHtmlJS(real_emp_name, emp_code_val, financial_year_val, month_val, bankName, bankCode, table_rows_html, currentFontSize){
   currentFontSize = currentFontSize || 12;
   return '<div style="font-size:'+currentFontSize+'px;width:100%">'
-    + '<div style="display:flex;align-items:center;gap:8px;width:100%;border:2px solid #000;border-radius:8px;background:#fff;padding:4px;margin-bottom:6px;min-height:80px">'
-    + '<div style="width:150px;height:70px;display:flex;align-items:center;justify-content:center;background:#fff;border:1px solid #ddd;border-radius:6px;flex-shrink:0">'
-    + '<img src="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'70\' height=\'70\' viewBox=\'0 0 70 70\'%3E%3Ccircle cx=\'35\' cy=\'35\' r=\'32\' fill=\'%23003366\' stroke=\'%23FFD700\' stroke-width=\'2\'/%3E%3Cpath d=\'M35 10 L42 28 L30 28 L38 48 L26 30 L38 30 Z\' fill=\'%23FFD700\'/%3E%3Ctext x=\'35\' y=\'62\' text-anchor=\'middle\' font-size=\'6\' fill=\'white\' font-weight=\'900\'%3EEETC%3C/text%3E%3C/svg%3E" style="width:65px;height:65px;object-fit:contain">'
-    + '</div>'
-    + '<div style="flex:1;text-align:center;color:#000">'
-    + '<div style="font-size:'+(currentFontSize+2)+'px;font-weight:800;white-space:nowrap">نموذج مفردات مرتب غير قابلة للصرف - شركة مصر الوسطى لنقل الكهرباء</div>'
-    + '<div style="font-size:'+currentFontSize+'px;font-weight:700;margin-top:2px;color:#003366"> ⚡ الإدارة العامة لشبكات وخطوط كهرباء بنى سويف⚡ </div>'
-    + '</div>'
-    + '</div>'
-    + '<div style="text-align:center;padding:4px;border:1px solid #000;border-radius:6px;background:#fff;margin-bottom:4px;white-space:nowrap"><span style="font-size:'+(currentFontSize+1)+'px;font-weight:900;color:#7f0000">👤 اسم الموظف: '+real_emp_name+'</span></div>'
+    // تم إلغاء Header الخاص بالاستمارة (اللوجو واسم الشركة) - بناء على طلبك
+    // تم إلغاء اسم الموظف المكتوب في الاستمارة - بناء على طلبك
     + '<table style="width:100%;border-collapse:collapse;font-size:'+currentFontSize+'px;font-weight:700;margin-bottom:4px;table-layout:fixed"><tr><td style="border:1px solid #000;padding:3px;text-align:center;background:#fffde7;color:#000">السنة المالية: '+toArabicDigits(financial_year_val)+' -- بيان شهر: '+toArabicDigits(month_val)+'</td><td style="border:1px solid #000;padding:3px;text-align:center;background:#fce4ec;color:#ff0000;font-weight:900">كود الموظف: '+toArabicDigits(emp_code_val)+'</td></tr><tr><td style="border:1px solid #000;padding:3px;text-align:center;background:#e3f2fd;color:#000">جهة الصرف: '+(bankName?bankName:'--')+'</td><td style="border:1px solid #000;padding:3px;text-align:center;background:#f3e5f5;color:#000">رقم الحساب: '+toArabicDigits(bankCode)+'</td></tr></table>'
     + '<table id="mainSalaryTable" style="width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed"><tr>'
-    + '<td id="notesCol" style="width:25%;border:1px solid #000;border-radius:6px;vertical-align:top;padding:5px;background:#fff;color:#000"><div style="text-align:center;background:#fff176;border:1px solid #000;border-radius:4px;padding:4px;margin-bottom:6px;font-weight:900;color:#000">بيان مفردات مرتب</div>للسيد/ <b style="color:#b71c1c">'+real_emp_name+'</b><br><br><span style="font-size:'+(currentFontSize-2)+'px;color:#000">1- قد أعطيت هذه المفردات بناء على طلب المذكور دون أدنى مسئولية على الشركة.<br>2- الشركة غير مسئولة تجاه البنك عن أية قروض تمنح للعامل بناء على هذه المفردات.<br>3- الشركة غير مسئولة عن سداد أية مديونيات.</span></td>'
-    + '<td style="width:1%"></td>'
-    + '<td style="width:74%;vertical-align:top;border:1px solid #000;border-radius:6px;overflow:hidden">'
+    // تم إلغاء عمود الملاحظات - بناء على طلبك
+    + '<td style="width:100%;vertical-align:top;border:1px solid #000;border-radius:6px;overflow:hidden">'
     + '<table style="width:100%;border-collapse:collapse;text-align:center;font-weight:700;table-layout:fixed">'
     + '<colgroup><col style="width:13%"><col style="width:32%"><col style="width:13%"><col style="width:42%"></colgroup>'
     + '<thead><tr><th colspan="2" style="background:#b71c1c;color:#fff;border:1px solid #000;padding:5px">الإستحقاقات</th><th colspan="2" style="background:#b71c1c;color:#fff;border:1px solid #000;padding:5px">المستقطع</th></tr><tr style="background:#e8f5e9"><th style="border:1px solid #000;padding:4px;color:#000">المبلغ</th><th style="border:1px solid #000;padding:4px;color:#000">البيانات</th><th style="border:1px solid #000;padding:4px;color:#000">المبلغ</th><th style="border:1px solid #000;padding:4px;color:#000">البيانات</th></tr></thead>'
     + '<tbody style="background:#fff;color:#000">'+table_rows_html+'</tbody>'
     + '</table>'
     + '</td></tr></table>'
-    + '<table style="width:100%;border-collapse:collapse;margin-top:6px;font-size:'+(currentFontSize-1)+'px;font-weight:800;table-layout:fixed">'
-    + '<tr><td style="width:25%;border:1px solid #000;padding:5px;text-align:center;background:#fffde7;color:#000">مسئول الإستحقاقات</td><td style="width:25%;border:1px solid #000;padding:5px;text-align:center;background:#e8f5e9;color:#000">رئيس الشئون الإدارية</td><td style="width:25%;border:1px solid #000;padding:5px;text-align:center;background:#e3f2fd;color:#000">مدير عام شبكات بنى سويف</td><td style="width:25%;border:none"></td></tr>'
-    + '<tr><td style="border:1px solid #000;height:55px;padding:4px;vertical-align:top;color:#000">توقيع / <div style="text-align:center;margin-top:18px">------</div></td><td style="border:1px solid #000;height:55px;padding:4px;vertical-align:top;color:#000">محاسب /<div style="text-align:center;margin-top:18px;color:#b71c1c">إبراهيم محمد سعيد</div></td><td style="border:1px solid #000;height:55px;padding:4px;vertical-align:top;color:#000">مهندس /<div style="text-align:center;margin-top:18px;color:#0d47a1">سيد محمد عبد الحفيظ</div></td><td style="border:none;padding:4px;text-align:left;line-height:1.2;color:#000"><span style="font-size:9px">إعداد وتطوير</span><br><b style="font-size:10px">أ/ مصطفى درويش</b><br></td></tr>'
-    + '</table>'
+    // تم إلغاء التوقيعات مع الاحتفاظ باسم إعداد وتطوير - بناء على طلبك
+    + '<div style="margin-top:12px; text-align:center; background:linear-gradient(180deg,#ffffff,#fefcf6); border:2px solid #000; border-radius:12px; padding:12px; box-shadow: 0 5px 0 #d2b48c, 0 3px 0 #000;">'
+    + '<div style="font-size:13px; font-weight:800; color:#000;">إعداد وتطوير</div>'
+    + '<div style="font-size:16px; font-weight:900; color:#b71c1c; margin-top:4px;">أ/ مصطفى درويش سيد درويش</div>'
+    + '<div style="font-size:13px; font-weight:800; color:#000; margin-top:6px;">رقم الهاتف : <span dir="ltr" style="font-family:monospace; font-weight:900;">01092259655</span></div>'
+    + '</div>'
     + '</div>';
 }
 
@@ -275,12 +267,57 @@ async function executeSearch(){
     stopLoadCounter();
 
     if(!res.ok || !j.found || !j.data){
-      // رسالة عدم وجود مرتب
+      // رسالة ثلاثية الأبعاد عند عدم وجود بيانات لهذا الشهر - بناء على طلبك
       const area = document.getElementById('displayArea');
       const printArea = document.getElementById('printArea');
       if(area) area.style.display='block';
       if(printArea){
-        printArea.innerHTML = '<div style="background:#fff;padding:20px;text-align:center;color:#7a0000;font-weight:800;border-radius:12px">❌ لا يوجد مرتب<br>السنة: '+toArabicDigits(yearStr)+' - الشهر: '+monthArabic+' - الكود: '+toArabicDigits(code)+'<br><br>'+ (j.msg||'لا يوجد بيانات') +'</div>';
+        printArea.innerHTML = `
+          <div style="
+            background:linear-gradient(180deg,#ffffff 0%,#fefcf6 50%,#f5e6c8 100%);
+            border:3px solid #000;
+            border-radius:18px;
+            padding:30px 20px;
+            text-align:center;
+            box-shadow: 0 10px 0 #d2b48c, 0 8px 0 #000, 0 20px 30px rgba(0,0,0,0.2), inset 0 2px 0 rgba(255,255,255,0.9);
+            transform: perspective(800px) rotateX(2deg);
+            position:relative;
+          ">
+            <div style="
+              font-size:22px;
+              font-weight:900;
+              color:#b71c1c;
+              text-shadow: 0 2px 0 #fff, 0 4px 0 #d2b48c, 0 6px 8px rgba(0,0,0,0.3);
+              margin-bottom:16px;
+              line-height:1.4;
+            ">⚠️ لا يوجد بيانات لهذا الشهر</div>
+            <div style="
+              font-size:15px;
+              font-weight:800;
+              color:#000;
+              line-height:2;
+              background:#fff;
+              border:2px solid #000;
+              border-radius:12px;
+              padding:14px;
+              box-shadow: 0 4px 0 #d2b48c, 0 2px 0 #000;
+              display:inline-block;
+              min-width:280px;
+            ">
+              الرجاء الإتصال بمطور الخدمة<br>
+              <span style="font-size:18px; color:#b71c1c;">أ/ مصطفى درويش سيد درويش</span><br><br>
+              <span style="background:#fffde7; border:1.5px solid #000; border-radius:8px; padding:4px 10px; display:inline-block; margin:4px; font-size:14px;">
+                رقم الهاتف / <span dir="ltr" style="font-family:monospace;">01092259655</span>
+              </span><br>
+              <span style="background:#e8f5e9; border:1.5px solid #000; border-radius:8px; padding:4px 10px; display:inline-block; margin:4px; font-size:14px;">
+                واتس أب / <span dir="ltr" style="font-family:monospace;">01092259655</span>
+              </span>
+            </div>
+            <div style="font-size:11px; color:#7a6652; margin-top:12px; font-weight:700;">
+              السنة: ${toArabicDigits(yearStr)} - الشهر: ${monthArabic} - الكود: ${toArabicDigits(code)}
+            </div>
+          </div>
+        `;
       }
       return;
     }
