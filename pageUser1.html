@@ -83,41 +83,7 @@ body{
   .printArea-real{ border:3px solid #000!important; }
 }
 
-#mobileBottomMenu{
-  display:none;
-  position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
-  background:linear-gradient(180deg,#ffffff 0%,#fff8e7 40%,#f5e6c8 100%);
-  border-top:3px solid #000;
-  border-radius:18px 18px 0 0;
-  padding:8px 6px 10px 6px;
-  z-index:9998;
-  justify-content:space-around;
-  align-items:center;
-  box-shadow: 0 -4px 0 #a08060, 0 -2px 0 #000;
-  gap:4px;
-}
-#mobileBottomMenu .mob-btn{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:2px;
-  height:56px;
-  background:linear-gradient(180deg,#ffffff,#fff8e7 40%,#f5e6c8 100%);
-  border:2px solid #000;
-  border-radius:14px;
-  font-weight:900;
-  font-size:10px;
-  color:#000;
-  cursor:pointer;
-}
 @media (max-width:768px){
-  #mobileBottomMenu{ display:flex !important; }
-  .nav-strip{ display:none !important; }
   body{ padding-bottom:80px !important; }
 }
 
@@ -135,6 +101,59 @@ table th{
 }
 #printArea{
   font-size:9px !important;
+}
+
+
+/* تتناسب مع الهاتف المحمول - بدون تكرار أزرار */
+#mobileBottomMenu{
+  display:none;
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:linear-gradient(180deg,#ffffff 0%,#fff8e7 40%,#f5e6c8 100%);
+  border-top:3px solid #000;
+  border-radius:18px 18px 0 0;
+  padding:8px 6px 10px 6px;
+  z-index:9998;
+  justify-content:space-around;
+  align-items:center;
+  box-shadow: 0 -4px 0 #a08060, 0 -2px 0 #000, 0 -8px 16px rgba(0,0,0,0.15);
+  gap:4px;
+}
+#mobileBottomMenu .mob-btn{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+  height:56px;
+  background:linear-gradient(180deg,#ffffff,#fff8e7 40%,#f5e6c8 100%);
+  border:2px solid #000;
+  border-radius:14px;
+  font-weight:900;
+  font-size:10px;
+  color:#000;
+  cursor:pointer;
+  box-shadow: 0 4px 0 #a08060, 0 2px 0 #000, inset 0 1px 0 #fff;
+  min-width:0;
+  padding:4px 2px;
+}
+#mobileBottomMenu .mob-btn:active{
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #a08060, 0 1px 0 #000;
+}
+#mobileBottomMenu .mob-btn .mob-icon{ font-size:20px; line-height:1; }
+#mobileBottomMenu .mob-btn .mob-label{ font-size:9px; font-weight:800; white-space:nowrap; }
+
+@media (max-width:768px){
+  body{ padding:8px !important; padding-bottom:80px !important; }
+  .max-w-4xl{ max-width:100% !important; padding:0 4px !important; }
+  #mobileBottomMenu{ display:flex !important; }
+  .nav-strip{ display:none !important; } /* بدون تكرار - إخفاء الشريط العلوي على الموبايل */
+  .printArea-real{ width:100% !important; font-size:9px !important; }
+  .top-strip{ flex-wrap:wrap !important; }
 }
 
 </style>
@@ -450,5 +469,30 @@ window.onload = function(){
   executeSearch();
 };
 </script>
+
+<!-- قائمة الأزرار أسفل شاشة الهاتف - بدون تكرار -->
+<div id="mobileBottomMenu" class="no-print">
+  <button class="mob-btn" onclick="changeMonth(-1)">
+    <span class="mob-icon">⏮</span>
+    <span class="mob-label">السابق</span>
+  </button>
+  <button class="mob-btn" onclick="changeMonth(1)">
+    <span class="mob-icon">⏭</span>
+    <span class="mob-label">التالي</span>
+  </button>
+  <button class="mob-btn" onclick="printWithBackground()">
+    <span class="mob-icon">🖨</span>
+    <span class="mob-label">طباعة</span>
+  </button>
+  <button class="mob-btn" onclick="downloadImage()">
+    <span class="mob-icon">📷</span>
+    <span class="mob-label">صورة</span>
+  </button>
+  <button class="mob-btn" onclick="logout()">
+    <span class="mob-icon">🚪</span>
+    <span class="mob-label">خروج</span>
+  </button>
+</div>
+
 </body>
 </html>
