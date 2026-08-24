@@ -27,14 +27,14 @@ body{
 }
 .top-strip{
   display:flex;
-  justify-content:space-between;
+  justify-content:center;
   align-items:center;
-  padding:14px 18px;
+  padding:16px 18px;
   gap:12px;
   flex-wrap:wrap;
+  text-align:center;
 }
-.top-strip h1{ font-size:18px; font-weight:800; margin:0; color:#000; line-height:1.2; }
-.top-strip p{ font-size:11px; color:#7a6652; margin:2px 0 0 0; }
+.top-strip h1{ font-size:22px; font-weight:900; margin:0; color:#000; line-height:1.3; text-align:center; width:100%; }
 .code-badge{
   display:inline-flex;
   align-items:center;
@@ -74,23 +74,55 @@ body{
 .month-center .label-year{ font-size:12px; color:#7a6652; font-weight:700; }
 .loader{ margin-top:16px; padding:18px; text-align:center; font-weight:700; color:#7a6652; display:none; }
 .displayArea{ margin-top:16px; }
-.printArea-real{ background:#fff!important; border:2px solid #000; border-radius:10px; padding:6px; width:100%; box-sizing:border-box; font-weight:700; color:#000; overflow:hidden; }
+.printArea-real{
+  background:#fff!important;
+  border:2px solid #000;
+  border-radius:10px;
+  padding:6px;
+  width:100%;
+  box-sizing:border-box;
+  font-weight:700;
+  color:#000;
+  overflow:hidden;
+  position:relative;
+}
+/* خلفية مائية مائلة في منتصف الاستمارة */
+.printArea-real::before{
+  content: "غير قابلة للصرف \A ولا يعتمد كمستند رسمى";
+  white-space: pre;
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform: translate(-50%,-50%) rotate(-30deg);
+  font-size:42px;
+  font-weight:900;
+  color: rgba(183,28,28,0.08);
+  text-align:center;
+  line-height:1.3;
+  pointer-events:none;
+  z-index:0;
+  width:90%;
+}
+.printArea-real > div{ position:relative; z-index:1; }
 .actions{ display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; justify-content:center; }
+.nowrap-cell{ white-space:nowrap !important; overflow:hidden; text-overflow:ellipsis; }
+.red-item{ color:#b71c1c !important; font-weight:900 !important; }
 @media print{
   body{ background:#fff!important; }
   .no-print{ display:none!important; }
   .card{ box-shadow:none!important; border:1px solid #000!important; }
   .printArea-real{ border:3px solid #000!important; }
+  .printArea-real::before{ color: rgba(183,28,28,0.12) !important; }
 }
 </style>
 </head>
 <body>
 <div class="max-w-4xl mx-auto">
 
-  <!-- top-strip - تم التعديل: في منتصف الصفحة بدون نص ثانوي -->
-  <div class="card top-strip no-print" style="justify-content:center; text-align:center;">
+  <!-- تم التعديل: في منتصف الصفحة بدون نص ثانوي -->
+  <div class="card top-strip no-print">
     <div style="flex:1; text-align:center;">
-      <h1 id="userName" style="text-align:center; width:100%; font-size:20px;">مرحبا User</h1>
+      <h1 id="userName">مرحبا User</h1>
     </div>
     <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
       <span id="headerCode" class="code-badge">الكود: --</span>
@@ -98,7 +130,6 @@ body{
     </div>
   </div>
 
-  <!-- nav-strip السابق/التالي والشهر الحالي -->
   <div class="card nav-strip no-print">
     <button class="btn-3d btn-nav" onclick="changeMonth(-1)">>> السابق</button>
     <div class="month-center">
@@ -177,10 +208,17 @@ function logout(){
   window.location.href='index.html';
 }
 
+// إصلاح مشكلة الانتقال ليناير: يبقى في نفس الشهر ولا ينتقل تلقائيا
 function changeMonth(delta){
-  currentMonth += delta;
-  if(currentMonth > 12){ currentMonth = 1; currentYear++; }
-  if(currentMonth < 1){ currentMonth = 12; currentYear--; }
+  // حفظ الشهر والسنة قبل التغيير
+  let newMonth = currentMonth + delta;
+  let newYear = currentYear;
+  
+  if(newMonth > 12){ newMonth = 1; newYear++; }
+  if(newMonth < 1){ newMonth = 12; newYear--; }
+  
+  currentMonth = newMonth;
+  currentYear = newYear;
   updateMonthLabels();
   executeSearch();
 }
@@ -208,23 +246,20 @@ function stopLoadCounter(){
   if(l) l.style.display='none';
 }
 
-// نفس تصميم استمارة المرتب من الكود الأول - بكل الدوال - تم إلغاء Header واسم الموظف وعمود الملاحظات والتوقيعات مع الاحتفاظ باسم المطور
+// نفس تصميم استمارة المرتب - تم إلغاء Header واسم الموظف وعمود الملاحظات والتوقيعات - تكبير الخط درجتين + علامة مائية
 function getFormHtmlJS(real_emp_name, emp_code_val, financial_year_val, month_val, bankName, bankCode, table_rows_html, currentFontSize){
-  currentFontSize = currentFontSize || 12;
+  // تكبير الخط درجتين: 12 -> 14
+  currentFontSize = 14;
   return '<div style="font-size:'+currentFontSize+'px;width:100%">'
-    // تم إلغاء Header الخاص بالاستمارة (اللوجو واسم الشركة) - بناء على طلبك
-    // تم إلغاء اسم الموظف المكتوب في الاستمارة - بناء على طلبك
-    + '<table style="width:100%;border-collapse:collapse;font-size:'+currentFontSize+'px;font-weight:700;margin-bottom:4px;table-layout:fixed"><tr><td style="border:1px solid #000;padding:3px;text-align:center;background:#fffde7;color:#000">السنة المالية: '+toArabicDigits(financial_year_val)+' -- بيان شهر: '+toArabicDigits(month_val)+'</td><td style="border:1px solid #000;padding:3px;text-align:center;background:#fce4ec;color:#ff0000;font-weight:900">كود الموظف: '+toArabicDigits(emp_code_val)+'</td></tr><tr><td style="border:1px solid #000;padding:3px;text-align:center;background:#e3f2fd;color:#000">جهة الصرف: '+(bankName?bankName:'--')+'</td><td style="border:1px solid #000;padding:3px;text-align:center;background:#f3e5f5;color:#000">رقم الحساب: '+toArabicDigits(bankCode)+'</td></tr></table>'
+    + '<table style="width:100%;border-collapse:collapse;font-size:'+currentFontSize+'px;font-weight:700;margin-bottom:6px;table-layout:fixed"><tr><td class="nowrap-cell" style="border:1px solid #000;padding:5px;text-align:center;background:#fffde7;color:#000;white-space:nowrap">السنة المالية: '+toArabicDigits(financial_year_val)+' -- بيان شهر: '+toArabicDigits(month_val)+'</td><td class="nowrap-cell" style="border:1px solid #000;padding:5px;text-align:center;background:#fce4ec;color:#ff0000;font-weight:900;white-space:nowrap">كود الموظف: '+toArabicDigits(emp_code_val)+'</td></tr><tr><td class="nowrap-cell" style="border:1px solid #000;padding:5px;text-align:center;background:#e3f2fd;color:#000;white-space:nowrap">جهة الصرف: '+(bankName?bankName:'--')+'</td><td class="nowrap-cell" style="border:1px solid #000;padding:5px;text-align:center;background:#f3e5f5;color:#000;white-space:nowrap">رقم الحساب: '+toArabicDigits(bankCode)+'</td></tr></table>'
     + '<table id="mainSalaryTable" style="width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed"><tr>'
-    // تم إلغاء عمود الملاحظات - بناء على طلبك
     + '<td style="width:100%;vertical-align:top;border:1px solid #000;border-radius:6px;overflow:hidden">'
     + '<table style="width:100%;border-collapse:collapse;text-align:center;font-weight:700;table-layout:fixed">'
     + '<colgroup><col style="width:13%"><col style="width:32%"><col style="width:13%"><col style="width:42%"></colgroup>'
-    + '<thead><tr><th colspan="2" style="background:#b71c1c;color:#fff;border:1px solid #000;padding:5px">الإستحقاقات</th><th colspan="2" style="background:#b71c1c;color:#fff;border:1px solid #000;padding:5px">المستقطع</th></tr><tr style="background:#e8f5e9"><th style="border:1px solid #000;padding:4px;color:#000">المبلغ</th><th style="border:1px solid #000;padding:4px;color:#000">البيانات</th><th style="border:1px solid #000;padding:4px;color:#000">المبلغ</th><th style="border:1px solid #000;padding:4px;color:#000">البيانات</th></tr></thead>'
+    + '<thead><tr><th class="nowrap-cell" colspan="2" style="background:#b71c1c;color:#fff;border:1px solid #000;padding:6px;white-space:nowrap">الإستحقاقات</th><th class="nowrap-cell" colspan="2" style="background:#b71c1c;color:#fff;border:1px solid #000;padding:6px;white-space:nowrap">المستقطع</th></tr><tr style="background:#e8f5e9"><th class="nowrap-cell" style="border:1px solid #000;padding:5px;color:#000;white-space:nowrap">المبلغ</th><th class="nowrap-cell" style="border:1px solid #000;padding:5px;color:#000;white-space:nowrap">البيان</th><th class="nowrap-cell" style="border:1px solid #000;padding:5px;color:#000;white-space:nowrap">المبلغ</th><th class="nowrap-cell" style="border:1px solid #000;padding:5px;color:#000;white-space:nowrap">البيانات</th></tr></thead>'
     + '<tbody style="background:#fff;color:#000">'+table_rows_html+'</tbody>'
     + '</table>'
     + '</td></tr></table>'
-    // تم إلغاء التوقيعات مع الاحتفاظ باسم إعداد وتطوير - بناء على طلبك
     + '<div style="margin-top:12px; text-align:center; background:linear-gradient(180deg,#ffffff,#fefcf6); border:2px solid #000; border-radius:12px; padding:12px; box-shadow: 0 5px 0 #d2b48c, 0 3px 0 #000;">'
     + '<div style="font-size:13px; font-weight:800; color:#000;">إعداد وتطوير</div>'
     + '<div style="font-size:16px; font-weight:900; color:#b71c1c; margin-top:4px;">أ/ مصطفى درويش سيد درويش</div>'
@@ -233,10 +268,14 @@ function getFormHtmlJS(real_emp_name, emp_code_val, financial_year_val, month_va
     + '</div>';
 }
 
-// جلب بيانات حقيقية من Turso بناء على كود الموظف من الهيدر + السنة والشهر الحاليين
+function isRedItem(label){
+  const redKeywords = ["علاج طبى", "علاج طبي", "ضريبه", "ضريبة", "جمعيه الخدمات الاجتماعية", "جمعية الخدمات الاجتماعية", "قسط صندوق انتماء", "قسط صندوق الانتماء"];
+  const lower = String(label).replace(/[ىي]/g, "ي").trim();
+  return redKeywords.some(k => lower.includes(k.replace(/[ىي]/g, "ي")) || String(label).includes(k));
+}
+
 async function executeSearch(){
   const code = getEmpCodeFromHeader();
-  const nameFromHeader = getEmpNameFromHeader();
   const loader = document.getElementById('loader');
   const displayArea = document.getElementById('displayArea');
 
@@ -256,18 +295,14 @@ async function executeSearch(){
   try{
     const monthArabic = monthNameMap[currentMonth] || String(currentMonth);
     const yearStr = String(currentYear);
-
-    // نفس API المستخدم في صفحة الادمن - يجلب من Turso
     const url = WORKER_BASE_URL + "/api/salary-turso?year=" + encodeURIComponent(yearStr) + "&month=" + encodeURIComponent(monthArabic) + "&code=" + encodeURIComponent(code);
     
-    console.log('Fetching:', url);
     const res = await fetch(url);
     const j = await res.json();
     
     stopLoadCounter();
 
     if(!res.ok || !j.found || !j.data){
-      // رسالة ثلاثية الأبعاد عند عدم وجود بيانات لهذا الشهر - بناء على طلبك
       const area = document.getElementById('displayArea');
       const printArea = document.getElementById('printArea');
       if(area) area.style.display='block';
@@ -277,44 +312,45 @@ async function executeSearch(){
             background:linear-gradient(180deg,#ffffff 0%,#fefcf6 50%,#f5e6c8 100%);
             border:3px solid #000;
             border-radius:18px;
-            padding:30px 20px;
+            padding:32px 20px;
             text-align:center;
             box-shadow: 0 10px 0 #d2b48c, 0 8px 0 #000, 0 20px 30px rgba(0,0,0,0.2), inset 0 2px 0 rgba(255,255,255,0.9);
             transform: perspective(800px) rotateX(2deg);
             position:relative;
           ">
             <div style="
-              font-size:22px;
+              font-size:26px;
               font-weight:900;
               color:#b71c1c;
               text-shadow: 0 2px 0 #fff, 0 4px 0 #d2b48c, 0 6px 8px rgba(0,0,0,0.3);
-              margin-bottom:16px;
+              margin-bottom:18px;
               line-height:1.4;
-            ">⚠️ لا يوجد بيانات لهذا الشهر</div>
+              white-space:pre-line;
+            ">لا يوجد بيانات لهذا الشهر
+الرجاء الإتصال بمطور الخدمة للإستعلام</div>
             <div style="
-              font-size:15px;
+              font-size:16px;
               font-weight:800;
               color:#000;
-              line-height:2;
+              line-height:2.2;
               background:#fff;
               border:2px solid #000;
               border-radius:12px;
-              padding:14px;
+              padding:16px;
               box-shadow: 0 4px 0 #d2b48c, 0 2px 0 #000;
               display:inline-block;
-              min-width:280px;
+              min-width:300px;
             ">
-              الرجاء الإتصال بمطور الخدمة<br>
-              <span style="font-size:18px; color:#b71c1c;">أ/ مصطفى درويش سيد درويش</span><br><br>
-              <span style="background:#fffde7; border:1.5px solid #000; border-radius:8px; padding:4px 10px; display:inline-block; margin:4px; font-size:14px;">
-                رقم الهاتف / <span dir="ltr" style="font-family:monospace;">01092259655</span>
+              <span style="font-size:19px; color:#b71c1c; font-weight:900;">أ/ مصطفى درويش سيد درويش</span><br><br>
+              <span style="background:#fffde7; border:1.5px solid #000; border-radius:8px; padding:6px 12px; display:inline-block; margin:5px; font-size:14px; white-space:nowrap;">
+                رقم الهاتف / <span dir="ltr" style="font-family:monospace; font-weight:900;">01092259655</span>
               </span><br>
-              <span style="background:#e8f5e9; border:1.5px solid #000; border-radius:8px; padding:4px 10px; display:inline-block; margin:4px; font-size:14px;">
-                واتس أب / <span dir="ltr" style="font-family:monospace;">01092259655</span>
+              <span style="background:#e8f5e9; border:1.5px solid #000; border-radius:8px; padding:6px 12px; display:inline-block; margin:5px; font-size:14px; white-space:nowrap;">
+                رقم الواتس أب / <span dir="ltr" style="font-family:monospace; font-weight:900;">01092259655</span>
               </span>
             </div>
-            <div style="font-size:11px; color:#7a6652; margin-top:12px; font-weight:700;">
-              السنة: ${toArabicDigits(yearStr)} - الشهر: ${monthArabic} - الكود: ${toArabicDigits(code)}
+            <div style="font-size:11px; color:#7a6652; margin-top:14px; font-weight:700;">
+              ${toArabicDigits(yearStr)} - ${monthArabic} - ${toArabicDigits(code)}
             </div>
           </div>
         `;
@@ -331,7 +367,14 @@ async function executeSearch(){
     const printArea = document.getElementById('printArea');
     if(area) area.style.display='block';
     if(printArea){
-      printArea.innerHTML = '<div style="background:#ffebee;padding:20px;text-align:center;color:#b71c1c;font-weight:800">❌ خطأ في جلب البيانات: '+err.message+'</div>';
+      printArea.innerHTML = `
+        <div style="background:linear-gradient(180deg,#ffffff 0%,#fefcf6 50%,#f5e6c8 100%); border:3px solid #000; border-radius:18px; padding:32px 20px; text-align:center; box-shadow: 0 10px 0 #d2b48c, 0 8px 0 #000, 0 20px 30px rgba(0,0,0,0.2);">
+          <div style="font-size:22px; font-weight:900; color:#b71c1c; text-shadow: 0 2px 0 #fff, 0 4px 0 #d2b48c, 0 6px 8px rgba(0,0,0,0.3); margin-bottom:14px;">لا يوجد بيانات لهذا الشهر<br>الرجاء الإتصال بمطور الخدمة للإستعلام</div>
+          <div style="font-size:15px; font-weight:800; background:#fff; border:2px solid #000; border-radius:12px; padding:14px; display:inline-block;">
+            <span style="color:#b71c1c; font-size:18px;">أ/ مصطفى درويش سيد درويش</span><br>
+            رقم الهاتف / 01092259655<br>رقم الواتس أب / 01092259655
+          </div>
+        </div>`;
     }
   }
 }
@@ -343,7 +386,6 @@ function renderForm(row){
   if(!area || !printArea) return;
   area.style.display='block';
 
-  // نفس منطق تقسيم الاستحقاقات والاستقطاعات من صفحة الادمن
   let allKeys = Object.keys(row);
   let startIdx = allKeys.findIndex(k => k.includes("مرتب_اساسي") || k.includes("مرتب اساسي"));
   let midIdx = allKeys.findIndex(k => k.includes("أجمالى_المستحق") || k.includes("اجمالى_المستحق") || k.includes("اجمالي_المستحق") || k.includes("إجمالى_المستحق"));
@@ -383,12 +425,19 @@ function renderForm(row){
   for(let i=0;i<max;i++){
     const a=inst[i]||{key:"",val:""};
     const b=must[i]||{key:"",val:""};
-    rowsHtml+='<tr style="height:24px"><td style="border:1px solid #000;padding:2px 3px;text-align:center;font-size:12px;color:#000">'+(a.val?toArabicDigits(a.val):"")+'</td><td style="border:1px solid #000;padding:2px 6px;text-align:right;font-size:12px;color:#000">'+a.key+'</td><td style="border:1px solid #000;padding:2px 3px;text-align:center;font-size:12px;color:#000">'+(b.val?toArabicDigits(b.val):"")+'</td><td style="border:1px solid #000;padding:2px 6px;text-align:right;font-size:12px;color:#000">'+b.key+'</td></tr>';
+    const aRed = isRedItem(a.key);
+    const bRed = isRedItem(b.key);
+    rowsHtml+='<tr style="height:28px">'
+      +'<td class="nowrap-cell" style="border:1px solid #000;padding:4px 3px;text-align:center;font-size:14px;white-space:nowrap;'+(aRed?'color:#b71c1c;font-weight:900;background:#fff1f1;':'color:#000')+'">'+(a.val?toArabicDigits(a.val):"")+'</td>'
+      +'<td class="nowrap-cell" style="border:1px solid #000;padding:4px 6px;text-align:right;font-size:14px;white-space:nowrap;'+(aRed?'color:#b71c1c;font-weight:900;background:#fff1f1;':'color:#000')+'">'+a.key+'</td>'
+      +'<td class="nowrap-cell" style="border:1px solid #000;padding:4px 3px;text-align:center;font-size:14px;white-space:nowrap;'+(bRed?'color:#b71c1c;font-weight:900;background:#fff1f1;':'color:#000')+'">'+(b.val?toArabicDigits(b.val):"")+'</td>'
+      +'<td class="nowrap-cell" style="border:1px solid #000;padding:4px 6px;text-align:right;font-size:14px;white-space:nowrap;'+(bRed?'color:#b71c1c;font-weight:900;background:#fff1f1;':'color:#000')+'">'+b.key+'</td>'
+      +'</tr>';
   }
 
   let safyVal = safyKey ? row[safyKey] : (row["الصافى"] || row["الصافي"] || row["الصافي_النهائي"]);
   if(safyVal){
-    rowsHtml+='<tr><td colspan="2" style="border:2px solid #000;padding:5px;text-align:center;font-weight:900;background:#fff9c4;color:#000">الصافي</td><td colspan="2" style="border:2px solid #000;padding:5px;text-align:center;font-weight:900;background:#fff176;color:#b71c1c;font-size:14px">'+toArabicDigits(parseFloat(safyVal).toFixed(2))+'</td></tr>';
+    rowsHtml+='<tr><td colspan="2" class="nowrap-cell" style="border:2px solid #000;padding:6px;text-align:center;font-weight:900;background:#fff9c4;color:#000;white-space:nowrap">الصافي</td><td colspan="2" class="nowrap-cell" style="border:2px solid #000;padding:6px;text-align:center;font-weight:900;background:#fff176;color:#b71c1c;font-size:16px;white-space:nowrap">'+toArabicDigits(parseFloat(safyVal).toFixed(2))+'</td></tr>';
   }
 
   const empName = row["الاسم"] || row["اسم_العامل"] || getEmpNameFromHeader() || "";
@@ -398,7 +447,7 @@ function renderForm(row){
   const bankName = row["اسم_البنك_المحول_و_الفرع_المحول_اليه"] || row["اسم_البنك_المحول_والفرع_المحول_الية"] || "";
   const bankCode = row["رقم_الحساب_البنكى"] || row["كود_البنك"] || "";
 
-  printArea.innerHTML = getFormHtmlJS(empName, empCode, finYear, monVal, bankName, bankCode, rowsHtml, 12);
+  printArea.innerHTML = getFormHtmlJS(empName, empCode, finYear, monVal, bankName, bankCode, rowsHtml, 14);
 }
 
 async function downloadImage(){
