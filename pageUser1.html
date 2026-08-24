@@ -29,10 +29,11 @@ body{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:8px 12px;
+  padding:8px 12px; /* تقليل ارتفاع الفريم بدون تغيير حجم المحتويات */
   gap:8px;
   flex-wrap:nowrap;
   text-align:right;
+  /* ثلاثي الأبعاد بألوان جميلة */
   background: linear-gradient(180deg, #ffffff 0%, #fff8e7 20%, #ffe9b8 50%, #ffd27a 100%) !important;
   border:2.5px solid #000 !important;
   border-radius:20px !important;
@@ -45,13 +46,13 @@ body{
   min-height:42px;
 }
 .top-strip h1{
-  font-size:22px;
+  font-size:22px; /* نفس حجم المحتويات بدون تغيير */
   font-weight:900;
   margin:0;
   line-height:1.2;
-  text-align:right;
+  text-align:right; /* جهة اليمين */
   flex:1;
-  color:#8B0000 !important;
+  color:#8B0000 !important; /* أحمر غامق */
   text-shadow: 
     0 1px 0 #fff,
     0 2px 0 #ffd27a,
@@ -95,10 +96,11 @@ body{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:6px 12px;
+  padding:6px 12px; /* تقليل ارتفاع الفريم بدون تغيير حجم المحتويات */
   margin-top:10px;
   gap:8px;
   min-height:38px;
+  /* ثلاثي الأبعاد بألوان جميلة وجذابة */
   background: linear-gradient(180deg, #ffffff 0%, #f5e6c8 30%, #e8d0a0 70%, #d2b48c 100%) !important;
   border:2.5px solid #000 !important;
   border-radius:20px !important;
@@ -119,23 +121,30 @@ body{
   gap:8px;
 }
 .month-center .label-month{
-  font-size:20px;
+  font-size:20px; /* نفس الحجم بدون تغيير */
   font-weight:900;
-  color:#8B0000 !important;
-  text-shadow: 0 1px 0 #fff, 0 2px 0 #ffe9b8, 0 2px 3px rgba(0,0,0,0.2);
+  color:#8B0000 !important; /* أحمر غامق */
+  text-shadow:
+    0 1px 0 #fff,
+    0 2px 0 #ffe9b8,
+    0 2px 3px rgba(0,0,0,0.2);
   order:1;
 }
 .month-center .label-year{
-  font-size:20px;
-  color:#8B0000 !important;
+  font-size:20px; /* نفس حجم الشهر - بجوار بعض */
+  color:#8B0000 !important; /* أحمر غامق */
   font-weight:900;
   background:transparent;
   border:none;
+  border-radius:0;
   padding:0;
   display:inline;
   box-shadow:none;
   margin-top:0;
-  text-shadow: 0 1px 0 #fff, 0 2px 0 #ffe9b8, 0 2px 3px rgba(0,0,0,0.2);
+  text-shadow:
+    0 1px 0 #fff,
+    0 2px 0 #ffe9b8,
+    0 2px 3px rgba(0,0,0,0.2);
   order:2;
 }
 .month-center .label-year::before{
@@ -157,38 +166,27 @@ body{
   overflow:hidden;
   position:relative;
 }
-/* خلفية مائية مائلة في منتصف الاستمارة - 45 درجة - 24px سطرين */
+/* خلفية مائية فوق الاستمارة - 16px بعرض الصفحة طوليا من الزاوية للزاوية - 45% ميل */
 .printArea-real::before{
-  content: "لا يعتمد رسمى \A ولا يصلح للتعامل مع الجهات الرسمية";
-  white-space: pre; /* لسطرين */
+  content: "لا يعتمد كمستند رسمى ولا يصلح للتعامل مع الجهات الرسمية";
   position:absolute;
   top:50%;
   left:50%;
   transform: translate(-50%,-50%) rotate(45deg);
-  font-size:24px; /* تكبير لـ 24px كما طلبت */
+  font-size:16px; /* حجم الخط 16px كما طلبت */
   font-weight:900;
-  color: rgba(139,0,0,0.14); /* أفتح شوية عشان الأرقام تبان */
+  color: rgba(139,0,0,0.18); /* أحمر غامق شفاف */
   text-align:center;
-  line-height:1.6;
+  white-space:nowrap;
   pointer-events:none;
-  z-index:0;
-  width:200%; /* من الزاوية للزاوية */
-  text-shadow: 0 1px 0 rgba(255,255,255,0.9);
-  letter-spacing:1px;
-}
-/* جعل الأرقام واضحة عند تقاطع الكلمات */
-.printArea-real table td,
-.printArea-real table th{
-  position:relative;
-  z-index:2;
-  background: rgba(255,255,255,0.85); /* خلفية بيضاء شفافة عشان الرقم يبان */
-}
-.printArea-real table td:nth-child(1),
-.printArea-real table td:nth-child(3),
-.printArea-real table th:nth-child(1),
-.printArea-real table th:nth-child(3){
-  background: rgba(255,255,255,0.92); /* المبالغ خلفية أوضح */
-  font-weight:900;
+  z-index:10;
+  width:200%; /* بعرض الصفحة طوليا من الزاوية للزاوية العكسية */
+  letter-spacing:2px;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.8);
+  border-top:2px solid rgba(139,0,0,0.15);
+  border-bottom:2px solid rgba(139,0,0,0.15);
+  padding:6px 0;
+  background: rgba(255,255,255,0.3);
 }
 .printArea-real > div{ position:relative; z-index:1; }
 .actions{ display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; justify-content:center; }
