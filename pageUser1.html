@@ -71,118 +71,26 @@ body{
   text-shadow: 0 1px 0 #fff;
 }
 .btn-3d{
-  height:42px;
-  padding:0 16px;
-  border-radius:14px;
-  border:2.5px solid #000;
-  font-weight:900;
-  font-size:13px;
+  height:40px;
+  padding:0 14px;
+  border-radius:12px;
+  border:2px solid #000;
+  font-weight:800;
+  font-size:12px;
   cursor:pointer;
-  transition:.12s;
+  transition:.1s;
   display:inline-flex;
   align-items:center;
   justify-content:center;
   gap:6px;
   white-space:nowrap;
-  position:relative;
-  transform: perspective(600px) rotateX(2deg);
-  text-shadow: 0 1px 0 rgba(255,255,255,0.8);
 }
-.btn-logout{
-  background:linear-gradient(180deg,#fff5f5,#ffd0d0) !important;
-  color:#8B0000;
-  box-shadow: 0 6px 0 #c47a7a, 0 4px 0 #000, inset 0 1px 0 #fff !important;
-}
-.btn-logout:active{ transform: perspective(600px) rotateX(2deg) translateY(4px); box-shadow: 0 2px 0 #c47a7a, 0 1px 0 #000, inset 0 1px 0 #fff !important; }
-.btn-nav{
-  background:linear-gradient(180deg,#ffffff,#fff8e7 40%,#f5e6c8 100%) !important;
-  color:#000;
-  box-shadow: 0 6px 0 #a08060, 0 4px 0 #000, inset 0 1px 0 #fff !important;
-  min-width:88px;
-}
-.btn-nav:active{ transform: perspective(600px) rotateX(2deg) translateY(4px); box-shadow: 0 2px 0 #a08060, 0 1px 0 #000, inset 0 1px 0 #fff !important; }
-.btn-main{
-  background:linear-gradient(180deg,#fff8e7,#ffefc3 30%,#f0c98a 100%) !important;
-  color:#5a2a00;
-  box-shadow: 0 6px 0 #c19a6b, 0 4px 0 #000, inset 0 1px 0 #fff !important;
-}
-.btn-main:active{ transform: perspective(600px) rotateX(2deg) translateY(4px); box-shadow: 0 2px 0 #c19a6b, 0 1px 0 #000, inset 0 1px 0 #fff !important; }
-
-/* تحسينات الموبايل */
-@media (max-width: 768px){
-  body{ padding:8px !important; }
-  .top-strip{ padding:6px 10px !important; min-height:36px !important; flex-wrap:wrap !important; }
-  .top-strip h1{ font-size:16px !important; }
-  .nav-strip{ flex-wrap:wrap !important; padding:6px 8px !important; gap:6px !important; }
-  .nav-strip > div{ flex-wrap:wrap !important; }
-  .month-center{ order:3; width:100% !important; margin-top:6px; }
-  .printArea-real{ padding:4px !important; border-radius:8px !important; overflow-x:auto !important; }
-  .printArea-real table{ table-layout:auto !important; width:auto !important; min-width:100% !important; }
-  .printArea-real table th, .printArea-real table td{ font-size:11px !important; padding:3px 4px !important; white-space:normal !important; word-break:break-word; }
-  .nowrap-cell{ white-space:normal !important; }
-  .btn-3d{ height:36px !important; padding:0 10px !important; font-size:11px !important; min-width:70px !important; }
-  #fullscreenModal .modal-content{ width:98vw !important; height:98vh !important; padding:4px !important; }
-  #fullscreenModal .printArea-real{ font-size:10px !important; }
-}
-
-/* أعمدة تغير حجمها حسب المحتويات */
-#mainSalaryTable{
-  table-layout:auto !important;
-}
-#mainSalaryTable colgroup col:nth-child(1){ width:auto !important; min-width:70px; }
-#mainSalaryTable colgroup col:nth-child(2){ width:auto !important; min-width:120px; }
-#mainSalaryTable colgroup col:nth-child(3){ width:auto !important; min-width:70px; }
-#mainSalaryTable colgroup col:nth-child(4){ width:auto !important; min-width:120px; }
-
-/* شاشة كاملة للاستمارة */
-#fullscreenModal{
-  display:none;
-  position:fixed;
-  top:0;
-  left:0;
-  width:100vw;
-  height:100vh;
-  background:rgba(0,0,0,0.85);
-  z-index:99999;
-  overflow:auto;
-  padding:10px;
-  box-sizing:border-box;
-}
-#fullscreenModal.active{ display:flex !important; flex-direction:column; align-items:center; justify-content:flex-start; }
-#fullscreenModal .modal-header{
-  width:100%;
-  max-width:1000px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  background:linear-gradient(180deg,#fff,#f5e6c8);
-  border:2px solid #000;
-  border-radius:12px;
-  padding:8px 12px;
-  margin-bottom:10px;
-  box-shadow: 0 4px 0 #a08060, 0 2px 0 #000;
-}
-#fullscreenModal .modal-content{
-  width:95vw;
-  max-width:1000px;
-  height:auto;
-  min-height:90vh;
-  background:#fff;
-  border:3px solid #000;
-  border-radius:10px;
-  padding:8px;
-  overflow:auto;
-  box-shadow: 0 0 20px rgba(0,0,0,0.5);
-}
-#fullscreenModal .close-btn{
-  background:linear-gradient(180deg,#fff1f1,#ffb0b0);
-  border:2px solid #000;
-  border-radius:10px;
-  padding:6px 14px;
-  font-weight:900;
-  cursor:pointer;
-  box-shadow: 0 3px 0 #c47a7a, 0 2px 0 #000;
-}
+.btn-logout{ background:#fff1f1; color:#b91c1c; box-shadow: 0 4px 0 #e8a0a0, 0 2px 0 #000; }
+.btn-logout:active{ transform:translateY(3px); box-shadow: 0 1px 0 #e8a0a0, 0 1px 0 #000; }
+.btn-nav{ background:linear-gradient(180deg,#ffffff,#f5e6c8); color:#000; box-shadow: 0 5px 0 #d2b48c, 0 3px 0 #000; min-width:88px; }
+.btn-nav:active{ transform:translateY(3px); box-shadow: 0 2px 0 #d2b48c, 0 1px 0 #000; }
+.btn-main{ background:linear-gradient(180deg,#ffefc3,#f0c98a); color:#000; box-shadow: 0 5px 0 #c19a6b, 0 3px 0 #000; }
+.btn-main:active{ transform:translateY(3px); box-shadow: 0 2px 0 #c19a6b, 0 1px 0 #000; }
 .nav-strip{
   display:flex;
   justify-content:space-between;
@@ -256,35 +164,38 @@ body{
   overflow:hidden;
   position:relative;
 }
-/* علامة مائية 24px سطرين - 45 درجة - من الزاوية للزاوية - ظاهرة بوضوح فوق الاستمارة */
-.printArea-real::before{
-  content: "لا يعتمد كمستند رسمى \A ولا يتم التعامل معها مع الجهات الخارجية";
-  white-space: pre;
+/* علامة مائية حقيقية - حل جذري - عنصر DOM حقيقي وليس pseudo-element */
+#realWatermark{
   position:absolute;
   top:50%;
   left:50%;
   transform: translate(-50%,-50%) rotate(-45deg);
   font-size:24px;
   font-weight:900;
-  color: rgba(139,0,0,0.32);
+  color: rgba(139,0,0,0.38);
   text-align:center;
   line-height:1.8;
   pointer-events:none;
-  z-index:2;
+  z-index:50;
   width:220%;
   text-shadow: 
     0 1px 0 rgba(255,255,255,1),
-    0 0 8px rgba(255,255,255,1);
+    0 0 10px rgba(255,255,255,1),
+    0 0 15px rgba(255,255,255,0.9);
   letter-spacing:1px;
-  border-top:4px double rgba(139,0,0,0.4);
-  border-bottom:4px double rgba(139,0,0,0.4);
-  padding:14px 0;
-  background: transparent;
+  border-top:5px double rgba(139,0,0,0.5);
+  border-bottom:5px double rgba(139,0,0,0.5);
+  padding:16px 0;
+  background: rgba(255,255,255,0.08);
   display:block !important;
   visibility:visible !important;
   opacity:1 !important;
 }
-/* جعل الأرقام واضحة عند تقاطع الكلمات - العلامة المائية تحت الجدول لكن ظاهرة */
+/* إخفاء العلامة المائية القديمة pseudo-element */
+.printArea-real::before{
+  display:none !important;
+}
+/* جعل الأرقام واضحة عند تقاطع الكلمات - العلامة المائية تحت الأرقام لكن فوق الخلفية */
 .printArea-real{
   position:relative;
   isolation:isolate;
@@ -300,18 +211,18 @@ body{
 .printArea-real table td,
 .printArea-real table th{
   position:relative;
-  z-index:6;
-  background: rgba(255,255,255,0.3) !important;
+  z-index:10;
+  background: rgba(255,255,255,0.35) !important;
 }
 .printArea-real table td:nth-child(1),
 .printArea-real table td:nth-child(3){
-  background: rgba(255,255,255,0.55) !important;
+  background: rgba(255,255,255,0.65) !important;
   font-weight:900;
-  text-shadow: 0 1px 0 #fff, 0 0 4px #fff, 0 0 8px #fff;
+  text-shadow: 0 1px 0 #fff, 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff;
 }
 .printArea-real table td:nth-child(2),
 .printArea-real table td:nth-child(4){
-  background: rgba(255,255,255,0.4) !important;
+  background: rgba(255,255,255,0.45) !important;
 }
 .actions{ display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; justify-content:center; }
 .nowrap-cell{ white-space:nowrap !important; overflow:hidden; text-overflow:ellipsis; }
@@ -385,11 +296,10 @@ body{
       <div id="currentMonthLabel" class="label-month">--</div>
       <div id="currentYearLabel" class="label-year">--</div>
     </div>
-    <!-- اليمين: طباعة وتحميل وصورة بكامل الشاشة في نفس سطر الشهر - ثلاثي الأبعاد -->
+    <!-- اليمين: طباعة وتحميل في نفس سطر الشهر -->
     <div style="display:flex; gap:6px; align-items:center;">
       <button class="btn-3d btn-main" onclick="printWithBackground()">🖨 طباعة</button>
-      <button class="btn-3d btn-nav" onclick="openFullscreenView()">📷 صورة</button>
-      <button class="btn-3d btn-nav" onclick="downloadImage()" style="min-width:60px;">💾</button>
+      <button class="btn-3d btn-nav" onclick="downloadImage()">📷 صورة</button>
     </div>
   </div>
 
@@ -414,19 +324,6 @@ body{
     </div>
   </div>
 
-</div>
-
-<!-- شاشة كاملة للاستمارة فقط بكامل محيط الشاشة - تظهر عند الضغط على زر صورة -->
-<div id="fullscreenModal">
-  <div class="modal-header no-print">
-    <div style="display:flex; gap:8px;">
-      <button class="close-btn" onclick="closeFullscreenView()">✕ إغلاق</button>
-      <button class="btn-3d btn-nav" onclick="downloadImage()" style="height:36px;">💾 تحميل</button>
-      <button class="btn-3d btn-main" onclick="printWithBackground()" style="height:36px;">🖨 طباعة</button>
-    </div>
-    <div style="font-weight:900; color:#8B0000; font-size:14px;">إستمارة المرتب - عرض كامل</div>
-  </div>
-  <div class="modal-content" id="fullscreenContent"></div>
 </div>
 
 <script>
@@ -798,7 +695,6 @@ function printWithBackground(){
     return;
   }
   
-  // إضافة ستايل مؤقت للطباعة بصفحة واحدة مع Background Graphics
   const printStyle = document.createElement('style');
   printStyle.id = 'temp-print-style';
   printStyle.textContent = `
@@ -847,11 +743,7 @@ function printWithBackground(){
     }
   `;
   document.head.appendChild(printStyle);
-  
-  // طباعة
   window.print();
-  
-  // إزالة الستايل المؤقت بعد الطباعة
   setTimeout(()=>{
     const s = document.getElementById('temp-print-style');
     if(s) s.remove();
@@ -867,17 +759,15 @@ function openFullscreenView(){
     alert('لا توجد بيانات للعرض');
     return;
   }
-  // نسخ الاستمارة كما هي مع كل التنسيقات
   content.innerHTML = area.innerHTML;
-  // تفعيل الأعمدة حسب المحتويات
   const tables = content.querySelectorAll('table');
   tables.forEach(t=>{
     t.style.tableLayout = 'auto';
     t.style.width = '100%';
   });
-  // جعلها بملء الشاشة
   modal.classList.add('active');
   document.body.style.overflow = 'hidden';
+  setTimeout(ensureRealWatermarkFullscreen, 100);
 }
 
 function closeFullscreenView(){
@@ -888,7 +778,23 @@ function closeFullscreenView(){
   }
 }
 
-// إغلاق بالضغط على ESC أو خارج المحتوى
+function ensureRealWatermarkFullscreen(){
+  const content = document.getElementById('fullscreenContent');
+  if(!content) return;
+  let wm = content.querySelector('#realWatermarkFullscreen');
+  if(!wm){
+    wm = document.createElement('div');
+    wm.id = 'realWatermarkFullscreen';
+    wm.innerHTML = 'لا يعتمد كمستند رسمى<br>ولا يتم التعامل بها مع الجهات الخارجية';
+    wm.style.cssText = 'position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) rotate(-45deg); font-size:24px; font-weight:900; color:rgba(139,0,0,0.32); text-align:center; line-height:1.8; pointer-events:none; z-index:50; width:220%; text-shadow:0 1px 0 #fff,0 0 10px #fff; border-top:5px double rgba(139,0,0,0.5); border-bottom:5px double rgba(139,0,0,0.5); padding:16px 0; background:rgba(255,255,255,0.08);';
+    const printArea = content.querySelector('.printArea-real') || content;
+    if(printArea) {
+      printArea.style.position = 'relative';
+      printArea.appendChild(wm);
+    }
+  }
+}
+
 document.addEventListener('keydown', function(e){
   if(e.key==='Escape'){
     closeFullscreenView();
@@ -917,6 +823,40 @@ window.onload = function(){
   updateMonthLabels();
   executeSearch();
 };
+
+// === حل جذري لإظهار العلامة المائية - عنصر DOM حقيقي ===
+function ensureRealWatermark(){
+  const printArea = document.getElementById('printArea');
+  if(!printArea) return;
+  let wm = document.getElementById('realWatermark');
+  if(!wm){
+    wm = document.createElement('div');
+    wm.id = 'realWatermark';
+    wm.innerHTML = 'لا يعتمد كمستند رسمى<br>ولا يتم التعامل بها مع الجهات الخارجية';
+    printArea.appendChild(wm);
+  }
+  // التأكد من أن العلامة المائية فوق الخلفية وتحت الأرقام
+  printArea.style.position = 'relative';
+}
+
+// مراقبة تغييرات الاستمارة وإعادة إضافة العلامة المائية تلقائيا
+(function(){
+  const printArea = document.getElementById('printArea');
+  if(!printArea) return;
+  
+  // إضافة العلامة المائية أول مرة
+  ensureRealWatermark();
+  
+  // مراقب لإعادة إضافتها عند كل تحديث للاستمارة
+  const observer = new MutationObserver(function(){
+    setTimeout(ensureRealWatermark, 10);
+  });
+  
+  observer.observe(printArea, { childList: true, subtree: true });
+  
+  // إعادة إضافة كل ثانية كتأمين إضافي
+  setInterval(ensureRealWatermark, 1000);
+})();
 </script>
 </body>
 </html>
