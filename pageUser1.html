@@ -29,46 +29,23 @@ body{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:8px 12px;
-  gap:8px;
-  flex-wrap:nowrap;
-  text-align:right;
-  background: linear-gradient(180deg, #ffffff 0%, #fff8e7 20%, #ffe9b8 50%, #ffd27a 100%) !important;
-  border:2.5px solid #000 !important;
-  border-radius:20px !important;
-  box-shadow: 
-    0 6px 0 #c19a6b,
-    0 4px 0 #000,
-    0 12px 20px rgba(0,0,0,0.2),
-    inset 0 1px 0 rgba(255,255,255,0.95) !important;
-  transform: perspective(800px) rotateX(1deg);
-  min-height:42px;
+  padding:14px 18px;
+  gap:12px;
+  flex-wrap:wrap;
 }
-.top-strip h1{
-  font-size:22px;
-  font-weight:900;
-  margin:0;
-  line-height:1.2;
-  text-align:right;
-  flex:1;
-  color:#8B0000 !important;
-  text-shadow: 
-    0 1px 0 #fff,
-    0 2px 0 #ffd27a,
-    0 3px 3px rgba(0,0,0,0.2);
-}
+.top-strip h1{ font-size:18px; font-weight:800; margin:0; color:#000; line-height:1.2; }
+.top-strip p{ font-size:11px; color:#7a6652; margin:2px 0 0 0; }
 .code-badge{
   display:inline-flex;
   align-items:center;
-  background:linear-gradient(180deg,#fff,#fff8e7) !important;
-  border:2.5px solid #000 !important;
+  background:#fff;
+  border:2px solid #000;
   border-radius:999px;
-  padding:6px 14px;
-  font-size:13px;
-  font-weight:900;
-  color:#b71c1c !important;
-  box-shadow: 0 4px 0 #c19a6b, 0 3px 0 #000, inset 0 1px 0 #fff !important;
-  text-shadow: 0 1px 0 #fff;
+  padding:4px 12px;
+  font-size:12px;
+  font-weight:800;
+  color:#000;
+  box-shadow: 0 3px 0 #d2b48c, 0 2px 0 #000;
 }
 .btn-3d{
   height:40px;
@@ -91,235 +68,108 @@ body{
 .btn-nav:active{ transform:translateY(3px); box-shadow: 0 2px 0 #d2b48c, 0 1px 0 #000; }
 .btn-main{ background:linear-gradient(180deg,#ffefc3,#f0c98a); color:#000; box-shadow: 0 5px 0 #c19a6b, 0 3px 0 #000; }
 .btn-main:active{ transform:translateY(3px); box-shadow: 0 2px 0 #c19a6b, 0 1px 0 #000; }
-.nav-strip{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:6px 12px;
-  margin-top:10px;
-  gap:8px;
-  min-height:38px;
-  background: linear-gradient(180deg, #ffffff 0%, #f5e6c8 30%, #e8d0a0 70%, #d2b48c 100%) !important;
-  border:2.5px solid #000 !important;
-  border-radius:20px !important;
-  box-shadow:
-    0 5px 0 #a08060,
-    0 3px 0 #000,
-    0 10px 18px rgba(0,0,0,0.18),
-    inset 0 1px 0 rgba(255,255,255,0.9) !important;
-  transform: perspective(800px) rotateX(1deg);
-}
-.month-center{
-  text-align:center;
-  flex:1;
-  display:flex;
-  flex-direction:row;
-  justify-content:center;
-  align-items:center;
-  gap:8px;
-}
-.month-center .label-month{
-  font-size:20px;
-  font-weight:900;
-  color:#8B0000 !important;
-  text-shadow:
-    0 1px 0 #fff,
-    0 2px 0 #ffe9b8,
-    0 2px 3px rgba(0,0,0,0.2);
-  order:1;
-}
-.month-center .label-year{
-  font-size:20px;
-  color:#8B0000 !important;
-  font-weight:900;
-  background:transparent;
-  border:none;
-  border-radius:0;
-  padding:0;
-  display:inline;
-  box-shadow:none;
-  margin-top:0;
-  text-shadow:
-    0 1px 0 #fff,
-    0 2px 0 #ffe9b8,
-    0 2px 3px rgba(0,0,0,0.2);
-  order:2;
-}
-.month-center .label-year::before{
-  content: " - ";
-  color:#8B0000;
-  font-weight:900;
-}
+.nav-strip{ display:flex; justify-content:space-between; align-items:center; padding:12px 14px; margin-top:14px; gap:10px; }
+.month-center{ text-align:center; flex:1; }
+.month-center .label-month{ font-size:20px; font-weight:800; color:#000; }
+.month-center .label-year{ font-size:12px; color:#7a6652; font-weight:700; }
 .loader{ margin-top:16px; padding:18px; text-align:center; font-weight:700; color:#7a6652; display:none; }
 .displayArea{ margin-top:16px; }
-.printArea-real{
-  background:#fff!important;
-  border:2px solid #000;
-  border-radius:10px;
-  padding:6px;
-  width:100%;
-  box-sizing:border-box;
-  font-weight:700;
-  color:#000;
-  overflow:hidden;
-  position:relative;
-}
-/* علامة مائية حقيقية - حل جذري - عنصر DOM حقيقي وليس pseudo-element */
-#realWatermark{
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform: translate(-50%,-50%) rotate(-45deg);
-  font-size:20px;
-  font-weight:900;
-  color: rgba(139,0,0,0.38);
-  text-align:center;
-  line-height:1.8;
-  pointer-events:none;
-  z-index:50;
-  width:220%;
-  text-shadow: 
-    0 1px 0 rgba(255,255,255,1),
-    0 0 10px rgba(255,255,255,1),
-    0 0 15px rgba(255,255,255,0.9);
-  letter-spacing:1px;
-  border-top:5px double rgba(139,0,0,0.5);
-  border-bottom:5px double rgba(139,0,0,0.5);
-  padding:16px 0;
-  background: rgba(255,255,255,0.08);
-  display:block !important;
-  visibility:visible !important;
-  opacity:1 !important;
-}
-/* إخفاء العلامة المائية القديمة pseudo-element */
-.printArea-real::before{
-  display:none !important;
-}
-/* جعل الأرقام واضحة عند تقاطع الكلمات - العلامة المائية تحت الأرقام لكن فوق الخلفية */
-.printArea-real{
-  position:relative;
-  isolation:isolate;
-}
-.printArea-real > div{
-  position:relative;
-  z-index:3;
-}
-.printArea-real table{
-  position:relative;
-  z-index:5;
-}
-.printArea-real table td,
-.printArea-real table th{
-  position:relative;
-  z-index:10;
-  background: rgba(255,255,255,0.35) !important;
-}
-.printArea-real table td:nth-child(1),
-.printArea-real table td:nth-child(3){
-  background: rgba(255,255,255,0.65) !important;
-  font-weight:900;
-  text-shadow: 0 1px 0 #fff, 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff;
-}
-.printArea-real table td:nth-child(2),
-.printArea-real table td:nth-child(4){
-  background: rgba(255,255,255,0.45) !important;
-}
+.printArea-real{ background:#fff!important; border:2px solid #000; border-radius:10px; padding:6px; width:100%; box-sizing:border-box; font-weight:700; color:#000; overflow:hidden; }
 .actions{ display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; justify-content:center; }
-.nowrap-cell{ white-space:nowrap !important; overflow:hidden; text-overflow:ellipsis; }
-.red-item{ color:#b71c1c !important; font-weight:900 !important; }
 @media print{
-  *{
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-  html, body{
-    background:#fff !important;
-    background-image:none !important;
-    margin:0 !important;
-    padding:0 !important;
-    height:auto !important;
-  }
-  body{
-    background:#fff !important;
-  }
+  body{ background:#fff!important; }
   .no-print{ display:none!important; }
   .card{ box-shadow:none!important; border:1px solid #000!important; }
-  .printArea-real{
-    border:3px solid #000!important;
-    background:#fff !important;
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-    width:100% !important;
-    margin:0 !important;
-    padding:6px !important;
-    box-shadow:none !important;
-  }
-  .printArea-real::before{
-    color: rgba(139,0,0,0.14) !important;
-    display:block !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-  .displayArea{
-    margin:0 !important;
-    padding:0 !important;
-  }
-  @page{
-    size: A4;
-    margin: 8mm;
-  }
+  .printArea-real{ border:3px solid #000!important; }
 }
+
+#mobileBottomMenu{
+  display:none;
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:linear-gradient(180deg,#ffffff 0%,#fff8e7 40%,#f5e6c8 100%);
+  border-top:3px solid #000;
+  border-radius:18px 18px 0 0;
+  padding:8px 6px 10px 6px;
+  z-index:9998;
+  justify-content:space-around;
+  align-items:center;
+  box-shadow: 0 -4px 0 #a08060, 0 -2px 0 #000;
+  gap:4px;
+}
+#mobileBottomMenu .mob-btn{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+  height:56px;
+  background:linear-gradient(180deg,#ffffff,#fff8e7 40%,#f5e6c8 100%);
+  border:2px solid #000;
+  border-radius:14px;
+  font-weight:900;
+  font-size:10px;
+  color:#000;
+  cursor:pointer;
+}
+@media (max-width:768px){
+  #mobileBottomMenu{ display:flex !important; }
+  .nav-strip{ display:none !important; }
+  body{ padding-bottom:80px !important; }
+}
+
+
+/* حجم خط البيانات الموجودة داخل الجدول 9px */
+.printArea-real table td,
+.printArea-real table th,
+#printArea td,
+#printArea th,
+#mainSalaryTable td,
+#mainSalaryTable th,
+table td,
+table th{
+  font-size:9px !important;
+}
+#printArea{
+  font-size:9px !important;
+}
+
 </style>
 </head>
 <body>
 <div class="max-w-4xl mx-auto">
 
+  <!-- top-strip - نفس دوال اسم العامل وكود الموظف بدون تعديل -->
   <div class="card top-strip no-print">
-    <div style="flex:1; text-align:right;">
-      <h1 id="userName">مرحبا بك أ/ User</h1>
+    <div>
+      <h1 id="userName">مرحبا User</h1>
+      <p>تم الدخول برقم البطاقة والبصمة - بيانات حقيقية من Turso</p>
     </div>
-    <div style="display:flex; align-items:center; gap:8px; flex-wrap:nowrap;">
+    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
       <span id="headerCode" class="code-badge">الكود: --</span>
       <button onclick="logout()" class="btn-3d btn-logout">خروج</button>
     </div>
   </div>
 
-  <!-- التعديل المطلوب: السابق والتالي على اليسار، الطباعة والتحميل على اليمين، الشهر في المنتصف -->
+  <!-- nav-strip السابق/التالي والشهر الحالي -->
   <div class="card nav-strip no-print">
-    <!-- اليسار: السابق والتالي -->
-    <div style="display:flex; gap:6px; align-items:center;">
-      <button class="btn-3d btn-nav" onclick="changeMonth(-1)">>> السابق</button>
-      <button class="btn-3d btn-nav" onclick="changeMonth(1)">التالي <<</button>
-    </div>
-    <!-- المنتصف: الشهر كما كان -->
+    <button class="btn-3d btn-nav" onclick="changeMonth(-1)">>> السابق</button>
     <div class="month-center">
       <div id="currentMonthLabel" class="label-month">--</div>
       <div id="currentYearLabel" class="label-year">--</div>
     </div>
-    <!-- اليمين: طباعة وتحميل في نفس سطر الشهر -->
-    <div style="display:flex; gap:6px; align-items:center;">
-      <button class="btn-3d btn-main" onclick="printWithBackground()">🖨 طباعة</button>
-      <button class="btn-3d btn-nav" onclick="downloadImage()">📷 صورة</button>
-    </div>
+    <button class="btn-3d btn-nav" onclick="changeMonth(1)">التالي <<</button>
   </div>
 
-  <div id="loader" class="card no-print" style="display:none; margin-top:16px; padding:24px 18px; text-align:center; background:linear-gradient(180deg,#ffffff 0%,#fefcf6 50%,#f5e6c8 100%); border:3px solid #000; border-radius:18px; box-shadow: 0 8px 0 #d2b48c, 0 5px 0 #000, 0 16px 24px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.9); transform: perspective(700px) rotateX(1deg);">
-    <div style="font-size:20px; font-weight:900; color:#000; text-shadow: 0 2px 0 #fff, 0 4px 0 #d2b48c, 0 6px 10px rgba(0,0,0,0.25);">⏳ إنتظر من فضلك جارى التحميل مع إشعار التحميل</div>
-    <div style="margin-top:10px; font-size:13px; font-weight:700; color:#7a6652;">
-      <span id="loadCounter" style="background:linear-gradient(180deg,#ffefc3,#f0c98a); border:2px solid #000; padding:4px 12px; border-radius:999px; box-shadow: 0 3px 0 #c19a6b, 0 2px 0 #000; color:#000;">٠ ث</span>
-      <span style="margin-right:8px;">جاري جلب البيانات من Turso...</span>
-    </div>
-    <div style="margin-top:12px; height:8px; background:#f5e6c8; border:1.5px solid #000; border-radius:999px; overflow:hidden;">
-      <div style="height:100%; width:100%; background:linear-gradient(90deg,#f0c98a,#d2b48c); animation: loadingBar 1.2s infinite linear;"></div>
-    </div>
-  </div>
-  <style>@keyframes loadingBar{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}</style>
+  <div id="loader" class="card loader no-print">⏳ جاري تحميل بيانات الراتب من قاعدة البيانات Turso... <span id="loadCounter">0 ث</span></div>
 
   <div id="displayArea" class="displayArea" style="display:none;">
     <div id="printArea" class="printArea-real"></div>
-    <!-- تم نقل أزرار الطباعة والتحميل لسطر الشهر - هذا الـ div مخفي -->
-    <div class="actions no-print" style="display:none;">
-      <button class="btn-3d btn-main" onclick="printWithBackground()">🖨 طباعة صفحة واحدة</button>
+    <div class="actions no-print">
+      <button class="btn-3d btn-main" onclick="window.print()">🖨 طباعة صفحة واحدة</button>
       <button class="btn-3d btn-nav" onclick="downloadImage()">📷 تحميل كصورة</button>
     </div>
   </div>
@@ -349,6 +199,7 @@ function monthNumberToArabicName(num){
   return monthNameMap[num] || String(num);
 }
 
+// نفس الدوال بدون تعديل - مرتبطة بصفحة أخرى
 function getEmpCodeFromHeader(){
   try{
     const v1 = localStorage.getItem('empCode');
@@ -383,12 +234,9 @@ function logout(){
 }
 
 function changeMonth(delta){
-  let newMonth = currentMonth + delta;
-  let newYear = currentYear;
-  if(newMonth > 12){ newMonth = 1; newYear++; }
-  if(newMonth < 1){ newMonth = 12; newYear--; }
-  currentMonth = newMonth;
-  currentYear = newYear;
+  currentMonth += delta;
+  if(currentMonth > 12){ currentMonth = 1; currentYear++; }
+  if(currentMonth < 1){ currentMonth = 12; currentYear--; }
   updateMonthLabels();
   executeSearch();
 }
@@ -416,42 +264,42 @@ function stopLoadCounter(){
   if(l) l.style.display='none';
 }
 
+// نفس تصميم استمارة المرتب من الكود الأول - بكل الدوال
 function getFormHtmlJS(real_emp_name, emp_code_val, financial_year_val, month_val, bankName, bankCode, table_rows_html, currentFontSize){
-  currentFontSize = 11;
+  currentFontSize = currentFontSize || 12;
   return '<div style="font-size:'+currentFontSize+'px;width:100%">'
+    + '<div style="display:flex;align-items:center;gap:8px;width:100%;border:2px solid #000;border-radius:8px;background:#fff;padding:4px;margin-bottom:6px;min-height:80px">'
+    + '<div style="width:150px;height:70px;display:flex;align-items:center;justify-content:center;background:#fff;border:1px solid #ddd;border-radius:6px;flex-shrink:0">'
+    + '<img src="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'70\' height=\'70\' viewBox=\'0 0 70 70\'%3E%3Ccircle cx=\'35\' cy=\'35\' r=\'32\' fill=\'%23003366\' stroke=\'%23FFD700\' stroke-width=\'2\'/%3E%3Cpath d=\'M35 10 L42 28 L30 28 L38 48 L26 30 L38 30 Z\' fill=\'%23FFD700\'/%3E%3Ctext x=\'35\' y=\'62\' text-anchor=\'middle\' font-size=\'6\' fill=\'white\' font-weight=\'900\'%3EEETC%3C/text%3E%3C/svg%3E" style="width:65px;height:65px;object-fit:contain">'
     + '</div>'
-    + '<table style="width:100%;border-collapse:collapse;font-size:'+currentFontSize+'px;font-weight:700;margin-bottom:6px;table-layout:fixed"><tr>'
-    + '<td class="nowrap-cell" style="border:1px solid #000;padding:5px;text-align:right;background:#fffde7;color:#000;white-space:nowrap;width:40%;overflow:hidden;text-overflow:ellipsis">👤 اسم الموظف: '+real_emp_name+'</td>'
-    + '<td class="nowrap-cell" style="border:1px solid #000;padding:5px;text-align:center;background:#fce4ec;color:#ff0000;font-weight:900;white-space:nowrap;width:20%">كود الموظف: '+toArabicDigits(emp_code_val)+'</td>'
-    + '<td class="nowrap-cell" style="border:1px solid #000;padding:5px;text-align:center;background:#fffde7;color:#000;white-space:nowrap;width:40%">السنة المالية: '+toArabicDigits(financial_year_val)+' -- بيان شهر: '+toArabicDigits(month_val)+'</td>'
-    + '</tr><tr>'
-    + '<td colspan="2" class="nowrap-cell" style="border:1px solid #000;padding:5px;text-align:center;background:#e3f2fd;color:#000;white-space:nowrap">جهة الصرف: '+(bankName?bankName:'--')+'</td>'
-    + '<td class="nowrap-cell" style="border:1px solid #000;padding:5px;text-align:center;background:#f3e5f5;color:#000;white-space:nowrap">رقم الحساب: '+toArabicDigits(bankCode)+'</td>'
-    + '</tr></table>'
+    + '<div style="flex:1;text-align:center;color:#000">'
+    + '<div style="font-size:'+(currentFontSize+2)+'px;font-weight:800;white-space:nowrap">نموذج مفردات مرتب غير قابلة للصرف - شركة مصر الوسطى لنقل الكهرباء</div>'
+    + '<div style="font-size:'+currentFontSize+'px;font-weight:700;margin-top:2px;color:#003366"> ⚡ الإدارة العامة لشبكات وخطوط كهرباء بنى سويف⚡ </div>'
+    + '</div>'
+    + '</div>'
+    + '<div style="text-align:center;padding:4px;border:1px solid #000;border-radius:6px;background:#fff;margin-bottom:4px;white-space:nowrap"><span style="font-size:'+(currentFontSize+1)+'px;font-weight:900;color:#7f0000">👤 اسم الموظف: '+real_emp_name+'</span></div>'
+    + '<table style="width:100%;border-collapse:collapse;font-size:'+currentFontSize+'px;font-weight:700;margin-bottom:4px;table-layout:fixed"><tr><td style="border:1px solid #000;padding:3px;text-align:center;background:#fffde7;color:#000">السنة المالية: '+toArabicDigits(financial_year_val)+' -- بيان شهر: '+toArabicDigits(month_val)+'</td><td style="border:1px solid #000;padding:3px;text-align:center;background:#fce4ec;color:#ff0000;font-weight:900">كود الموظف: '+toArabicDigits(emp_code_val)+'</td></tr><tr><td style="border:1px solid #000;padding:3px;text-align:center;background:#e3f2fd;color:#000">جهة الصرف: '+(bankName?bankName:'--')+'</td><td style="border:1px solid #000;padding:3px;text-align:center;background:#f3e5f5;color:#000">رقم الحساب: '+toArabicDigits(bankCode)+'</td></tr></table>'
     + '<table id="mainSalaryTable" style="width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed"><tr>'
-    + '<td style="width:100%;vertical-align:top;border:1px solid #000;border-radius:6px;overflow:hidden">'
+    + '<td id="notesCol" style="width:25%;border:1px solid #000;border-radius:6px;vertical-align:top;padding:5px;background:#fff;color:#000"><div style="text-align:center;background:#fff176;border:1px solid #000;border-radius:4px;padding:4px;margin-bottom:6px;font-weight:900;color:#000">بيان مفردات مرتب</div>للسيد/ <b style="color:#b71c1c">'+real_emp_name+'</b><br><br><span style="font-size:'+(currentFontSize-2)+'px;color:#000">1- قد أعطيت هذه المفردات بناء على طلب المذكور دون أدنى مسئولية على الشركة.<br>2- الشركة غير مسئولة تجاه البنك عن أية قروض تمنح للعامل بناء على هذه المفردات.<br>3- الشركة غير مسئولة عن سداد أية مديونيات.</span></td>'
+    + '<td style="width:1%"></td>'
+    + '<td style="width:74%;vertical-align:top;border:1px solid #000;border-radius:6px;overflow:hidden">'
     + '<table style="width:100%;border-collapse:collapse;text-align:center;font-weight:700;table-layout:fixed">'
     + '<colgroup><col style="width:13%"><col style="width:32%"><col style="width:13%"><col style="width:42%"></colgroup>'
-    + '<thead><tr><th class="nowrap-cell" colspan="2" style="border:1px solid #000;padding:6px;white-space:nowrap">الإستحقاقات</th><th class="nowrap-cell" colspan="2" style="background:#b71c1c;color:#fff;border:1px solid #000;padding:6px;white-space:nowrap">المستقطع</th></tr><tr style="background:#e8f5e9"><th class="nowrap-cell" style="border:1px solid #000;padding:5px;color:#000;white-space:nowrap">المبلغ</th><th class="nowrap-cell" style="border:1px solid #000;padding:5px;color:#000;white-space:nowrap">البيان</th><th class="nowrap-cell" style="border:1px solid #000;padding:5px;color:#000;white-space:nowrap">المبلغ</th><th class="nowrap-cell" style="border:1px solid #000;padding:5px;color:#000;white-space:nowrap">البيانات</th></tr></thead>'
+    + '<thead><tr><th colspan="2" style="background:#b71c1c;color:#fff;border:1px solid #000;padding:5px">الإستحقاقات</th><th colspan="2" style="background:#b71c1c;color:#fff;border:1px solid #000;padding:5px">المستقطع</th></tr><tr style="background:#e8f5e9"><th style="border:1px solid #000;padding:4px;color:#000">المبلغ</th><th style="border:1px solid #000;padding:4px;color:#000">البيانات</th><th style="border:1px solid #000;padding:4px;color:#000">المبلغ</th><th style="border:1px solid #000;padding:4px;color:#000">البيانات</th></tr></thead>'
     + '<tbody style="background:#fff;color:#000">'+table_rows_html+'</tbody>'
     + '</table>'
     + '</td></tr></table>'
-    + '<div style="margin-top:12px; text-align:center; background:linear-gradient(180deg,#ffffff,#fefcf6); border:2px solid #000; border-radius:12px; padding:12px; box-shadow: 0 5px 0 #d2b48c, 0 3px 0 #000;">'
-    + '<div style=":13px; font-weight:800; color:#000;">إعداد وتطوير</div>'
-    + '<div style=":16px; font-weight:900; color:#b71c1c; margin-top:4px;">أ/ مصطفى درويش سيد درويش</div>'
-    + '<div style=":13px; font-weight:800; color:#000; margin-top:6px;">رقم الهاتف : <span dir="ltr" style="font-family:monospace; font-weight:900;">01092259655</span></div>'
-    + '</div>'
+    + '<table style="width:100%;border-collapse:collapse;margin-top:6px;font-size:'+(currentFontSize-1)+'px;font-weight:800;table-layout:fixed">'
+    + '<tr><td style="width:25%;border:1px solid #000;padding:5px;text-align:center;background:#fffde7;color:#000">مسئول الإستحقاقات</td><td style="width:25%;border:1px solid #000;padding:5px;text-align:center;background:#e8f5e9;color:#000">رئيس الشئون الإدارية</td><td style="width:25%;border:1px solid #000;padding:5px;text-align:center;background:#e3f2fd;color:#000">مدير عام شبكات بنى سويف</td><td style="width:25%;border:none"></td></tr>'
+    + '<tr><td style="border:1px solid #000;height:55px;padding:4px;vertical-align:top;color:#000">توقيع / <div style="text-align:center;margin-top:18px">------</div></td><td style="border:1px solid #000;height:55px;padding:4px;vertical-align:top;color:#000">محاسب /<div style="text-align:center;margin-top:18px;color:#b71c1c">إبراهيم محمد سعيد</div></td><td style="border:1px solid #000;height:55px;padding:4px;vertical-align:top;color:#000">مهندس /<div style="text-align:center;margin-top:18px;color:#0d47a1">سيد محمد عبد الحفيظ</div></td><td style="border:none;padding:4px;text-align:left;line-height:1.2;color:#000"><span style="font-size:9px">إعداد وتطوير</span><br><b style="font-size:10px">أ/ مصطفى درويش</b><br></td></tr>'
+    + '</table>'
     + '</div>';
 }
 
-function isRedItem(label){
-  const redKeywords = ["علاج طبى", "علاج طبي", "ضريبه", "ضريبة", "جمعيه الخدمات الاجتماعية", "جمعية الخدمات الاجتماعية", "قسط صندوق انتماء", "قسط صندوق الانتماء"];
-  const lower = String(label).replace(/[ىي]/g, "ي").trim();
-  return redKeywords.some(k => lower.includes(k.replace(/[ىي]/g, "ي")) || String(label).includes(k));
-}
-
+// جلب بيانات حقيقية من Turso بناء على كود الموظف من الهيدر + السنة والشهر الحاليين
 async function executeSearch(){
   const code = getEmpCodeFromHeader();
+  const nameFromHeader = getEmpNameFromHeader();
   const loader = document.getElementById('loader');
   const displayArea = document.getElementById('displayArea');
 
@@ -471,74 +319,23 @@ async function executeSearch(){
   try{
     const monthArabic = monthNameMap[currentMonth] || String(currentMonth);
     const yearStr = String(currentYear);
+
+    // نفس API المستخدم في صفحة الادمن - يجلب من Turso
     const url = WORKER_BASE_URL + "/api/salary-turso?year=" + encodeURIComponent(yearStr) + "&month=" + encodeURIComponent(monthArabic) + "&code=" + encodeURIComponent(code);
     
+    console.log('Fetching:', url);
     const res = await fetch(url);
     const j = await res.json();
     
     stopLoadCounter();
 
-    let dataMonth = j.data ? (j.data["الشهر"] || "") : "";
-    let dataYear = j.data ? String(j.data["السنه"] || "") : "";
-    const requestedMonth = monthArabic.trim();
-    const requestedYear = yearStr.trim();
-    const returnedMonth = String(dataMonth).trim();
-    const returnedYear = String(dataYear).trim();
-    const isMonthMismatch = returnedMonth && requestedMonth && returnedMonth !== requestedMonth;
-    const isYearMismatch = returnedYear && requestedYear && returnedYear !== requestedYear;
-    
-    if(!res.ok || !j.found || !j.data || isMonthMismatch || isYearMismatch){
+    if(!res.ok || !j.found || !j.data){
+      // رسالة عدم وجود مرتب
       const area = document.getElementById('displayArea');
       const printArea = document.getElementById('printArea');
       if(area) area.style.display='block';
       if(printArea){
-        printArea.innerHTML = `
-          <div style="
-            background:linear-gradient(180deg,#ffffff 0%,#fefcf6 50%,#f5e6c8 100%);
-            border:3px solid #000;
-            border-radius:18px;
-            padding:32px 20px;
-            text-align:center;
-            box-shadow: 0 10px 0 #d2b48c, 0 8px 0 #000, 0 20px 30px rgba(0,0,0,0.2), inset 0 2px 0 rgba(255,255,255,0.9);
-            transform: perspective(800px) rotateX(2deg);
-            position:relative;
-          ">
-            <div style="
-              :26px;
-              font-weight:900;
-              color:#b71c1c;
-              text-shadow: 0 2px 0 #fff, 0 4px 0 #d2b48c, 0 6px 8px rgba(0,0,0,0.3);
-              margin-bottom:18px;
-              line-height:1.4;
-              white-space:pre-line;
-            ">لا يوجد بيانات لهذا الشهر
-الرجاء الإتصال بمطور الخدمة للإستعلام</div>
-            <div style="
-              :16px;
-              font-weight:800;
-              color:#000;
-              line-height:2.2;
-              background:#fff;
-              border:2px solid #000;
-              border-radius:12px;
-              padding:16px;
-              box-shadow: 0 4px 0 #d2b48c, 0 2px 0 #000;
-              display:inline-block;
-              min-width:300px;
-            ">
-              <span style=":19px; color:#b71c1c; font-weight:900;">أ/ مصطفى درويش سيد درويش</span><br><br>
-              <span style="background:#fffde7; border:1.5px solid #000; border-radius:8px; padding:6px 12px; display:inline-block; margin:5px; :14px; white-space:nowrap;">
-                رقم الهاتف / <span dir="ltr" style="font-family:monospace; font-weight:900;">01092259655</span>
-              </span><br>
-              <span style="background:#e8f5e9; border:1.5px solid #000; border-radius:8px; padding:6px 12px; display:inline-block; margin:5px; :14px; white-space:nowrap;">
-                رقم الواتس أب / <span dir="ltr" style="font-family:monospace; font-weight:900;">01092259655</span>
-              </span>
-            </div>
-            <div style=":11px; color:#7a6652; margin-top:14px; font-weight:700;">
-              ${toArabicDigits(yearStr)} - ${monthArabic} - ${toArabicDigits(code)}
-            </div>
-          </div>
-        `;
+        printArea.innerHTML = '<div style="background:#fff;padding:20px;text-align:center;color:#7a0000;font-weight:800;border-radius:12px">❌ لا يوجد مرتب<br>السنة: '+toArabicDigits(yearStr)+' - الشهر: '+monthArabic+' - الكود: '+toArabicDigits(code)+'<br><br>'+ (j.msg||'لا يوجد بيانات') +'</div>';
       }
       return;
     }
@@ -552,14 +349,7 @@ async function executeSearch(){
     const printArea = document.getElementById('printArea');
     if(area) area.style.display='block';
     if(printArea){
-      printArea.innerHTML = `
-        <div style="background:linear-gradient(180deg,#ffffff 0%,#fefcf6 50%,#f5e6c8 100%); border:3px solid #000; border-radius:18px; padding:32px 20px; text-align:center; box-shadow: 0 10px 0 #d2b48c, 0 8px 0 #000, 0 20px 30px rgba(0,0,0,0.2);">
-          <div style=":22px; font-weight:900; color:#b71c1c; text-shadow: 0 2px 0 #fff, 0 4px 0 #d2b48c, 0 6px 8px rgba(0,0,0,0.3); margin-bottom:14px;">لا يوجد بيانات لهذا الشهر<br>الرجاء الإتصال بمطور الخدمة للإستعلام</div>
-          <div style=":15px; font-weight:800; background:#fff; border:2px solid #000; border-radius:12px; padding:14px; display:inline-block;">
-            <span style="color:#b71c1c; :18px;">أ/ مصطفى درويش سيد درويش</span><br>
-            رقم الهاتف / 01092259655<br>رقم الواتس أب / 01092259655
-          </div>
-        </div>`;
+      printArea.innerHTML = '<div style="background:#ffebee;padding:20px;text-align:center;color:#b71c1c;font-weight:800">❌ خطأ في جلب البيانات: '+err.message+'</div>';
     }
   }
 }
@@ -571,6 +361,7 @@ function renderForm(row){
   if(!area || !printArea) return;
   area.style.display='block';
 
+  // نفس منطق تقسيم الاستحقاقات والاستقطاعات من صفحة الادمن
   let allKeys = Object.keys(row);
   let startIdx = allKeys.findIndex(k => k.includes("مرتب_اساسي") || k.includes("مرتب اساسي"));
   let midIdx = allKeys.findIndex(k => k.includes("أجمالى_المستحق") || k.includes("اجمالى_المستحق") || k.includes("اجمالي_المستحق") || k.includes("إجمالى_المستحق"));
@@ -610,19 +401,12 @@ function renderForm(row){
   for(let i=0;i<max;i++){
     const a=inst[i]||{key:"",val:""};
     const b=must[i]||{key:"",val:""};
-    const aRed = isRedItem(a.key);
-    const bRed = isRedItem(b.key);
-    rowsHtml+='<tr style="height:28px">'
-      +'<td class="nowrap-cell" style="border:1px solid #000;padding:4px 3px;text-align:center;font-size:9px;white-space:nowrap;'+(aRed?'color:#b71c1c;font-weight:900;background:#fff1f1;':'color:#000')+'">'+(a.val?toArabicDigits(a.val):"")+'</td>'
-      +'<td class="nowrap-cell" style="border:1px solid #000;padding:4px 6px;text-align:right;font-size:9px;white-space:nowrap;'+(aRed?'color:#b71c1c;font-weight:900;background:#fff1f1;':'color:#000')+'">'+a.key+'</td>'
-      +'<td class="nowrap-cell" style="border:1px solid #000;padding:4px 3px;text-align:center;font-size:9px;white-space:nowrap;'+(bRed?'color:#b71c1c;font-weight:900;background:#fff1f1;':'color:#000')+'">'+(b.val?toArabicDigits(b.val):"")+'</td>'
-      +'<td class="nowrap-cell" style="border:1px solid #000;padding:4px 6px;text-align:right;font-size:9px;white-space:nowrap;'+(bRed?'color:#b71c1c;font-weight:900;background:#fff1f1;':'color:#000')+'">'+b.key+'</td>'
-      +'</tr>';
+    rowsHtml+='<tr style="height:24px"><td style="border:1px solid #000;padding:2px 3px;text-align:center;font-size:12px;color:#000">'+(a.val?toArabicDigits(a.val):"")+'</td><td style="border:1px solid #000;padding:2px 6px;text-align:right;font-size:12px;color:#000">'+a.key+'</td><td style="border:1px solid #000;padding:2px 3px;text-align:center;font-size:12px;color:#000">'+(b.val?toArabicDigits(b.val):"")+'</td><td style="border:1px solid #000;padding:2px 6px;text-align:right;font-size:12px;color:#000">'+b.key+'</td></tr>';
   }
 
   let safyVal = safyKey ? row[safyKey] : (row["الصافى"] || row["الصافي"] || row["الصافي_النهائي"]);
   if(safyVal){
-    rowsHtml+='<tr><td colspan="2" class="nowrap-cell" style="border:2px solid #000;padding:6px;text-align:center;font-weight:900;background:#fff9c4;color:#000;white-space:nowrap">الصافي</td><td colspan="2" class="nowrap-cell" style="border:2px solid #000;padding:6px;text-align:center;font-weight:900;background:#fff176;color:#b71c1c;font-size:18px;white-space:nowrap">'+toArabicDigits(parseFloat(safyVal).toFixed(2))+'</td></tr>';
+    rowsHtml+='<tr><td colspan="2" style="border:2px solid #000;padding:5px;text-align:center;font-weight:900;background:#fff9c4;color:#000">الصافي</td><td colspan="2" style="border:2px solid #000;padding:5px;text-align:center;font-weight:900;background:#fff176;color:#b71c1c;font-size:14px">'+toArabicDigits(parseFloat(safyVal).toFixed(2))+'</td></tr>';
   }
 
   const empName = row["الاسم"] || row["اسم_العامل"] || getEmpNameFromHeader() || "";
@@ -632,194 +416,28 @@ function renderForm(row){
   const bankName = row["اسم_البنك_المحول_و_الفرع_المحول_اليه"] || row["اسم_البنك_المحول_والفرع_المحول_الية"] || "";
   const bankCode = row["رقم_الحساب_البنكى"] || row["كود_البنك"] || "";
 
-  printArea.innerHTML = getFormHtmlJS(empName, empCode, finYear, monVal, bankName, bankCode, rowsHtml, 14);
+  printArea.innerHTML = getFormHtmlJS(empName, empCode, finYear, monVal, bankName, bankCode, rowsHtml, 12);
 }
 
-// === تعديل دالة تحميل كصورة: تحمل الاستمارة كما هي بالكلمات العربية الواضحة وبنفس التنسيق وبنفس Background Graphics ===
 async function downloadImage(){
   const area = document.getElementById('printArea');
   if(!area) return;
-  
-  // إظهار رسالة تحميل
-  const originalText = document.activeElement ? document.activeElement.textContent : '';
   try{
-    // انتظار تحميل الخطوط
-    if(document.fonts && document.fonts.ready){
-      await document.fonts.ready;
-    }
-    
-    // إعداد html2canvas مع Background Graphics والكلمات العربية الواضحة
-    const canvas = await html2canvas(area, { 
-      scale: 3, // دقة عالية للكلمات العربية الواضحة
-      backgroundColor: "#ffffff",
-      useCORS: true,
-      allowTaint: true,
-      logging: false,
-      foreignObjectRendering: false,
-      imageTimeout: 0,
-      onclone: (clonedDoc) => {
-        // تفعيل Background Graphics في النسخة المستنسخة
-        const clonedArea = clonedDoc.getElementById('printArea');
-        if(clonedArea){
-          clonedArea.style.background = '#ffffff';
-          // التأكد من ظهور العلامة المائية
-          const style = clonedDoc.createElement('style');
-          style.textContent = `
-            .printArea-real::before{
-              display:block !important;
-              visibility:visible !important;
-            }
-          `;
-          clonedDoc.head.appendChild(style);
-        }
-      }
-    });
-    
+    const canvas = await html2canvas(area, { scale:2, backgroundColor:"#ffffff", useCORS:true });
     const link = document.createElement('a');
-    link.download = 'مرتب-'+currentYear+'-'+monthNameMap[currentMonth]+'-'+getEmpCodeFromHeader()+'.png';
-    link.href = canvas.toDataURL('image/png', 1.0);
+    link.download = 'مرتب-'+currentYear+'-'+currentMonth+'-'+getEmpCodeFromHeader()+'.png';
+    link.href = canvas.toDataURL('image/png');
     link.click();
   }catch(e){
-    console.error(e);
     alert('تعذر تحميل الصورة: ' + e.message);
-    // محاولة بديلة بجودة أقل
-    try{
-      const canvas2 = await html2canvas(area, { scale: 2, backgroundColor: "#ffffff", useCORS: true });
-      const link2 = document.createElement('a');
-      link2.download = 'مرتب-'+currentYear+'-'+currentMonth+'-'+getEmpCodeFromHeader()+'.png';
-      link2.href = canvas2.toDataURL('image/png');
-      link2.click();
-    }catch(e2){
-      alert('فشل التحميل: ' + e2.message);
-    }
   }
 }
-
-// === تعديل دالة الطباعة: صفحة واحدة مع Background Graphics وبنفس التصميم بالظبط ===
-function printWithBackground(){
-  const area = document.getElementById('printArea');
-  if(!area || area.innerHTML.trim()===''){
-    alert('لا توجد بيانات للطباعة');
-    return;
-  }
-  
-  const printStyle = document.createElement('style');
-  printStyle.id = 'temp-print-style';
-  printStyle.textContent = `
-    @media print{
-      *{
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-      }
-      html, body{
-        height:auto !important;
-        overflow:visible !important;
-        background:#fff !important;
-      }
-      body > div{
-        max-width:100% !important;
-        padding:0 !important;
-      }
-      .no-print{
-        display:none !important;
-      }
-      #displayArea{
-        display:block !important;
-        margin:0 !important;
-        padding:0 !important;
-      }
-      #printArea{
-        display:block !important;
-        border:2px solid #000 !important;
-        background:#fff !important;
-        page-break-inside: avoid !important;
-        break-inside: avoid !important;
-        page-break-after: avoid !important;
-        page-break-before: avoid !important;
-        width:100% !important;
-        max-width:100% !important;
-        box-shadow:none !important;
-      }
-      #printArea *{
-        page-break-inside: avoid !important;
-        break-inside: avoid !important;
-      }
-      @page{
-        size: A4;
-        margin: 8mm;
-      }
-    }
-  `;
-  document.head.appendChild(printStyle);
-  window.print();
-  setTimeout(()=>{
-    const s = document.getElementById('temp-print-style');
-    if(s) s.remove();
-  }, 1000);
-}
-
-// === دوال جديدة: عرض الاستمارة بكامل الشاشة على الموبايل - الأعمدة حسب المحتويات ===
-function openFullscreenView(){
-  const area = document.getElementById('printArea');
-  const modal = document.getElementById('fullscreenModal');
-  const content = document.getElementById('fullscreenContent');
-  if(!area || !modal || !content || area.innerHTML.trim()===''){
-    alert('لا توجد بيانات للعرض');
-    return;
-  }
-  content.innerHTML = area.innerHTML;
-  const tables = content.querySelectorAll('table');
-  tables.forEach(t=>{
-    t.style.tableLayout = 'auto';
-    t.style.width = '100%';
-  });
-  modal.classList.add('active');
-  document.body.style.overflow = 'hidden';
-  setTimeout(ensureRealWatermarkFullscreen, 100);
-}
-
-function closeFullscreenView(){
-  const modal = document.getElementById('fullscreenModal');
-  if(modal){
-    modal.classList.remove('active');
-    document.body.style.overflow = '';
-  }
-}
-
-function ensureRealWatermarkFullscreen(){
-  const content = document.getElementById('fullscreenContent');
-  if(!content) return;
-  let wm = content.querySelector('#realWatermarkFullscreen');
-  if(!wm){
-    wm = document.createElement('div');
-    wm.id = 'realWatermarkFullscreen';
-    wm.innerHTML = 'لا يعتمد كمستند رسمى<br>ولا يتم التعامل بها مع الجهات الخارجية';
-    wm.style.cssText = 'position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) rotate(-45deg); font-size:24px; font-weight:900; color:rgba(139,0,0,0.32); text-align:center; line-height:1.8; pointer-events:none; z-index:50; width:220%; text-shadow:0 1px 0 #fff,0 0 10px #fff; border-top:5px double rgba(139,0,0,0.5); border-bottom:5px double rgba(139,0,0,0.5); padding:16px 0; background:rgba(255,255,255,0.08);';
-    const printArea = content.querySelector('.printArea-real') || content;
-    if(printArea) {
-      printArea.style.position = 'relative';
-      printArea.appendChild(wm);
-    }
-  }
-}
-
-document.addEventListener('keydown', function(e){
-  if(e.key==='Escape'){
-    closeFullscreenView();
-  }
-});
-document.addEventListener('click', function(e){
-  const modal = document.getElementById('fullscreenModal');
-  if(e.target===modal){
-    closeFullscreenView();
-  }
-});
 
 window.onload = function(){
   try{
     const u = JSON.parse(localStorage.getItem('logged_user')||'{}');
     const nameEl = document.getElementById('userName');
-    if(nameEl) nameEl.textContent = 'مرحبا بك أ/ ' + (u.name || getEmpNameFromHeader() || 'User');
+    if(nameEl) nameEl.textContent = 'مرحبا ' + (u.name || getEmpNameFromHeader() || 'User');
     const codeBadge = document.getElementById('headerCode');
     const code = getEmpCodeFromHeader();
     if(codeBadge) codeBadge.textContent = 'الكود: ' + (code ? toArabicDigits(code) : '--');
@@ -831,40 +449,6 @@ window.onload = function(){
   updateMonthLabels();
   executeSearch();
 };
-
-// === حل جذري لإظهار العلامة المائية - عنصر DOM حقيقي ===
-function ensureRealWatermark(){
-  const printArea = document.getElementById('printArea');
-  if(!printArea) return;
-  let wm = document.getElementById('realWatermark');
-  if(!wm){
-    wm = document.createElement('div');
-    wm.id = 'realWatermark';
-    wm.innerHTML = 'لا يعتمد كمستند رسمى<br>ولا يتم التعامل بها مع الجهات الخارجية';
-    printArea.appendChild(wm);
-  }
-  // التأكد من أن العلامة المائية فوق الخلفية وتحت الأرقام
-  printArea.style.position = 'relative';
-}
-
-// مراقبة تغييرات الاستمارة وإعادة إضافة العلامة المائية تلقائيا
-(function(){
-  const printArea = document.getElementById('printArea');
-  if(!printArea) return;
-  
-  // إضافة العلامة المائية أول مرة
-  ensureRealWatermark();
-  
-  // مراقب لإعادة إضافتها عند كل تحديث للاستمارة
-  const observer = new MutationObserver(function(){
-    setTimeout(ensureRealWatermark, 10);
-  });
-  
-  observer.observe(printArea, { childList: true, subtree: true });
-  
-  // إعادة إضافة كل ثانية كتأمين إضافي
-  setInterval(ensureRealWatermark, 1000);
-})();
 </script>
 </body>
 </html>
