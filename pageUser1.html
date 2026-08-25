@@ -82,6 +82,85 @@ body{
   .card{ box-shadow:none!important; border:1px solid #000!important; }
   .printArea-real{ border:3px solid #000!important; }
 }
+
+/* جعل جميع الأزرار عند استخدام الهاتف تظهر كقائمة في أسفل الشاشة */
+#mobileBottomMenu{
+  display:none;
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:linear-gradient(180deg,#ffffff 0%,#fff8e7 40%,#f5e6c8 100%);
+  border-top:3px solid #000;
+  border-radius:18px 18px 0 0;
+  padding:8px 6px 10px 6px;
+  z-index:9998;
+  justify-content:space-around;
+  align-items:center;
+  box-shadow: 0 -4px 0 #a08060, 0 -2px 0 #000, 0 -8px 16px rgba(0,0,0,0.15);
+  gap:4px;
+}
+#mobileBottomMenu .mob-btn{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+  height:56px;
+  background:linear-gradient(180deg,#ffffff,#fff8e7 40%,#f5e6c8 100%);
+  border:2px solid #000;
+  border-radius:14px;
+  font-weight:900;
+  font-size:10px;
+  color:#000;
+  cursor:pointer;
+  box-shadow: 0 4px 0 #a08060, 0 2px 0 #000, inset 0 1px 0 #fff;
+  min-width:0;
+  padding:4px 2px;
+}
+#mobileBottomMenu .mob-btn .mob-icon{ font-size:20px; line-height:1; }
+#mobileBottomMenu .mob-btn .mob-label{ font-size:9px; font-weight:800; white-space:nowrap; }
+
+/* العمود الأول 13 والثاني 33 والثالث 13 والرابع 40 */
+#mainSalaryTable col:nth-child(1){ width:13% !important; }
+#mainSalaryTable col:nth-child(2){ width:33% !important; }
+#mainSalaryTable col:nth-child(3){ width:13% !important; }
+#mainSalaryTable col:nth-child(4){ width:40% !important; }
+
+/* علامة مائية في منتصف الصفحة فوق الإستمارة وفوق الجدول بزاوية 45% */
+#realWatermark{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform: translate(-50%,-50%) rotate(-45deg);
+  font-size:20px;
+  font-weight:900;
+  color: rgba(184,134,11,0.32);
+  text-align:center;
+  line-height:2;
+  pointer-events:none;
+  z-index:100;
+  width:200%;
+  letter-spacing:1px;
+  border-top:20px double rgba(184,134,11,0.35);
+  border-bottom:20px double rgba(184,134,11,0.35);
+  padding:18px 0;
+  background: rgba(255,255,255,0.08);
+  display:block !important;
+  visibility:visible !important;
+}
+.printArea-real{ position:relative; }
+.printArea-real::before{ display:none !important; }
+
+@media (max-width:768px){
+  body{ padding:8px !important; padding-bottom:85px !important; }
+  .max-w-4xl{ max-width:100% !important; }
+  #mobileBottomMenu{ display:flex !important; }
+  .nav-strip{ display:none !important; }
+  .actions{ display:none !important; }
+}
+
 </style>
 </head>
 <body>
@@ -179,9 +258,13 @@ function logout(){
 }
 
 function changeMonth(delta){
-  currentMonth += delta;
-  if(currentMonth > 12){ currentMonth = 1; currentYear++; }
-  if(currentMonth < 1){ currentMonth = 12; currentYear--; }
+  // عند الضغط على زر التالي يجلب بيانات نفس الشهر لنفس السنة - إصلاح عدم جلب يناير لنفس السنة
+  let newMonth = currentMonth + delta;
+  let newYear = currentYear;
+  if(newMonth > 12){ newMonth = 1; newYear++; }
+  if(newMonth < 1){ newMonth = 12; newYear--; }
+  currentMonth = newMonth;
+  currentYear = newYear;
   updateMonthLabels();
   executeSearch();
 }
@@ -212,14 +295,15 @@ function stopLoadCounter(){
 // نفس تصميم استمارة المرتب من الكود الأول - بكل الدوال
 function getFormHtmlJS(real_emp_name, emp_code_val, financial_year_val, month_val, bankName, bankCode, table_rows_html, currentFontSize){
   currentFontSize = currentFontSize || 12;
-  return '<div style="font-size:'+currentFontSize+'px;width:100%">'
+  return '<div style="font-size:'+currentFontSize+'px;width:100%;position:relative">'
+    + '<div id="realWatermark">لا يعتمد كمستند رسمى ولا يمكن التعامل بها مع الجهات الخارجية</div>'
     + '<div style="text-align:center;padding:4px;border:1px solid #000;border-radius:6px;background:#fff;margin-bottom:4px;white-space:nowrap"><span style="font-size:'+(currentFontSize+1)+'px;font-weight:900;color:#7f0000">👤 اسم الموظف: '+real_emp_name+'</span></div>'
     + '<table style="width:100%;border-collapse:collapse;font-size:'+currentFontSize+'px;font-weight:700;margin-bottom:4px;table-layout:fixed"><tr><td style="border:1px solid #000;padding:3px;text-align:center;background:#fffde7;color:#000">السنة المالية: '+toArabicDigits(financial_year_val)+' -- بيان شهر: '+toArabicDigits(month_val)+'</td><td style="border:1px solid #000;padding:3px;text-align:center;background:#fce4ec;color:#ff0000;font-weight:900">كود الموظف: '+toArabicDigits(emp_code_val)+'</td></tr><tr><td style="border:1px solid #000;padding:3px;text-align:center;background:#e3f2fd;color:#000">جهة الصرف: '+(bankName?bankName:'--')+'</td><td style="border:1px solid #000;padding:3px;text-align:center;background:#f3e5f5;color:#000">رقم الحساب: '+toArabicDigits(bankCode)+'</td></tr></table>'
     + '<table id="mainSalaryTable" style="width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed"><tr>'
     + '<td style="width:100%;vertical-align:top;border:1px solid #000;border-radius:6px;overflow:hidden">'
     + '<table style="width:100%;border-collapse:collapse;text-align:center;font-weight:700;table-layout:fixed">'
-    + '<colgroup><col style="width:13%"><col style="width:32%"><col style="width:13%"><col style="width:42%"></colgroup>'
-    + '<thead><tr><th colspan="2" style="background:#b71c1c;color:#fff;border:1px solid #000;padding:5px">الإستحقاقات</th><th colspan="2" style="background:#b71c1c;color:#fff;border:1px solid #000;padding:5px">المستقطع</th></tr><tr style="background:#e8f5e9"><th style="border:1px solid #000;padding:4px;color:#000">المبلغ</th><th style="border:1px solid #000;padding:4px;color:#000">البيانات</th><th style="border:1px solid #000;padding:4px;color:#000">المبلغ</th><th style="border:1px solid #000;padding:4px;color:#000">البيانات</th></tr></thead>'
+    + '<colgroup><col style="width:13%"><col style="width:33%"><col style="width:13%"><col style="width:40%"></colgroup>'
+    + '<thead><tr><th colspan="2" style="background:#b71c1c;color:#fff;border:1px solid #000;padding:5px">الإستحقاقات</th><th colspan="2" style="background:#b71c1c;color:#fff;border:1px solid #000;padding:5px">المستقطع</th></tr><tr style="background:#e8f5e9"><th style="border:1px solid #000;padding:4px;color:#000;width:13%">المبلغ</th><th style="border:1px solid #000;padding:4px;color:#000;width:33%">البيانات</th><th style="border:1px solid #000;padding:4px;color:#000;width:13%">المبلغ</th><th style="border:1px solid #000;padding:4px;color:#000;width:40%">البيانات</th></tr></thead>'
     + '<tbody style="background:#fff;color:#000">'+table_rows_html+'</tbody>'
     + '</table>'
     + '</td></tr></table>'
@@ -259,13 +343,27 @@ async function executeSearch(){
     
     stopLoadCounter();
 
-    if(!res.ok || !j.found || !j.data){
-      // رسالة عدم وجود مرتب
+    let dataMonth = j.data ? (j.data["الشهر"] || "") : "";
+    let dataYear = j.data ? String(j.data["السنه"] || "") : "";
+    const requestedMonth = monthArabic.trim();
+    const requestedYear = yearStr.trim();
+    const returnedMonth = String(dataMonth).trim();
+    const returnedYear = String(dataYear).trim();
+    const isMonthMismatch = returnedMonth && requestedMonth && returnedMonth !== requestedMonth;
+    const isYearMismatch = returnedYear && requestedYear && returnedYear !== requestedYear;
+
+    if(!res.ok || !j.found || !j.data || isMonthMismatch || isYearMismatch){
+      // عند عدم وجود نفس الشهر لنفس السنة - عرض النص المطلوب
       const area = document.getElementById('displayArea');
       const printArea = document.getElementById('printArea');
       if(area) area.style.display='block';
       if(printArea){
-        printArea.innerHTML = '<div style="background:#fff;padding:20px;text-align:center;color:#7a0000;font-weight:800;border-radius:12px">❌ لا يوجد مرتب<br>السنة: '+toArabicDigits(yearStr)+' - الشهر: '+monthArabic+' - الكود: '+toArabicDigits(code)+'<br><br>'+ (j.msg||'لا يوجد بيانات') +'</div>';
+        printArea.innerHTML = '<div style="background:linear-gradient(180deg,#ffffff 0%,#fefcf6 50%,#f5e6c8 100%);border:3px solid #000;border-radius:18px;padding:32px 20px;text-align:center;box-shadow: 0 10px 0 #d2b48c, 0 8px 0 #000;">'
+          + '<div style="font-size:20px;font-weight:900;color:#b71c1c;margin-bottom:18px;line-height:1.6">لا يوجد بيانات لشهر '+monthArabic+' '+toArabicDigits(yearStr)+'<br>يرجى التواصل مع مسئول الموقع</div>'
+          + '<div style="font-size:16px;font-weight:800;color:#000;line-height:2;background:#fff;border:2px solid #000;border-radius:12px;padding:16px;display:inline-block;min-width:280px">'
+          + '<span style="font-size:18px;color:#b71c1c;font-weight:900">أ/ مصطفى درويش سيد</span><br>هاتف / <span dir="ltr" style="font-family:monospace;font-weight:900">01092259655</span><br><br>'
+          + '<span style="font-size:12px;color:#7a6652">السنة: '+toArabicDigits(yearStr)+' - الشهر: '+monthArabic+' - الكود: '+toArabicDigits(code)+'</span>'
+          + '</div></div>';
       }
       return;
     }
@@ -337,6 +435,8 @@ function renderForm(row){
   let safyVal = safyKey ? row[safyKey] : (row["الصافى"] || row["الصافي"] || row["الصافي_النهائي"]);
   if(safyVal){
     rowsHtml+='<tr><td colspan="2" style="border:2px solid #000;padding:5px;text-align:center;font-weight:900;background:#fff9c4;color:#000">الصافي</td><td colspan="2" style="border:2px solid #000;padding:5px;text-align:center;font-weight:900;background:#fff176;color:#b71c1c;font-size:14px">'+toArabicDigits(parseFloat(safyVal).toFixed(2))+'</td></tr>';
+    // بعد الصافي كتابة تم تطوير هذا الموقع بواسطة
+    rowsHtml+='<tr><td colspan="4" style="border:2px solid #000;padding:10px;text-align:center;background:#fffde7;color:#000;font-size:11px;line-height:1.8">تم تطوير هذا الموقع بواسطه<br><span style="color:#b71c1c;font-weight:900;font-size:13px">أ/ مصطفى درويش سيد درويش</span><br>محمول / <span dir="ltr" style="font-family:monospace;font-weight:900">01092259655</span></td></tr>';
   }
 
   const empName = row["الاسم"] || row["اسم_العامل"] || getEmpNameFromHeader() || "";
@@ -380,5 +480,30 @@ window.onload = function(){
   executeSearch();
 };
 </script>
+
+<!-- قائمة جميع الأزرار أسفل شاشة الهاتف المحمول -->
+<div id="mobileBottomMenu" class="no-print">
+  <button class="mob-btn" onclick="changeMonth(-1)">
+    <span class="mob-icon">⏮</span>
+    <span class="mob-label">السابق</span>
+  </button>
+  <button class="mob-btn" onclick="changeMonth(1)">
+    <span class="mob-icon">⏭</span>
+    <span class="mob-label">التالي</span>
+  </button>
+  <button class="mob-btn" onclick="window.print()">
+    <span class="mob-icon">🖨</span>
+    <span class="mob-label">طباعة</span>
+  </button>
+  <button class="mob-btn" onclick="downloadImage()">
+    <span class="mob-icon">📷</span>
+    <span class="mob-label">صورة</span>
+  </button>
+  <button class="mob-btn" onclick="logout()">
+    <span class="mob-icon">🚪</span>
+    <span class="mob-label">خروج</span>
+  </button>
+</div>
+
 </body>
 </html>
