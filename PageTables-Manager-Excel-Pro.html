@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<script src="auth-guard.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إدارة الجداول - رفع Excel احترافي</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0e1a; --card:rgba(255,255,255,0.08); --card2:rgba(255,255,255,0.04);
+  --border:rgba(99,102,241,0.3); --text:#f8fafc; --text2:#94a3b8;
+  --accent:#6366f1; --accent2:#8b5cf6; --green:#10b981; --red:#ef4444; --yellow:#f59e0b;
+  --shadow:0 25px 50px -12px rgba(0,0,0,0.5); --glow:0 0 40px rgba(99,102,241,0.15);
+}
+[data-theme="light"]{
+  --bg:#fdf6e3; --card:rgba(255,255,255,0.95); --card2:#fff; --border:rgba(0,0,0,0.15);
+  --text:#1a1a1a; --text2:#7a6652; --accent:#8B0000; --shadow:0 20px 40px rgba(0,0,0,0.12);
+}
+*{font-family:'Cairo',sans-serif;box-sizing:border-box}
+body{background:var(--bg);background-image:radial-gradient(1200px 600px at 20% -10%, rgba(99,102,241,0.15), transparent 60%),radial-gradient(1000px 500px at 80% 10%, rgba(139,92,246,0.12), transparent 50%);min-height:100vh;color:var(--text);margin:0;padding:16px;padding-bottom:100px}
+.card{background:var(--card);backdrop-filter:blur(20px) saturate(180%);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow),var(--glow), inset 0 1px 0 rgba(255,255,255,0.1);padding:18px;margin-bottom:16px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent)}
+[data-theme="light"] .card{background:linear-gradient(180deg,#fff 0%,#fefcf6 100%);border:2px solid #000;box-shadow:0 8px 0 #d2b48c,0 4px 0 #000}
+.btn{height:44px;padding:0 18px;border-radius:12px;border:1px solid var(--border);font-weight:800;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.08);color:var(--text);transition:all .2s}
+.btn:hover{transform:translateY(-2px)}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;box-shadow:0 8px 20px rgba(99,102,241,0.3)}
+.btn-green{background:linear-gradient(135deg,#059669,#047857);color:#fff;border:none}
+.btn-red{background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;border:none}
+.btn-yellow{background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;border:none}
+.input{width:100%;padding:10px 14px;border-radius:12px;border:1.5px solid var(--border);background:var(--card2);color:var(--text);font-weight:700;text-align:center}
+[data-theme="light"] .input{background:#fff;border:2px solid #000;color:#000}
+.table-wrap{overflow:auto;max-height:70vh;border-radius:16px;border:1px solid var(--border);background:rgba(255,255,255,0.02)}
+table{width:100%;border-collapse:collapse;font-size:11px;min-width:800px}
+th{position:sticky;top:0;z-index:10;background:linear-gradient(135deg,#1f2937,#111827);color:#fff;padding:10px 6px;border:1px solid #000;font-weight:900;white-space:nowrap}
+[data-theme="light"] th{background:#b71c1c}
+td{border:1px solid rgba(0,0,0,0.12);padding:6px 4px;text-align:center;background:rgba(255,255,255,0.9);color:#000;white-space:nowrap;max-width:250px;overflow:hidden;text-overflow:ellipsis}
+tr:nth-child(even) td{background:#f8fafc}
+tr:hover td{background:#e0e7ff !important}
+.badge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:900}
+.badge-green{background:#d1fae5;color:#065f46;border:1px solid #10b981}
+.badge-blue{background:#dbeafe;color:#1e40af;border:1px solid #6366f1}
+.badge-yellow{background:#fef3c7;color:#92400e;border:1px solid #f59e0b}
+#themeToggle{position:fixed;top:16px;left:16px;width:50px;height:50px;border-radius:50%;background:var(--card);backdrop-filter:blur(20px);border:1px solid var(--border);box-shadow:var(--shadow);cursor:pointer;z-index:10000;display:flex;align-items:center;justify-content:center;font-size:22px}
+.progress{width:100%;height:8px;background:rgba(0,0,0,0.2);border-radius:999px;overflow:hidden}
+.progress-bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .3s;width:0%}
+</style>
+</head>
+<body>
+<button id="themeToggle" title="تغيير المظهر">🌙</button>
+
+<div class="max-w-[98%] mx-auto">
+  <!-- Header -->
+  <div class="card" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+    <div>
+      <h1 style="font-size:22px;font-weight:900;background:linear-gradient(135deg,var(--text),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent">🗂️ إدارة الجداول - رفع Excel مباشر</h1>
+      <p style="font-size:11px;color:var(--text2);margin-top:4px">اختر جدول من القائمة → عرض البيانات → رفع Excel بنفس الكود_البنكى ونفس اسم العمود</p>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <span class="badge badge-blue" id="tablesCount">الجداول: --</span>
+      <span class="badge badge-green" id="rowsCount">الصفوف: --</span>
+      <span class="badge badge-yellow" id="selectedTableBadge">لم يتم الاختيار</span>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="card">
+    <div style="display:grid;grid-template-columns:1fr 180px 180px;gap:10px;align-items:end">
+      <div>
+        <label style="font-size:12px;font-weight:900;margin-bottom:6px;display:block">📋 قائمة الجداول في القاعدة:</label>
+        <select id="tablesSelect" class="input" style="text-align:right">
+          <option value="">⏳ جاري تحميل الجداول...</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:800;display:block;margin-bottom:6px">بحث سريع</label>
+        <input id="searchInput" class="input" placeholder="🔍 ابحث في البيانات..." oninput="filterTable()">
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:800;display:block;margin-bottom:6px">عدد الصفوف</label>
+        <select id="limitSelect" class="input" onchange="loadTableData()">
+          <option value="100">100 صف</option>
+          <option value="250" selected>250 صف</option>
+          <option value="500">500 صف</option>
+          <option value="1000">1000 صف</option>
+          <option value="5000">5000 صف</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
+      <button class="btn btn-primary" onclick="loadTables()">🔄 تحديث قائمة الجداول</button>
+      <button class="btn" onclick="loadTableData()" style="background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff">👁️ عرض البيانات</button>
+      <button class="btn btn-green" onclick="document.getElementById('excelFile').click()">📤 رفع Excel للجدول المحدد</button>
+      <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" style="display:none">
+      <button class="btn btn-yellow" onclick="exportCurrentToExcel()">📥 تصدير Excel</button>
+      <button class="btn btn-red" onclick="clearPreview()">🧹 مسح المعاينة</button>
+      <div style="flex:1"></div>
+      <span id="status" style="font-size:11px;font-weight:800;color:var(--text2);align-self:center"></span>
+    </div>
+
+    <!-- Upload Mode -->
+    <div style="display:flex;gap:12px;align-items:center;margin-top:12px;flex-wrap:wrap;background:rgba(99,102,241,0.08);padding:10px;border-radius:12px;border:1px dashed var(--border)">
+      <label style="font-size:12px;font-weight:900">وضع الرفع:</label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;cursor:pointer"><input type="radio" name="uploadMode" value="upsert" checked> 🔁 تحديث بنفس الكود_البنكى (نفس العمود لنفس العمود)</label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;cursor:pointer"><input type="radio" name="uploadMode" value="insert"> ➕ إضافة صفوف جديدة فقط</label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;cursor:pointer"><input type="radio" name="uploadMode" value="replace"> ♻️ استبدال كامل (حذف وإدخال)</label>
+    </div>
+
+    <div id="uploadProgressWrap" style="display:none;margin-top:12px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:800;margin-bottom:4px"><span id="progressText">0%</span><span id="progressDetail"></span></div>
+      <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+    </div>
+
+    <div id="excelPreview" style="display:none;margin-top:14px;background:rgba(16,185,129,0.08);border:1px solid #10b981;border-radius:12px;padding:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <h3 style="font-size:13px;font-weight:900">📊 معاينة Excel:</h3>
+        <div style="display:flex;gap:8px">
+          <span class="badge badge-blue" id="excelColsBadge"></span>
+          <span class="badge badge-green" id="excelRowsBadge"></span>
+          <span class="badge badge-yellow" id="excelKeyBadge"></span>
+        </div>
+      </div>
+      <div id="excelPreviewTable" class="table-wrap" style="max-height:250px;margin-top:10px"></div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn btn-green" id="confirmUploadBtn" onclick="confirmExcelUpload()">✅ تأكيد الرفع للجدول</button>
+        <button class="btn" onclick="clearPreview()">❌ إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Table -->
+  <div class="card" style="padding:10px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px">
+      <h3 style="font-size:14px;font-weight:900">📄 بيانات الجدول: <span id="currentTableName" style="color:var(--accent)">--</span></h3>
+      <div style="display:flex;gap:6px;align-items:center">
+        <span style="font-size:11px;color:var(--text2)" id="columnsInfo"></span>
+      </div>
+    </div>
+    <div class="table-wrap" id="mainTableWrap">
+      <table id="mainTable">
+        <thead id="mainThead"><tr><th>اختر جدولاً لعرض البيانات</th></tr></thead>
+        <tbody id="mainTbody"><tr><td style="padding:40px;text-align:center;color:var(--text2)">👈 اختر جدول من القائمة المنسدلة أعلاه<br>ثم اضغط عرض البيانات</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="font-size:11px;color:var(--text2)">
+    <b>شرح وضع الرفع:</b><br>
+    • <b style="color:var(--accent)">تحديث بنفس الكود_البنكى</b>: لو الجدول فيه عمود <code>الكود_البنكى</code> وموجود في الإكسل، هيحدث نفس العمود لنفس العمود لنفس الكود فقط - باقي الأعمدة لا تتأثر.<br>
+    • <b>إضافة جديدة</b>: يدخل الصفوف كصفوف جديدة.<br>
+    • <b>استبدال كامل</b>: يحذف كل البيانات القديمة ويدخل بيانات الإكسل.
+  </div>
+</div>
+
+<script>
+const WORKER_BASE_URL = "https://turso-api.mostafa-voic77729.workers.dev";
+const TURSO_URL = localStorage.getItem('tursoUrl') || "";
+const TURSO_TOKEN = localStorage.getItem('tursoToken') || "";
+
+let currentTable = "";
+let currentColumns = [];
+let currentData = [];
+let excelData = null;
+let excelHeaders = [];
+let excelRows = [];
+
+function setStatus(msg, type="info"){
+  const el=document.getElementById('status');
+  el.textContent=msg;
+  el.style.color = type==="error" ? "#ef4444" : type==="success" ? "#10b981" : "var(--text2)";
+}
+function updateProgress(p, detail=""){
+  document.getElementById('uploadProgressWrap').style.display='block';
+  document.getElementById('progressBar').style.width=p+'%';
+  document.getElementById('progressText').textContent=p+'%';
+  document.getElementById('progressDetail').textContent=detail;
+}
+
+async function tursoQuery(sql){
+  // يدعم Worker الحالى /api/turso + كل المسارات المحتملة
+  const tryParse = (j)=>{
+    if(Array.isArray(j)) return j;
+    if(j && Array.isArray(j.data)) return j.data;
+    if(j && Array.isArray(j.rows)) return j.rows;
+    if(j && Array.isArray(j.result)) return j.result;
+    if(j && j.result && Array.isArray(j.result.rows)) return j.result.rows;
+    if(j && j.ok && Array.isArray(j.rows)) return j.rows;
+    return null;
+  };
+
+  const endpoints = [
+    `${WORKER_BASE_URL}/api/turso`,          // الموجود حالياً في Worker V13
+    `${WORKER_BASE_URL}/api/query`,
+    `${WORKER_BASE_URL}/api/turso/query`,
+    `${WORKER_BASE_URL}/api/turso-query`,
+    `${WORKER_BASE_URL}/api/sql`,
+    `${WORKER_BASE_URL}/api/exec`
+  ];
+
+  let lastError = null;
+  for(let ep of endpoints){
+    try{
+      const r = await fetch(ep,{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({sql, query:sql})
+      });
+      const txt = await r.text();
+      let j = null;
+      try{ j = JSON.parse(txt); }catch{ 
+        if(r.ok && txt.includes('rows')) continue;
+        lastError = txt.slice(0,300);
+        continue;
+      }
+      if(!r.ok){
+        lastError = j?.msg || txt.slice(0,300);
+        // لو ok=false بس فيه رسالة، لا تتجاهل
+        if(j && j.ok===false && j.msg) lastError = j.msg;
+        continue;
+      }
+      const arr = tryParse(j);
+      if(arr!==null) return arr;
+      // لو رجع {ok:true, rows:[]}
+      if(j && j.ok && j.rows) return j.rows;
+      // لو رجع object واحد
+      if(j && typeof j==='object' && j.ok!==false && Object.keys(j).length){
+        if(j.rows) return j.rows;
+        if(j.data) return j.data;
+      }
+    }catch(e){
+      lastError = e.message;
+      if(e.message && e.message.includes('TURSO') ) throw e;
+    }
+  }
+  throw new Error(lastError || "فشل الاتصال بـ Worker - تأكد أن Worker شغال على " + WORKER_BASE_URL);
+}
+
+function normalizeRows(rows){
+  if(!rows) return [];
+  if(!Array.isArray(rows)) return [rows];
+  return rows;
+}
+
+async function loadTables(){
+  setStatus("⏳ جاري تحميل الجداول...", "info");
+  try{
+    const rows = normalizeRows(await tursoQuery(`SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name`));
+    const tables = rows.map(r=> r.name || r.NAME || r.tbl_name || Object.values(r)[0]).filter(v=> v && typeof v==='string');
+    const sel=document.getElementById('tablesSelect');
+    sel.innerHTML = '<option value="">-- اختر جدول --</option>' + tables.map(t=>`<option value="${t}">${t}</option>`).join('');
+    document.getElementById('tablesCount').textContent = `الجداول: ${tables.length}`;
+    setStatus(`✅ تم تحميل ${tables.length} جدول`, "success");
+    if(currentTable && tables.includes(currentTable)) sel.value=currentTable;
+  }catch(err){
+    console.error(err);
+    setStatus("❌ "+err.message, "error");
+    document.getElementById('tablesSelect').innerHTML='<option>خطأ في التحميل - راجع Worker</option>';
+  }
+}
+
+async function loadTableData(){
+  const table = document.getElementById('tablesSelect').value;
+  if(!table){ alert("اختر جدول أولاً"); return; }
+  currentTable = table;
+  document.getElementById('currentTableName').textContent=table;
+  document.getElementById('selectedTableBadge').textContent=table;
+  setStatus(`⏳ جلب بيانات ${table}...`);
+  try{
+    const limit = document.getElementById('limitSelect').value;
+    // أعمدة
+    let colsInfoRaw = normalizeRows(await tursoQuery(`PRAGMA table_info('${table.replace(/'/g,"''")}')`));
+    // colsInfoRaw قد يكون [{cid:0,name:...}] أو غير ذلك
+    let cols = [];
+    if(colsInfoRaw.length && colsInfoRaw[0].name){
+      cols = colsInfoRaw.map(c=> c.name).filter(Boolean);
+    } else if(colsInfoRaw.length){
+      // حاول استخراج الاسم من القيم
+      cols = colsInfoRaw.map(c=> c.name || c.NAME || c[1] || Object.values(c)[1]).filter(Boolean);
+    }
+    currentColumns = cols;
+    document.getElementById('columnsInfo').textContent = `الأعمدة: ${cols.join(" | ")}`;
+
+    // بيانات
+    const dataRaw = normalizeRows(await tursoQuery(`SELECT * FROM "${table.replace(/"/g,'""')}" LIMIT ${limit}`));
+    currentData = dataRaw;
+    renderMainTable(dataRaw, cols);
+    document.getElementById('rowsCount').textContent=`الصفوف: ${dataRaw.length} / ${limit}`;
+    setStatus(`✅ تم عرض ${dataRaw.length} صف من ${table}`, "success");
+  }catch(err){
+    console.error(err);
+    setStatus("❌ "+err.message, "error");
+  }
+}
+
+function renderMainTable(data, cols){
+  const thead=document.getElementById('mainThead');
+  const tbody=document.getElementById('mainTbody');
+  if(!data.length){
+    thead.innerHTML=`<tr>${cols.map(c=>`<th>${c}</th>`).join('')}</tr>`;
+    tbody.innerHTML='<tr><td colspan="'+cols.length+'" style="padding:30px">لا توجد بيانات</td></tr>';
+    return;
+  }
+  const displayCols = cols.length? cols : Object.keys(data[0]);
+  thead.innerHTML=`<tr><th>#</th>${displayCols.map(c=>`<th>${c}</th>`).join('')}</tr>`;
+  tbody.innerHTML=data.map((row,i)=>{
+    return `<tr><td style="background:#e0e7ff !important;font-weight:900">${i+1}</td>${displayCols.map(c=>{
+      let v=row[c] ?? row[c.toLowerCase()] ?? "";
+      if(v===null||v===undefined) v="";
+      let str=String(v);
+      if(str.length>60) str=str.slice(0,60)+"...";
+      return `<td title="${String(row[c]||'')}">${str}</td>`;
+    }).join('')}</tr>`;
+  }).join('');
+}
+
+function filterTable(){
+  const q=document.getElementById('searchInput').value.trim().toLowerCase();
+  if(!q){ renderMainTable(currentData, currentColumns); return; }
+  const filtered=currentData.filter(row=> Object.values(row).some(v=> String(v).toLowerCase().includes(q)));
+  renderMainTable(filtered, currentColumns);
+  document.getElementById('rowsCount').textContent=`الصفوف: ${filtered.length} / ${currentData.length}`;
+}
+
+// Excel handling
+function findKeyField(headers){
+  const cands=["الكود_البنكى","الكود_البنكي","كود_بنكى","كود_العامل","كود_الموظف","الكود","البنكى","emptid","code","bank_code","emp_code"];
+  for(let c of cands){
+    let f=headers.find(h=> h===c || String(h).toLowerCase()===c.toLowerCase() || String(h).includes(c));
+    if(f) return f;
+  }
+  let f2=headers.find(h=> String(h).toLowerCase().includes("كود") || String(h).toLowerCase().includes("code"));
+  return f2 || headers[0];
+}
+
+document.getElementById('excelFile').addEventListener('change', async (e)=>{
+  const file=e.target.files[0];
+  if(!file) return;
+  if(!currentTable){ alert("اختر جدول أولاً من القائمة المنسدلة"); e.target.value=""; return; }
+
+  const buf=await file.arrayBuffer();
+  const wb=XLSX.read(buf,{type:'array'});
+  const sheetName=wb.SheetNames[0];
+  const ws=wb.Sheets[sheetName];
+  const json=XLSX.utils.sheet_to_json(ws,{header:1});
+  if(!json.length){ alert("الشيت فارغ"); return; }
+  const headers=json[0].map(h=> String(h||"").trim()).filter(Boolean);
+  const rows=json.slice(1).filter(r=> r && r.some(v=> v!==null && v!=="")).map(r=>{
+    let o={}; headers.forEach((h,i)=> o[h]= r[i]??null); return o;
+  });
+
+  excelHeaders=headers;
+  excelRows=rows;
+  excelData={headers,rows,sheetName,fileName:file.name};
+
+  const key=findKeyField(headers);
+  document.getElementById('excelPreview').style.display='block';
+  document.getElementById('excelColsBadge').textContent=`الأعمدة: ${headers.length}`;
+  document.getElementById('excelRowsBadge').textContent=`الصفوف: ${rows.length}`;
+  document.getElementById('excelKeyBadge').textContent=`المفتاح: ${key}`;
+
+  document.getElementById('excelPreviewTable').innerHTML=`
+    <table><thead><tr><th>#</th>${headers.map(h=>`<th style="${h===key?'background:linear-gradient(135deg,#f59e0b,#d97706);color:#000':''}">${h}${h===key?' 🔑':''}</th>`).join('')}</tr></thead>
+    <tbody>${rows.slice(0,10).map((r,i)=>`<tr><td>${i+1}</td>${headers.map(h=>`<td>${r[h]??''}</td>`).join('')}</tr>`).join('')}</tbody></table>
+    ${rows.length>10?`<div style="font-size:11px;padding:6px;text-align:center">... و ${rows.length-10} صف آخر</div>`:''}
+  `;
+  setStatus(`📊 معاينة: ${file.name} - ${rows.length} صف جاهز للرفع إلى ${currentTable}`, "info");
+});
+
+function clearPreview(){
+  document.getElementById('excelPreview').style.display='none';
+  document.getElementById('excelFile').value="";
+  document.getElementById('uploadProgressWrap').style.display='none';
+  excelData=null;
+}
+
+async function confirmExcelUpload(){
+  if(!excelData || !currentTable){ alert("لا توجد بيانات"); return; }
+  const mode=document.querySelector('input[name="uploadMode"]:checked').value;
+  const btn=document.getElementById('confirmUploadBtn');
+  btn.disabled=true; btn.textContent="⏳ جاري الرفع...";
+  updateProgress(5, "بدء...");
+
+  try{
+    const keyExcel=findKeyField(excelData.headers);
+    // جلب أعمدة الجدول الحالية
+    let colsInfoRaw2 = normalizeRows(await tursoQuery(`PRAGMA table_info('${currentTable.replace(/'/g,"''")}')`));
+    const dbCols = colsInfoRaw2.map(c=> c.name || c.NAME || Object.values(c)[1]).filter(Boolean);
+    let keyDb=dbCols.find(c=> c===keyExcel || c.toLowerCase()===keyExcel.toLowerCase() || c.includes("الكود_البنكى") || c.includes("كود_العامل") || c.toLowerCase().includes("code")) || dbCols.find(c=> c.toLowerCase().includes("كود")) || dbCols[0];
+
+    if(!keyDb){ alert("لم يتم العثور على عمود مفتاح في الجدول"); return; }
+
+    const commonCols=excelData.headers.filter(h=> dbCols.includes(h));
+    if(!commonCols.length){ alert(`لا توجد أعمدة مشتركة بين الإكسل والجدول!\nإكسل: ${excelData.headers.join(", ")}\nجدول: ${dbCols.join(", ")}`); return; }
+
+    let updated=0, inserted=0, errors=0;
+    const total=excelData.rows.length;
+
+    if(mode==="replace"){
+      updateProgress(10, "حذف البيانات القديمة...");
+      await tursoQuery(`DELETE FROM "${currentTable.replace(/"/g,'""')}"`);
+    }
+
+    for(let idx=0; idx<excelData.rows.length; idx++){
+      const row=excelData.rows[idx];
+      const codeVal=row[keyExcel];
+      if(codeVal===null||codeVal===""||codeVal===undefined){ errors++; continue; }
+
+      const whereVal=typeof codeVal==="number"? codeVal : `'${String(codeVal).replace(/'/g,"''")}'`;
+
+      try{
+        if(mode==="insert"){
+          const cols=commonCols;
+          const vals=cols.map(c=>{
+            let v=row[c]; if(v===null||v===undefined||v==="") return "NULL";
+            if(typeof v==="number") return String(v);
+            return `'${String(v).replace(/'/g,"''")}'`;
+          });
+          await tursoQuery(`INSERT INTO "${currentTable.replace(/"/g,'""')}" ("${cols.map(c=>c.replace(/"/g,'""')).join('","')}") VALUES (${vals.join(",")})`);
+          inserted++;
+        }else if(mode==="upsert"){
+          // تحديث بنفس العمود لنفس العمود
+          const setCols=commonCols.filter(c=> c!==keyDb);
+          if(!setCols.length) continue;
+          const setClause=setCols.map(c=>{
+            let v=row[c]; if(v===null||v===undefined||v==="") return null;
+            if(typeof v==="number") return `"${c.replace(/"/g,'""')}"=${v}`;
+            return `"${c.replace(/"/g,'""')}"='${String(v).replace(/'/g,"''")}'`;
+          }).filter(Boolean).join(", ");
+          if(!setClause) continue;
+
+          // تحقق هل الصف موجود
+          const check=await tursoQuery(`SELECT COUNT(*) as cnt FROM "${currentTable.replace(/"/g,'""')}" WHERE "${keyDb.replace(/"/g,'""')}"=${whereVal}`);
+          const cnt=check[0]?.cnt || Object.values(check[0]||{})[0] || 0;
+
+          if(Number(cnt)===0){
+            const cols=commonCols;
+            const vals=cols.map(c=>{
+              let v=row[c]; if(v===null||v===undefined||v==="") return "NULL";
+              if(typeof v==="number") return String(v);
+              return `'${String(v).replace(/'/g,"''")}'`;
+            });
+            await tursoQuery(`INSERT INTO "${currentTable.replace(/"/g,'""')}" ("${cols.map(c=>c.replace(/"/g,'""')).join('","')}") VALUES (${vals.join(",")})`);
+            inserted++;
+          }else{
+            await tursoQuery(`UPDATE "${currentTable.replace(/"/g,'""')}" SET ${setClause} WHERE "${keyDb.replace(/"/g,'""')}"=${whereVal}`);
+            updated++;
+          }
+        }else if(mode==="replace"){
+          const cols=commonCols;
+          const vals=cols.map(c=>{
+            let v=row[c]; if(v===null||v===undefined||v==="") return "NULL";
+            if(typeof v==="number") return String(v);
+            return `'${String(v).replace(/'/g,"''")}'`;
+          });
+          await tursoQuery(`INSERT INTO "${currentTable.replace(/"/g,'""')}" ("${cols.map(c=>c.replace(/"/g,'""')).join('","')}") VALUES (${vals.join(",")})`);
+          inserted++;
+        }
+      }catch(e){
+        console.error(e); errors++;
+      }
+
+      if(idx % 5===0){
+        const p=Math.round(((idx+1)/total)*100);
+        updateProgress(p, `${idx+1}/${total} - تحديث:${updated} إضافة:${inserted}`);
+      }
+    }
+
+    updateProgress(100, `انتهى - تحديث:${updated} إضافة:${inserted} أخطاء:${errors}`);
+    setStatus(`🎉 تم: تحديث ${updated} - إضافة ${inserted} - أخطاء ${errors} في جدول ${currentTable}`, "success");
+    alert(`تم بنجاح!\nالجدول: ${currentTable}\nالوضع: ${mode}\nتحديث: ${updated}\nإضافة: ${inserted}\nأخطاء: ${errors}`);
+    loadTableData();
+  }catch(err){
+    setStatus("❌ "+err.message, "error");
+    alert(err.message);
+  }finally{
+    btn.disabled=false; btn.textContent="✅ تأكيد الرفع للجدول";
+  }
+}
+
+async function exportCurrentToExcel(){
+  if(!currentData.length){ alert("لا توجد بيانات للتصدير"); return; }
+  const ws=XLSX.utils.json_to_sheet(currentData);
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, currentTable||"data");
+  XLSX.writeFile(wb, `${currentTable||'export'}_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+
+document.getElementById('tablesSelect').addEventListener('change', ()=>{
+  if(document.getElementById('tablesSelect').value) loadTableData();
+});
+
+window.onload=()=>{
+  loadTables();
+  const savedTheme=localStorage.getItem('theme')||'dark';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  document.getElementById('themeToggle').textContent=savedTheme==='dark'?'☀️':'🌙';
+};
+
+(function(){
+  const btn=document.getElementById('themeToggle');
+  btn.addEventListener('click', ()=>{
+    const cur=document.documentElement.getAttribute('data-theme');
+    const next=cur==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    btn.textContent=next==='dark'?'☀️':'🌙';
+  });
+})();
+</script>
+</body>
+</html>
