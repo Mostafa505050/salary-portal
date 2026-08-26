@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<script src="auth-guard.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>النظام الشامل V4 - إدارة جميع الجداول - إدخال + Excel + موبايل + فاتح/داكن احترافي</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ==================== نظام الألوان الاحترافي فاتح/داكن ==================== */
+:root{
+  --bg-primary:#0a0e1a; --bg-secondary:#111827; --bg-card:rgba(255,255,255,0.08); --bg-card-hover:rgba(255,255,255,0.12);
+  --bg-input:rgba(255,255,255,0.06); --border:rgba(99,102,241,0.3); --border-strong:rgba(99,102,241,0.5);
+  --text:#f8fafc; --text2:#94a3b8; --text3:#cbd5e1;
+  --accent:#6366f1; --accent2:#8b5cf6; --accent3:#06b6d4; --green:#10b981; --red:#ef4444; --yellow:#f59e0b;
+  --shadow:0 25px 50px -12px rgba(0,0,0,0.5); --glow:0 0 40px rgba(99,102,241,0.15);
+  --table-header:#1f2937; --table-row-odd:rgba(255,255,255,0.02); --table-row-even:rgba(255,255,255,0.05);
+}
+[data-theme="light"]{
+  --bg-primary:#fdf6e3; --bg-secondary:#fffbeb; --bg-card:rgba(255,255,255,0.92); --bg-card-hover:rgba(255,255,255,1);
+  --bg-input:#ffffff; --border:rgba(0,0,0,0.15); --border-strong:rgba(0,0,0,0.3);
+  --text:#1a1a1a; --text2:#5a4a3a; --text3:#7a6652;
+  --accent:#8B0000; --accent2:#b8860b; --accent3:#003366; --shadow:0 20px 40px rgba(0,0,0,0.12);
+  --table-header:#b71c1c; --table-row-odd:#ffffff; --table-row-even:#fefcf6;
+}
+
+/* ==================== الأساسيات ==================== */
+*{font-family:'Cairo',sans-serif;box-sizing:border-box;transition:background .3s ease,color .3s ease,border-color .3s ease}
+body{
+  background:var(--bg-primary);
+  background-image: radial-gradient(1200px 600px at 20% -10%, rgba(99,102,241,0.15), transparent 60%), radial-gradient(1000px 500px at 80% 10%, rgba(139,92,246,0.12), transparent 50%);
+  min-height:100vh;color:var(--text);margin:0;padding:12px;padding-bottom:140px;overflow-x:hidden;
+}
+[data-theme="light"] body{
+  background:var(--bg-primary);
+  background-image: radial-gradient(900px 500px at 50% 0%, rgba(210,180,140,0.25), transparent 70%), linear-gradient(180deg,#fdf6e3,#f5f5dc);
+}
+
+.card{
+  background:var(--bg-card);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);
+  border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow),var(--glow),inset 0 1px 0 rgba(255,255,255,0.1);
+  padding:14px;margin-bottom:12px;position:relative;overflow:hidden;
+}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent)}
+[data-theme="light"] .card{
+  background:linear-gradient(180deg,#ffffff 0%,#fefcf6 15%,#f5e6c8 100%);border:2px solid #000;
+  box-shadow:0 8px 0 #d2b48c,0 4px 0 #000,0 12px 24px rgba(0,0,0,0.12),inset 0 1px 0 rgba(255,255,255,0.9);
+}
+
+.btn{
+  height:40px;padding:0 14px;border-radius:10px;border:1px solid var(--border);font-weight:800;font-size:11px;
+  cursor:pointer;display:inline-flex;align-items:center;gap:6px;background:var(--bg-card);color:var(--text);
+  transition:all .2s;white-space:nowrap;justify-content:center;
+}
+.btn:hover{transform:translateY(-1px);background:var(--bg-card-hover)}
+.btn-p{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;box-shadow:0 6px 16px rgba(99,102,241,0.3)}
+.btn-g{background:linear-gradient(135deg,#059669,#047857);color:#fff;border:none}
+.btn-y{background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;border:none}
+.btn-r{background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;border:none}
+.btn:disabled{opacity:0.5;cursor:not-allowed}
+[data-theme="light"] .btn{background:#fff;color:#000;border:2px solid #000;box-shadow:0 3px 0 #d2b48c,0 2px 0 #000}
+[data-theme="light"] .btn-p{background:#b71c1c;color:#fff;border:2px solid #000}
+[data-theme="light"] .btn-g{background:#065f46;color:#fff}
+
+.input{
+  width:100%;padding:8px 10px;border-radius:10px;border:1.5px solid var(--border);
+  background:var(--bg-input);color:var(--text);font-weight:700;font-size:11px;text-align:center;
+}
+.input:focus{outline:2px solid var(--accent);background:var(--bg-card-hover);border-color:var(--border-strong)}
+[data-theme="light"] .input{background:#fff;border:2px solid #000;color:#000}
+.input option{background:var(--bg-secondary);color:var(--text)}
+[data-theme="light"] .input option{background:#fff;color:#000}
+label{font-size:10px;font-weight:800;margin-bottom:3px;display:block;color:var(--text2)}
+.badge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:999px;font-size:10px;font-weight:900;border:1px solid}
+.badge-blue{background:rgba(99,102,241,0.15);color:var(--accent);border-color:var(--border)}
+.badge-green{background:rgba(16,185,129,0.15);color:var(--green);border-color:rgba(16,185,129,0.3)}
+.badge-yellow{background:rgba(245,158,11,0.15);color:var(--yellow);border-color:rgba(245,158,11,0.3)}
+
+/* جداول */
+.table-wrap{overflow:auto;max-height:60vh;border-radius:12px;border:1px solid var(--border);background:var(--bg-card);margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:10px;min-width:700px}
+th{position:sticky;top:0;z-index:5;background:var(--table-header);color:#fff;padding:7px 4px;border:1px solid #000;font-weight:900;white-space:nowrap}
+td{border:1px solid rgba(0,0,0,0.1);padding:5px;text-align:center;background:var(--table-row-odd);color:var(--text)}
+tr:nth-child(even) td{background:var(--table-row-even)}
+tr:hover td{background:rgba(99,102,241,0.1) !important}
+[data-theme="light"] td{background:#fff;color:#000}
+[data-theme="light"] tr:nth-child(even) td{background:#fefcf6}
+[data-theme="light"] tr:hover td{background:#e0e7ff !important}
+
+.tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.tab{padding:7px 12px;border-radius:999px;border:1px solid var(--border);background:var(--bg-card);font-size:10px;font-weight:900;cursor:pointer;color:var(--text)}
+.tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none}
+[data-theme="light"] .tab{background:#fff;color:#000;border:2px solid #000}
+[data-theme="light"] .tab.active{background:#b71c1c;color:#fff}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px}
+@media(max-width:768px){.grid2,.grid3,.grid4{grid-template-columns:1fr 1fr}}
+
+/* زر الثيم */
+#themeToggle{
+  position:fixed;top:12px;left:12px;width:48px;height:48px;border-radius:50%;
+  background:var(--bg-card);backdrop-filter:blur(20px);border:1px solid var(--border);
+  box-shadow:var(--shadow);cursor:pointer;z-index:10000;display:flex;align-items:center;justify-content:center;font-size:20px;
+}
+[data-theme="light"] #themeToggle{background:#fff;border:2px solid #000}
+
+/* قائمة الأزرار الثابتة أسفل الهاتف - احترافية */
+#mobileBottomMenu{
+  position:fixed;bottom:0;left:0;right:0;z-index:9999;
+  background:var(--bg-card);backdrop-filter:blur(20px) saturate(180%);
+  border-top:1px solid var(--border);box-shadow:0 -10px 30px rgba(0,0,0,0.3),var(--glow);
+  padding:8px 6px;display:flex;gap:6px;justify-content:space-around;align-items:center;
+  overflow-x:auto;scrollbar-width:none;
+}
+#mobileBottomMenu::-webkit-scrollbar{display:none}
+[data-theme="light"] #mobileBottomMenu{
+  background:linear-gradient(180deg,#ffffff,#f5e6c8);border-top:2px solid #000;
+  box-shadow:0 -8px 0 #d2b48c,0 -4px 0 #000;
+}
+.mob-btn{
+  flex:1;min-width:60px;max-width:100px;height:58px;border-radius:12px;
+  border:1px solid var(--border);background:var(--bg-card);color:var(--text);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  font-size:9px;font-weight:900;cursor:pointer;transition:all .2s;
+}
+.mob-btn:active{transform:scale(0.95)}
+.mob-btn.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none}
+.mob-icon{font-size:18px}
+.mob-label{font-size:8px;white-space:nowrap}
+[data-theme="light"] .mob-btn{background:#fff;color:#000;border:2px solid #000;box-shadow:0 3px 0 #d2b48c}
+[data-theme="light"] .mob-btn.active{background:#b71c1c;color:#fff}
+
+.log{background:#000;color:#10b981;padding:10px;border-radius:10px;font-family:monospace;font-size:9px;max-height:150px;overflow:auto;white-space:pre-wrap;direction:ltr;text-align:left;border:1px solid #10b981}
+.section-title{font-size:12px;font-weight:900;margin:8px 0 6px 0;padding:6px 10px;background:rgba(99,102,241,0.15);border-radius:8px;border-right:3px solid var(--accent);color:var(--text)}
+[data-theme="light"] .section-title{background:rgba(183,28,28,0.1);border-right-color:#b71c1c;color:#000}
+
+/* إخفاء شريط التمرير */
+.no-scrollbar{scrollbar-width:none} .no-scrollbar::-webkit-scrollbar{display:none}
+</style>
+</head>
+<body>
+<button id="themeToggle" title="فاتح/داكن">🌙</button>
+
+<div class="max-w-[99%] mx-auto">
+  <!-- Header -->
+  <div class="card" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+    <div>
+      <h1 style="font-size:18px;font-weight:900;background:linear-gradient(135deg,var(--text),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent">🗂️ النظام الشامل V4 - إدارة جميع الجداول - احترافي</h1>
+      <p style="font-size:10px;color:var(--text2);margin-top:3px">اختر جدول → إدخال احترافي بعناصر مخصصة + رفع Excel + تصدير + أزرار ثابتة أسفل الهاتف + فاتح/داكن</p>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+      <span class="badge badge-blue" id="tablesCount">الجداول: --</span>
+      <span class="badge badge-green" id="rowsCount">الصفوف: --</span>
+      <span class="badge badge-yellow" id="selectedTableBadge">لم يتم الاختيار</span>
+      <select id="themeSelect" class="input" style="width:90px" onchange="changeTheme(this.value)">
+        <option value="dark">🌙 داكن</option>
+        <option value="light">☀️ فاتح</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- اختيار الجدول -->
+  <div class="card">
+    <div style="display:grid;grid-template-columns:1fr 160px 160px;gap:8px;align-items:end">
+      <div>
+        <label>📋 اختر جدول من القاعدة (جميع الجداول V4):</label>
+        <select id="tablesSelect" class="input" style="text-align:right;font-weight:900">
+          <option value="">⏳ جاري تحميل الجداول...</option>
+        </select>
+      </div>
+      <div>
+        <label>🔍 بحث سريع</label>
+        <input id="searchInput" class="input" placeholder="ابحث..." oninput="filterTable()">
+      </div>
+      <div>
+        <label>عدد الصفوف</label>
+        <select id="limitSelect" class="input" onchange="loadTableData()">
+          <option value="50">50 صف</option>
+          <option value="100" selected>100 صف</option>
+          <option value="250">250 صف</option>
+          <option value="500">500 صف</option>
+          <option value="1000">1000 صف</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px" id="topButtons">
+      <button class="btn btn-p" onclick="loadTables()">🔄 تحديث الجداول</button>
+      <button class="btn" onclick="loadTableData()">👁️ عرض البيانات</button>
+      <button class="btn btn-g" onclick="document.getElementById('excelFile').click()">📤 رفع Excel</button>
+      <input type="file" id="excelFile" accept=".xlsx,.xls" style="display:none" onchange="handleExcelUpload(this)">
+      <button class="btn btn-y" onclick="exportCurrentToExcel()">📥 تصدير Excel</button>
+      <button class="btn" onclick="downloadTemplateCurrent()">📄 نموذج Excel</button>
+      <button class="btn btn-r" onclick="clearCurrentTable()">🗑️ تفريغ الجدول</button>
+    </div>
+
+    <!-- نموذج إدخال ديناميكي لكل جدول -->
+    <div id="dynamicFormArea" style="margin-top:12px;display:none">
+      <div class="section-title" id="formTitle">📝 نموذج إدخال - عناصر مخصصة للجدول</div>
+      <div id="dynamicForm" class="grid3"></div>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <button class="btn btn-p" onclick="saveDynamicForm()">💾 حفظ في الجدول</button>
+        <button class="btn" onclick="clearDynamicForm()">🔄 تفريغ الحقول</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- معاينة Excel -->
+  <div class="card" id="excelPreview" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <b style="font-size:11px">📊 معاينة Excel</b>
+      <button class="btn btn-r" onclick="clearPreview()" style="height:32px">✖ إغلاق</button>
+    </div>
+    <div id="excelPreviewContent" style="margin-top:8px"></div>
+    <div style="display:flex;gap:8px;margin-top:10px;align-items:center;flex-wrap:wrap">
+      <label style="font-size:10px"><input type="radio" name="uploadMode" value="upsert" checked> تحديث/إضافة (Upsert)</label>
+      <label style="font-size:10px"><input type="radio" name="uploadMode" value="insert"> إضافة فقط</label>
+      <label style="font-size:10px"><input type="radio" name="uploadMode" value="replace"> استبدال كامل</label>
+      <button class="btn btn-p" onclick="confirmExcelUpload()">✅ تأكيد الرفع</button>
+      <div style="flex:1"><div class="progress" style="height:6px;background:rgba(0,0,0,0.2);border-radius:999px"><div id="uploadProgress" style="height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0%;transition:width .3s"></div></div></div>
+    </div>
+  </div>
+
+  <!-- عرض البيانات -->
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+      <b style="font-size:11px">📊 بيانات الجدول: <span id="currentTableName">لم يتم الاختيار</span></b>
+      <div style="display:flex;gap:6px">
+        <span class="badge badge-blue" id="tableInfo">--</span>
+        <button class="btn" style="height:32px" onclick="loadTableData()">🔄 تحديث</button>
+      </div>
+    </div>
+    <div class="table-wrap"><table id="dataTable"><thead></thead><tbody><tr><td>اختر جدول من القائمة أعلاه</td></tr></tbody></table></div>
+    <div id="statusMsg" style="font-size:10px;margin-top:6px;padding:6px;border-radius:8px;display:none"></div>
+  </div>
+
+  <!-- شرح الجداول -->
+  <div class="card">
+    <div class="section-title">📚 شرح الجداول الاحترافية V4 - هرمية متكاملة</div>
+    <div style="font-size:10px;line-height:2;color:var(--text3);display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div>
+        <b>1- القطاعات:</b> قطاع دمياط، المنصورة، القاهرة<br>
+        <b>2- المحطات:</b> قطاع → محطة (توليد/نقل/توزيع) - منع تكرار الاسم في نفس القطاع<br>
+        <b>3- الإدارات العامة:</b> قطاع → إدارة عامة (موارد بشرية، مالية، فنية)<br>
+        <b>4- الإدارات:</b> إدارة عامة → إدارة فرعية (شئون عاملين، تدريب)<br>
+        <b>5- المجموعات الوظيفية:</b> هندسية، فنية، إدارية، مالية<br>
+        <b>6- الوظائف:</b> مجموعة → وظيفة + مستوى وظيفي (قيادي، إشرافي، تخصصي، فني)
+      </div>
+      <div>
+        <b>7- تخصصات الوظائف:</b> وظيفة → تخصص دقيق (مهندس كهرباء قوى، فني كهرباء صيانة)<br>
+        <b>8- فئات المؤهلات:</b> دكتوراه، ماجستير، بكالوريوس، ليسانس، دبلوم...<br>
+        <b>9- أنواع المؤهلات:</b> فئة → نوع (بكالوريوس → هندسة، تجارة)<br>
+        <b>10- تخصصات المؤهلات:</b> نوع → تخصص (هندسة → كهرباء قوى)<br>
+        <b>11- الكادر → درجة → فئة مالية بمرتب</b><br>
+        <b>12- الموظفون:</b> يربط بكل المستوى الثالث (تخصص وظيفة + تخصص مؤهل + فئة مالية)<br>
+        <b>13- Change_Salarey:</b> متغيرات شهرية (تعديل أساسي، بدل ورادي، بدل غذاء...)
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <b style="font-size:10px">📊 السجل:</b>
+    <div id="log" class="log">جاهز - النظام الشامل V4 - جميع الجداول احترافية + موبايل + فاتح/داكن\n</div>
+  </div>
+</div>
+
+<!-- قائمة الأزرار الثابتة أسفل الهاتف - احترافية -->
+<div id="mobileBottomMenu">
+  <button class="mob-btn" onclick="loadTables()">
+    <span class="mob-icon">🔄</span><span class="mob-label">تحديث</span>
+  </button>
+  <button class="mob-btn" onclick="loadTableData()">
+    <span class="mob-icon">👁️</span><span class="mob-label">عرض</span>
+  </button>
+  <button class="mob-btn" onclick="document.getElementById('excelFile').click()">
+    <span class="mob-icon">📤</span><span class="mob-label">رفع Excel</span>
+  </button>
+  <button class="mob-btn" onclick="exportCurrentToExcel()">
+    <span class="mob-icon">📥</span><span class="mob-label">تصدير</span>
+  </button>
+  <button class="mob-btn" onclick="downloadTemplateCurrent()">
+    <span class="mob-icon">📄</span><span class="mob-label">نموذج</span>
+  </button>
+  <button class="mob-btn" onclick="saveDynamicForm()">
+    <span class="mob-icon">💾</span><span class="mob-label">حفظ</span>
+  </button>
+  <button class="mob-btn" onclick="changeThemeToggle()">
+    <span class="mob-icon" id="mobThemeIcon">🌙</span><span class="mob-label" id="mobThemeLabel">داكن</span>
+  </button>
+</div>
+
+<script>
+// ==================== الإعدادات ====================
+const WORKER="https://turso-api.mostafa-voic77729.workers.dev";
+let currentTable="", currentData=[], excelData=null, tableSchemas={}, fkCache={};
+
+function log(m){ const e=document.getElementById('log'); e.textContent+=`[${new Date().toLocaleTimeString()}] ${m}\n`; e.scrollTop=e.scrollHeight; }
+function setStatus(msg,type="info"){
+  const el=document.getElementById('statusMsg'); el.style.display='block'; el.textContent=msg;
+  if(type==="success") el.style.background='rgba(16,185,129,0.15)',el.style.color='#065f46',el.style.border='1px solid rgba(16,185,129,0.3)';
+  else if(type==="error") el.style.background='rgba(239,68,68,0.15)',el.style.color='#991b1b',el.style.border='1px solid rgba(239,68,68,0.3)';
+  else el.style.background='rgba(99,102,241,0.15)',el.style.color='var(--accent)',el.style.border='1px solid var(--border)';
+}
+async function q(sql){
+  try{
+    const r=await fetch(`${WORKER}/api/turso`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sql})});
+    const j=await r.json(); return j.rows||j.data||[];
+  }catch(e){ log('❌ '+e.message); setStatus('❌ '+e.message,'error'); return []; }
+}
+
+// ==================== تحميل الجداول ====================
+async function loadTables(){
+  const rows=await q(`SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name`);
+  const select=document.getElementById('tablesSelect');
+  const tables=rows.map(r=>r.name||Object.values(r)[0]).filter(Boolean);
+  select.innerHTML='<option value="">-- اختر جدول --</option>'+tables.map(t=>`<option value="${t}">${t}</option>`).join('');
+  document.getElementById('tablesCount').textContent=`الجداول: ${tables.length}`;
+  log(`الجداول: ${tables.length} - ${tables.join(', ')}`);
+  // تحميل مخططات الجداول
+  for(let t of tables){
+    try{
+      const info=await q(`PRAGMA table_info('${t.replace(/'/g,"''")}')`);
+      const fks=await q(`PRAGMA foreign_key_list('${t.replace(/'/g,"''")}')`);
+      tableSchemas[t]={cols:info,fks:fks};
+    }catch{}
+  }
+}
+
+async function loadTableData(){
+  const table=document.getElementById('tablesSelect').value;
+  if(!table){ alert('اختر جدول أولاً'); return; }
+  currentTable=table;
+  document.getElementById('currentTableName').textContent=table;
+  document.getElementById('selectedTableBadge').textContent=table;
+  const limit=document.getElementById('limitSelect').value;
+  const rows=await q(`SELECT * FROM "${table.replace(/"/g,'""')}" LIMIT ${limit}`);
+  currentData=rows;
+  document.getElementById('rowsCount').textContent=`الصفوف: ${rows.length}`;
+  document.getElementById('tableInfo').textContent=`${rows.length} صف - ${tableSchemas[table]?.cols?.length||0} عمود`;
+  renderTable(rows);
+  await buildDynamicForm(table);
+  log(`عرض ${table}: ${rows.length} صف`);
+  setStatus(`✅ عرض ${table}: ${rows.length} صف`,'success');
+}
+
+function renderTable(rows){
+  const tbl=document.getElementById('dataTable');
+  if(!rows.length){ tbl.innerHTML='<thead><tr><th>لا توجد بيانات</th></tr></thead><tbody><tr><td>الجدول فارغ - يمكنك إضافة بيانات أو رفع Excel</td></tr></tbody>'; return; }
+  const cols=Object.keys(rows[0]);
+  let html=`<thead><tr>${cols.map(c=>`<th>${c}</th>`).join('')}<th>إجراءات</th></tr></thead><tbody>`;
+  html+=rows.map((r,i)=>`<tr>${cols.map(c=>`<td>${r[c]??''}</td>`).join('')}<td><button class="btn" style="height:28px;font-size:9px" onclick="editRow(${i})">✏️</button> <button class="btn btn-r" style="height:28px;font-size:9px" onclick="deleteRow('${r[cols[0]]}')">🗑️</button></td></tr>`).join('');
+  html+='</tbody>';
+  tbl.innerHTML=html;
+}
+
+function filterTable(){
+  const term=document.getElementById('searchInput').value.toLowerCase();
+  if(!term){ renderTable(currentData); return; }
+  const filtered=currentData.filter(r=>Object.values(r).some(v=>String(v).toLowerCase().includes(term)));
+  renderTable(filtered);
+  document.getElementById('tableInfo').textContent=`${filtered.length}/${currentData.length} صف (بحث: ${term})`;
+}
+
+// ==================== نموذج ديناميكي لكل جدول ====================
+async function buildDynamicForm(table){
+  const schema=tableSchemas[table]; if(!schema){ return; }
+  const cols=schema.cols||[]; const fks=schema.fks||[];
+  const form=document.getElementById('dynamicForm'); const area=document.getElementById('dynamicFormArea');
+  document.getElementById('formTitle').textContent=`📝 نموذج إدخال ${table} - ${cols.length} حقل - اختيار فقط من القوائم للـ FK`;
+  form.innerHTML=''; area.style.display='block';
+  
+  // خريطة FK: عمود → جدول مرجعي
+  const fkMap={}; fks.forEach(fk=>{ fkMap[fk.from]=fk.table; });
+
+  for(let col of cols){
+    const colName=col.name; const colType=col.type||'TEXT';
+    if(colName.includes('تاريخ_الإنشاء')||colName.includes('تاريخ_التحديث')) continue; // تجاهل حقول تلقائية
+    const isPK=col.pk===1;
+    const isFK=!!fkMap[colName];
+    const div=document.createElement('div');
+    div.innerHTML=`<label>${colName} ${isPK?'* PK':''} ${isFK?'🔗 FK → '+fkMap[colName]:''} (${colType})</label>`;
+    
+    if(isFK){
+      // قائمة منسدلة من الجدول المرجعي
+      const refTable=fkMap[colName];
+      const select=document.createElement('select');
+      select.id=`form_${colName}`; select.className='input';
+      select.innerHTML='<option value="">-- اختر من '+refTable+' --</option>';
+      // تحميل بيانات الجدول المرجعي
+      if(!fkCache[refTable]){
+        const refRows=await q(`SELECT * FROM "${refTable.replace(/"/g,'""')}" LIMIT 100`);
+        fkCache[refTable]=refRows;
+      }
+      const refRows=fkCache[refTable]||[];
+      if(refRows.length){
+        const displayCols=Object.keys(refRows[0]).slice(0,3); // أول 3 أعمدة للعرض
+        refRows.forEach(r=>{
+          const val=r[Object.keys(r)[0]]; // أول عمود هو عادة الـ ID
+          const label=displayCols.map(c=>r[c]).join(' - ').slice(0,60);
+          const opt=document.createElement('option'); opt.value=val; opt.textContent=label; select.appendChild(opt);
+        });
+      }
+      div.appendChild(select);
+      // زر تحديث القائمة
+      const btn=document.createElement('button'); btn.className='btn'; btn.style.cssText='margin-top:4px;height:28px;width:100%'; btn.textContent='🔄 تحديث قائمة '+refTable;
+      btn.onclick=async()=>{
+        fkCache[refTable]=null;
+        const refRows=await q(`SELECT * FROM "${refTable.replace(/"/g,'""')}" LIMIT 100`);
+        fkCache[refTable]=refRows;
+        select.innerHTML='<option value="">-- اختر --</option>';
+        if(refRows.length){
+          const displayCols=Object.keys(refRows[0]).slice(0,3);
+          refRows.forEach(r=>{
+            const val=r[Object.keys(r)[0]]; const label=displayCols.map(c=>r[c]).join(' - ').slice(0,60);
+            const opt=document.createElement('option'); opt.value=val; opt.textContent=label; select.appendChild(opt);
+          });
+        }
+        log(`تحديث FK ${refTable}: ${refRows.length}`);
+      };
+      div.appendChild(btn);
+    }else{
+      const input=document.createElement('input');
+      input.id=`form_${colName}`; input.className='input';
+      input.placeholder=colName;
+      if(colType.includes('INT')||colName.includes('رقم')||colName.includes('كود') && !colName.includes('اسم')){
+        if(colName.includes('تاريخ')) input.type='date';
+        else if(colType.includes('INT')) input.type='number';
+        else input.type='text';
+      }else if(colName.includes('تاريخ')){
+        input.type='date';
+      }else if(colName.toLowerCase().includes('email')){
+        input.type='email';
+      }else{
+        input.type='text';
+      }
+      // إذا كان PK و autoincrement، اجعله اختياري
+      if(isPK && colType.includes('INTEGER')) input.placeholder+=' (تلقائي إذا فارغ)';
+      div.appendChild(input);
+    }
+    form.appendChild(div);
+  }
+  // تحديد عدد الأعمدة حسب عدد الحقول
+  if(cols.length<=4) form.className='grid2';
+  else if(cols.length<=8) form.className='grid3';
+  else form.className='grid4';
+}
+
+async function saveDynamicForm(){
+  if(!currentTable){ alert('اختر جدول أولاً'); return; }
+  const schema=tableSchemas[currentTable]; if(!schema) return;
+  const cols=schema.cols.filter(c=>!c.name.includes('تاريخ_الإنشاء')&&!c.name.includes('تاريخ_التحديث'));
+  const data={};
+  for(let col of cols){
+    const el=document.getElementById(`form_${col.name}`);
+    if(!el) continue;
+    let val=el.value.trim();
+    if(!val && col.pk===1 && col.type.includes('INTEGER')) continue; // تجاهل PK تلقائي
+    if(val) data[col.name]=val;
+  }
+  if(!Object.keys(data).length){ alert('أدخل بيانات أولاً'); return; }
+  const colNames=Object.keys(data);
+  const colVals=colNames.map(c=>{
+    const v=data[c];
+    if(!isNaN(v) && v!=='' && !c.includes('اسم') && !c.includes('كود_') && !c.includes('هاتف') && !c.includes('قومي') && !c.includes('عنوان')) return v;
+    return `'${String(v).replace(/'/g,"''")}'`;
+  });
+  try{
+    await q(`INSERT OR REPLACE INTO "${currentTable.replace(/"/g,'""')}" ("${colNames.map(c=>c.replace(/"/g,'""')).join('","')}") VALUES (${colVals.join(',')})`);
+    setStatus(`✅ تم حفظ البيانات في ${currentTable}`,'success');
+    log(`✅ حفظ في ${currentTable}: ${JSON.stringify(data).slice(0,100)}`);
+    loadTableData();
+  }catch(e){
+    setStatus('❌ '+e.message,'error');
+    log('❌ خطأ حفظ: '+e.message);
+  }
+}
+
+function clearDynamicForm(){
+  const schema=tableSchemas[currentTable]; if(!schema) return;
+  schema.cols.forEach(c=>{
+    const el=document.getElementById(`form_${c.name}`);
+    if(el) el.value='';
+  });
+}
+
+async function editRow(idx){
+  const row=currentData[idx]; if(!row) return;
+  const schema=tableSchemas[currentTable]; if(!schema) return;
+  schema.cols.forEach(c=>{
+    const el=document.getElementById(`form_${c.name}`);
+    if(el && row[c.name]!==undefined) el.value=row[c.name]??'';
+  });
+  document.getElementById('dynamicFormArea').scrollIntoView({behavior:'smooth'});
+  log(`تحرير صف ${idx}`);
+}
+
+async function deleteRow(keyVal){
+  if(!confirm(`حذف الصف ${keyVal} من ${currentTable}؟`)) return;
+  const schema=tableSchemas[currentTable]; const pkCol=schema?.cols?.find(c=>c.pk===1)?.name||Object.keys(currentData[0]||{})[0];
+  if(!pkCol) return;
+  try{
+    await q(`DELETE FROM "${currentTable.replace(/"/g,'""')}" WHERE "${pkCol.replace(/"/g,'""')}"='${String(keyVal).replace(/'/g,"''")}'`);
+    setStatus(`🗑️ تم حذف ${keyVal}`,'success');
+    loadTableData();
+  }catch(e){ setStatus('❌ '+e.message,'error'); }
+}
+
+async function clearCurrentTable(){
+  if(!currentTable){ alert('اختر جدول'); return; }
+  if(!confirm(`تأكيد تفريغ جدول ${currentTable} بالكامل؟ لا يمكن التراجع!`)) return;
+  if(!confirm(`تأكيد نهائي: حذف كل البيانات من ${currentTable}؟`)) return;
+  await q(`DELETE FROM "${currentTable.replace(/"/g,'""')}"`);
+  setStatus(`🗑️ تم تفريغ ${currentTable}`,'success');
+  loadTableData();
+}
+
+// ==================== Excel ====================
+async function handleExcelUpload(input){
+  const file=input.files[0]; if(!file) return;
+  const buf=await file.arrayBuffer(); const wb=XLSX.read(buf,{type:'array'}); const ws=wb.Sheets[wb.SheetNames[0]];
+  const json=XLSX.utils.sheet_to_json(ws,{header:1}); 
+  if(!json.length){ alert('ملف فارغ'); return; }
+  const headers=json[0].map(h=>String(h||'').trim()).filter(Boolean);
+  const rows=json.slice(1).map(r=>{ let o={}; headers.forEach((h,i)=>o[h]=r[i]); return o; }).filter(r=>Object.values(r).some(v=>v!==null&&v!==''));
+  excelData={headers,rows,fileName:file.name};
+  const preview=document.getElementById('excelPreview');
+  const content=document.getElementById('excelPreviewContent');
+  content.innerHTML=`<div style="font-size:10px;margin-bottom:6px">📊 ${file.name} - ${rows.length} صف - الأعمدة: ${headers.join(', ')}</div><div class="table-wrap" style="max-height:30vh"><table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.slice(0,10).map(r=>`<tr>${headers.map(h=>`<td>${r[h]??''}</td>`).join('')}</tr>`).join('')}</tbody></table></div><div style="font-size:10px;margin-top:6px">عرض أول 10 صفوف من ${rows.length}</div>`;
+  preview.style.display='block';
+  preview.scrollIntoView({behavior:'smooth'});
+  log(`Excel معاينة: ${file.name} - ${rows.length} صف`);
+}
+
+function clearPreview(){
+  document.getElementById('excelPreview').style.display='none';
+  document.getElementById('excelFile').value=""; excelData=null;
+  document.getElementById('uploadProgress').style.width='0%';
+}
+
+async function confirmExcelUpload(){
+  if(!excelData||!currentTable){ alert('لا توجد بيانات أو جدول'); return; }
+  const mode=document.querySelector('input[name="uploadMode"]:checked').value;
+  const btn=document.querySelector('#excelPreview .btn-p'); btn.disabled=true; btn.textContent='⏳ جاري...';
+  try{
+    const schema=tableSchemas[currentTable]; const dbCols=schema?.cols?.map(c=>c.name)||[];
+    const commonCols=excelData.headers.filter(h=>dbCols.includes(h));
+    if(!commonCols.length){ alert(`لا توجد أعمدة مشتركة!\nExcel: ${excelData.headers.join(', ')}\nDB: ${dbCols.join(', ')}`); btn.disabled=false; btn.textContent='✅ تأكيد الرفع'; return; }
+    const pkCol=schema?.cols?.find(c=>c.pk===1)?.name||commonCols[0];
+    let updated=0,inserted=0,errors=0;
+    const total=excelData.rows.length;
+    if(mode==='replace'){
+      await q(`DELETE FROM "${currentTable.replace(/"/g,'""')}"`);
+    }
+    for(let idx=0; idx<excelData.rows.length; idx++){
+      const row=excelData.rows[idx];
+      try{
+        if(mode==='insert'){
+          const cols=commonCols; const vals=cols.map(c=>{
+            let v=row[c]; if(v===null||v===undefined||v==='') return 'NULL';
+            if(typeof v==='number') return String(v);
+            return `'${String(v).replace(/'/g,"''")}'`;
+          });
+          await q(`INSERT INTO "${currentTable.replace(/"/g,'""')}" ("${cols.map(c=>c.replace(/"/g,'""')).join('","')}") VALUES (${vals.join(',')})`);
+          inserted++;
+        }else if(mode==='upsert'){
+          const keyVal=row[pkCol];
+          if(keyVal===undefined||keyVal===null||keyVal===''){ errors++; continue; }
+          const whereVal=typeof keyVal==='number'?keyVal:`'${String(keyVal).replace(/'/g,"''")}'`;
+          const check=await q(`SELECT COUNT(*) as cnt FROM "${currentTable.replace(/"/g,'""')}" WHERE "${pkCol.replace(/"/g,'""')}"=${whereVal}`);
+          const cnt=check[0]?.cnt||0;
+          if(Number(cnt)===0){
+            const cols=commonCols; const vals=cols.map(c=>{
+              let v=row[c]; if(v===null||v===undefined||v==='') return 'NULL';
+              if(typeof v==='number') return String(v);
+              return `'${String(v).replace(/'/g,"''")}'`;
+            });
+            await q(`INSERT INTO "${currentTable.replace(/"/g,'""')}" ("${cols.map(c=>c.replace(/"/g,'""')).join('","')}") VALUES (${vals.join(',')})`);
+            inserted++;
+          }else{
+            const setCols=commonCols.filter(c=>c!==pkCol);
+            const setClause=setCols.map(c=>{
+              let v=row[c]; if(v===null||v===undefined||v==='') return null;
+              if(typeof v==='number') return `"${c.replace(/"/g,'""')}"=${v}`;
+              return `"${c.replace(/"/g,'""')}"='${String(v).replace(/'/g,"''")}'`;
+            }).filter(Boolean).join(', ');
+            if(setClause) await q(`UPDATE "${currentTable.replace(/"/g,'""')}" SET ${setClause} WHERE "${pkCol.replace(/"/g,'""')}"=${whereVal}`);
+            updated++;
+          }
+        }else if(mode==='replace'){
+          const cols=commonCols; const vals=cols.map(c=>{
+            let v=row[c]; if(v===null||v===undefined||v==='') return 'NULL';
+            if(typeof v==='number') return String(v);
+            return `'${String(v).replace(/'/g,"''")}'`;
+          });
+          await q(`INSERT INTO "${currentTable.replace(/"/g,'""')}" ("${cols.map(c=>c.replace(/"/g,'""')).join('","')}") VALUES (${vals.join(',')})`);
+          inserted++;
+        }
+      }catch(e){ errors++; log('⚠️ '+e.message.slice(0,60)); }
+      if(idx%5===0){
+        const p=Math.round(((idx+1)/total)*100);
+        document.getElementById('uploadProgress').style.width=p+'%';
+      }
+    }
+    document.getElementById('uploadProgress').style.width='100%';
+    setStatus(`🎉 تم: تحديث ${updated} - إضافة ${inserted} - أخطاء ${errors} في ${currentTable}`,'success');
+    alert(`تم!\nتحديث: ${updated}\nإضافة: ${inserted}\nأخطاء: ${errors}`);
+    loadTableData();
+  }catch(err){ setStatus('❌ '+err.message,'error'); alert(err.message); }
+  finally{ btn.disabled=false; btn.textContent='✅ تأكيد الرفع'; }
+}
+
+async function exportCurrentToExcel(){
+  if(!currentData.length){ alert('لا توجد بيانات للتصدير'); return; }
+  const ws=XLSX.utils.json_to_sheet(currentData);
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,currentTable||'data');
+  XLSX.writeFile(wb,`${currentTable||'export'}_${new Date().toISOString().slice(0,10)}.xlsx`);
+  log(`تصدير ${currentTable}: ${currentData.length} صف`);
+}
+
+async function downloadTemplateCurrent(){
+  if(!currentTable){ alert('اختر جدول'); return; }
+  const schema=tableSchemas[currentTable]; if(!schema){ alert('لا يوجد مخطط'); return; }
+  const cols=schema.cols.map(c=>c.name);
+  // إنشاء صف نموذجي
+  const sampleRow=cols.map(c=>{
+    if(c.includes('كود_القطاع')) return 'SEC-DAM';
+    if(c.includes('اسم_القطاع')) return 'قطاع دمياط';
+    if(c.includes('كود_المحطة')) return 'ST-DAM-01';
+    if(c.includes('اسم_المحطة')) return 'محطة دمياط';
+    if(c.includes('كود_الإدارة')) return 'HR-01';
+    if(c.includes('اسم_الإدارة')) return 'إدارة شئون العاملين';
+    if(c.includes('اسم_العامل')) return 'أحمد محمد';
+    if(c.includes('الكود_البنكى')) return '1001';
+    if(c.includes('الرقم_القومى')) return '29901011234567';
+    if(c.includes('اسم_المؤهل')) return 'هندسة';
+    if(c.includes('اسم_التخصص')) return 'كهرباء قوى';
+    if(c.includes('اسم_الوظيفة')) return 'مهندس';
+    if(c.includes('السنه')) return 2025;
+    if(c.includes('الشهر')) return 'يناير';
+    if(c.includes('كود_العامل')) return '1001';
+    return '';
+  });
+  const data=[cols,sampleRow];
+  const ws=XLSX.utils.aoa_to_sheet(data);
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,currentTable);
+  XLSX.writeFile(wb,`نموذج_${currentTable}.xlsx`);
+  log(`نموذج ${currentTable}`);
+}
+
+// ==================== الثيم الاحترافي ====================
+function changeTheme(theme){
+  document.documentElement.setAttribute('data-theme',theme);
+  localStorage.setItem('theme',theme);
+  document.getElementById('themeToggle').textContent=theme==='dark'?'☀️':'🌙';
+  document.getElementById('themeSelect').value=theme;
+  document.getElementById('mobThemeIcon').textContent=theme==='dark'?'☀️':'🌙';
+  document.getElementById('mobThemeLabel').textContent=theme==='dark'?'فاتح':'داكن';
+}
+function changeThemeToggle(){
+  const cur=document.documentElement.getAttribute('data-theme');
+  changeTheme(cur==='dark'?'light':'dark');
+}
+
+document.getElementById('tablesSelect').addEventListener('change',()=>{ if(document.getElementById('tablesSelect').value) loadTableData(); });
+
+window.onload=()=>{
+  loadTables();
+  const saved=localStorage.getItem('theme')||'dark';
+  changeTheme(saved);
+  log('✅ النظام الشامل V4 جاهز - جميع الجداول احترافية - موبايل بأزرار ثابتة - فاتح/داكن احترافي');
+};
+
+(function(){
+  const btn=document.getElementById('themeToggle');
+  btn.addEventListener('click',()=>changeThemeToggle());
+})();
+</script>
+</body>
+</html>
