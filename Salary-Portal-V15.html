@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نظام الموظفين - v15 احترافي - Tab + رسالة 3D + طباعة نظيفة</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#070a14; --bg2:#101628; --card:rgba(255,255,255,0.06); --cardH:rgba(255,255,255,0.10);
+  --input:rgba(255,255,255,0.06); --border:rgba(99,102,241,0.28); --border2:rgba(99,102,241,0.5);
+  --text:#f1f5f9; --text2:#94a3b8; --acc:#6366f1; --acc2:#8b5cf6; --green:#10b981;
+  --shadow:0 20px 50px rgba(0,0,0,0.45); --fantasy1:linear-gradient(135deg, #6366f1 0%, #8b5cf6 35%, #06b6d4 70%, #10b981 100%);
+  --fantasy2:linear-gradient(135deg, rgba(99,102,241,0.14), rgba(139,92,246,0.07), rgba(6,182,214,0.07));
+}
+[data-theme="light"]{
+  --bg:#fdfaf3; --bg2:#fffefb; --card:rgba(255,255,255,0.98); --cardH:#fff;
+  --input:#ffffff; --border:rgba(0,0,0,0.12); --border2:#111827;
+  --text:#111827; --text2:#6b5d4d; --acc:#991b1b; --acc2:#a16207;
+  --shadow:0 18px 40px rgba(0,0,0,0.10);
+  --fantasy1:linear-gradient(135deg, #991b1b 0%, #b45309 40%, #1e3a8a 100%);
+  --fantasy2:linear-gradient(135deg, rgba(153,27,27,0.06), rgba(180,83,9,0.05), rgba(30,58,138,0.05));
+}
+*{font-family:'Cairo',sans-serif;box-sizing:border-box}
+body{background:radial-gradient(1200px 600px at 10% -10%, rgba(99,102,241,0.22), transparent 60%), radial-gradient(900px 500px at 90% 0%, rgba(139,92,246,0.18), transparent 50%), var(--bg);min-height:100vh;color:var(--text);margin:0;padding:0;overflow-x:hidden}
+#fixedHeader{position:sticky;top:0;z-index:1000;backdrop-filter:blur(28px) saturate(200%);background:rgba(7,10,20,0.88);border-bottom:1px solid rgba(99,102,241,0.35);box-shadow:0 12px 32px rgba(0,0,0,0.3), 0 1px 0 rgba(255,255,255,0.08) inset;padding:10px 12px}
+[data-theme="light"] #fixedHeader{background:rgba(255,254,251,0.92);box-shadow:0 12px 32px rgba(0,0,0,0.08), 0 2px 0 #000}
+#mainContent{padding:12px;padding-bottom:140px;max-width:98%;margin:0 auto}
+.card{background:var(--card);backdrop-filter:blur(22px) saturate(170%);border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow),0 0 50px rgba(99,102,241,0.12), inset 0 1px 0 rgba(255,255,255,0.08);padding:16px;margin-bottom:12px;position:relative}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1.2px;background:var(--fantasy1);opacity:.55;pointer-events:none}
+[data-theme="light"] .card{background:linear-gradient(180deg,#ffffff 0%,#fffefb 100%);border:1.6px solid rgba(0,0,0,0.14);box-shadow:0 12px 0 rgba(210,180,140,0.38),0 3px 0 #000,0 20px 40px rgba(0,0,0,0.12)}
+.card-fantasy{border:1.6px solid var(--border2)}
+.step-panel{overflow:visible !important}
+.stepper{background:rgba(0,0,0,0.08);border-radius:999px;padding:6px 6px !important;margin-top:8px;display:flex;gap:5px;overflow-x:auto}
+.step{display:flex;align-items:center;gap:4px;padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:var(--card);font-size:9.5px;font-weight:800;white-space:nowrap;cursor:pointer;min-width:auto;height:30px}
+.step.active{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;border:none;box-shadow:0 4px 14px rgba(99,102,241,0.35);transform:scale(1.02)}
+.step.done{background:rgba(16,185,129,0.15);color:var(--green)}
+.progress{height:6px;background:rgba(0,0,0,0.12);border-radius:999px;overflow:hidden;margin:6px 0}
+.progress-bar{height:100%;background:var(--fantasy1);transition:width .5s;border-radius:999px}
+.btn{height:42px;padding:0 16px;border-radius:13px;border:1px solid var(--border);font-weight:800;font-size:11px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;background:var(--card);color:var(--text);justify-content:center}
+.btn-p{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;border:none}
+.btn-g{background:linear-gradient(135deg,#059669,#10b981);color:#fff;border:none}
+.btn-y{background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;border:none}
+[data-theme="light"] .btn{background:#fff;color:#000;border:1.8px solid #000;box-shadow:0 3px 0 #d6c19a}
+.input{width:100%;padding:10px 12px;border-radius:12px;border:1.5px solid var(--border);background:var(--input);color:var(--text);font-weight:700;font-size:12px;text-align:right;transition:all .2s}
+.input:focus{outline:2px solid var(--acc);transform:translateY(-1px);box-shadow:0 0 0 4px rgba(99,102,241,0.15), 0 8px 20px rgba(99,102,241,0.12)}
+[data-theme="light"] .input{background:#fff;border:1.8px solid #111;color:#111}
+label{font-size:10px;font-weight:800;margin-bottom:4px;display:block;color:var(--text2)}
+.badge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:999px;font-size:9px;font-weight:900;border:1px solid}
+.display-name{font-size:11px;font-weight:800;color:var(--acc);margin-top:3px}
+.display-code{font-size:9px;color:var(--text2)}
+.section-title{font-size:11px;font-weight:900;margin:10px 0 6px 0;padding:7px 10px;background:var(--fantasy2);border-radius:10px;border-right:4px solid var(--acc);color:var(--text)}
+#themeToggle{position:fixed;top:10px;left:10px;width:40px;height:40px;border-radius:50%;background:var(--card);border:1px solid var(--border);box-shadow:var(--shadow);cursor:pointer;z-index:1001;display:flex;align-items:center;justify-content:center;font-size:18px}
+#bottomSpacer{height:130px;width:100%;display:block}
+#mobileBottomMenu{position:fixed;bottom:0;left:0;right:0;z-index:40;background:rgba(10,14,26,0.94);backdrop-filter:blur(22px) saturate(180%);border-top:1px solid rgba(99,102,241,0.35);padding:6px 6px 8px 6px;display:flex;gap:6px;justify-content:space-around;align-items:center;box-shadow:0 -8px 24px rgba(0,0,0,0.35)}
+[data-theme="light"] #mobileBottomMenu{background:linear-gradient(180deg,#fff 0%,#f5e6c8 100%);border-top:2px solid #000}
+.mob-btn{flex:1;min-width:58px;max-width:92px;height:58px;border-radius:16px;border:1px solid var(--border);background:linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04));color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:7px;font-weight:900;cursor:pointer;position:relative;box-shadow:0 5px 0 rgba(0,0,0,0.28),0 8px 16px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.2);transform:translateY(0);transition:all .12s}
+.mob-btn:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,0.28)}
+.mob-btn.active{background:linear-gradient(180deg, #8b7cff, #6366f1 35%, #4f46e5);color:#fff;border:none;box-shadow:0 6px 0 #2a277a,0 10px 20px rgba(99,102,241,0.45), inset 0 1px 0 rgba(255,255,255,0.3);transform:translateY(-1px)}
+.mob-icon{font-size:20px}.mob-label{font-size:7px;white-space:nowrap;font-weight:900}
+[data-theme="light"] .mob-btn{background:linear-gradient(180deg,#fff,#f5e6c8);box-shadow:0 5px 0 #d2b48c,0 7px 14px rgba(0,0,0,0.15);border:2px solid #000}
+[data-theme="light"] .mob-btn.active{background:linear-gradient(180deg,#ef4444,#991b1b);box-shadow:0 5px 0 #7f1d1d}
+.view-section{display:none}
+.view-section.active{display:block;animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.auto-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);padding:2px 6px;border-radius:999px;font-size:8px;font-weight:800;margin-right:4px}
+.date-wrap{position:relative}
+.date-hint{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:9px;color:var(--text2);pointer-events:none}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media(max-width:720px){.grid2,.grid3{grid-template-columns:1fr}}
+
+/* فلتر داخل القائمة + دعم Tab وأسهم */
+.custom-select-wrapper{position:relative;width:100%;z-index:5}
+.custom-select-trigger{width:100%;padding:10px 12px;border-radius:12px;border:1.5px solid var(--border);background:var(--input);color:var(--text);font-weight:700;font-size:12px;text-align:right;cursor:pointer;display:flex;justify-content:space-between;align-items:center;min-height:42px;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,0.08)}
+.custom-select-trigger.has-value{border-color:var(--border2);background:var(--card)}
+.custom-select-trigger:focus{outline:2px solid var(--acc);box-shadow:0 0 0 4px rgba(99,102,241,0.2)}
+.custom-select-trigger:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(99,102,241,0.15);border-color:var(--acc)}
+.custom-options{position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:9999999;background:var(--bg2);border:2px solid var(--acc);border-radius:14px;max-height:260px;overflow:hidden;display:none;box-shadow:0 20px 40px rgba(0,0,0,0.5);flex-direction:column}
+.custom-options.open{display:flex;animation:dropFade .18s ease}
+.custom-options.open-up{top:auto !important;bottom:calc(100% + 8px) !important;box-shadow:0 -20px 40px rgba(0,0,0,0.5) !important;animation:dropFadeUp .18s ease !important}
+@keyframes dropFade{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes dropFadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.custom-filter-row{padding:8px;background:linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.1));border-bottom:2px solid var(--acc);display:flex;gap:6px;align-items:center;position:sticky;top:0}
+.custom-filter-row input{flex:1;padding:8px 12px;border-radius:10px;border:2px solid var(--acc);background:#fff;color:#000;font-size:12px;font-weight:800;outline:none}
+.custom-options-list{overflow-y:auto;flex:1;background:#fff}
+.custom-option{padding:10px 12px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:center;color:#111;transition:all .15s}
+.custom-option:hover{background:#eef2ff;color:#4f46e5;transform:translateX(-2px)}
+.custom-option.selected{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff}
+.custom-option.highlighted{background:#fef3c7 !important;color:#92400e !important;border-right:4px solid #f59e0b}
+[data-theme="dark"] .custom-options-list{background:var(--bg2)}
+[data-theme="dark"] .custom-option{color:var(--text);border-bottom-color:rgba(255,255,255,0.06)}
+.custom-count{font-size:9px;background:var(--acc);color:#fff;padding:2px 6px;border-radius:999px}
+
+/* رسالة حفظ 3D احترافية */
+#saveModal3D{position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,0.55);backdrop-filter:blur(12px) saturate(180%);display:none;align-items:center;justify-content:center;padding:20px}
+#saveModal3D.show{display:flex;animation:modalFade .3s ease}
+@keyframes modalFade{from{opacity:0}to{opacity:1}}
+.save-3d-card{width:100%;max-width:380px;background:linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);border-radius:24px;border:2px solid #000;box-shadow:0 20px 0 #cbd5e1, 0 30px 60px rgba(0,0,0,0.4), inset 0 1px 0 #fff, inset 0 -1px 0 rgba(0,0,0,0.1);padding:24px 20px;text-align:center;transform:translateY(20px) scale(0.95);animation:cardPop .4s cubic-bezier(0.34,1.56,0.64,1) forwards;position:relative;overflow:hidden}
+.save-3d-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:var(--fantasy1)}
+@keyframes cardPop{to{transform:translateY(0) scale(1)}}
+.save-3d-icon{width:72px;height:72px;border-radius:50%;margin:0 auto 16px auto;display:flex;align-items:center;justify-content:center;font-size:36px;box-shadow:0 8px 0 rgba(0,0,0,0.15), 0 12px 24px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.4)}
+.save-3d-icon.success{background:linear-gradient(135deg, #10b981, #059669);color:#fff}
+.save-3d-icon.error{background:linear-gradient(135deg, #ef4444, #dc2626);color:#fff}
+.save-3d-icon.info{background:linear-gradient(135deg, #6366f1, #4f46e5);color:#fff}
+.save-3d-title{font-size:16px;font-weight:900;color:#111;margin-bottom:8px}
+.save-3d-msg{font-size:12px;color:#475569;line-height:1.6;margin-bottom:18px;font-weight:700}
+.save-3d-btn{width:100%;height:48px;border-radius:14px;border:2px solid #000;background:linear-gradient(180deg, #111, #000);color:#fff;font-weight:900;font-size:13px;cursor:pointer;box-shadow:0 6px 0 #000, 0 10px 20px rgba(0,0,0,0.2);transition:all .12s}
+.save-3d-btn:active{transform:translateY(4px);box-shadow:0 2px 0 #000, 0 4px 10px rgba(0,0,0,0.2)}
+[data-theme="dark"] .save-3d-card{background:linear-gradient(180deg, #1e293b, #0f172a);border-color:var(--border2)}
+[data-theme="dark"] .save-3d-title{color:#fff}
+[data-theme="dark"] .save-3d-msg{color:#94a3b8}
+
+/* طباعة - نظيفة احترافية - بدون checkboxes */
+@media print{
+  @page{size:A4 portrait;margin:8mm 7mm}
+  body{background:#fff;color:#000;padding:0;margin:0}
+  #fixedHeader,#themeToggle,#mobileBottomMenu,.no-print,#mainContent{display:none !important}
+  #printArea{display:block !important;width:100% !important}
+}
+#printArea{display:none}
+.print-a4{width:190mm;min-height:267mm;margin:0 auto;background:#fff;color:#000;padding:6mm 6mm 4mm 6mm;display:flex;flex-direction:column;gap:5px;font-family:'Cairo',sans-serif}
+.print-a4.filled{border:none !important;box-shadow:none !important} /* إلغاء الإطار الخارجي للمملوءة */
+.print-a4.blank{border:1.8px solid #000;border-radius:6px;box-shadow:0 0 0 1px #000 inset}
+.print-head{border-bottom:3px double #000;padding-bottom:5px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:flex-start}
+.print-head h2{font-size:13px;font-weight:900;margin:0;line-height:1.3;color:#000}
+.print-head small{font-size:7.5px;color:#333;line-height:1.3;display:block;margin-top:3px}
+.print-meta{text-align:left;font-size:8px;line-height:1.4}
+.print-sec{border:1.8px solid #000;border-radius:6px;overflow:hidden;margin-bottom:4px;background:#fff;box-shadow:0 1px 0 #000}
+.print-sec-title{background:#111;color:#fff;font-size:9.5px;font-weight:900;padding:4px 10px;display:flex;justify-content:space-between;align-items:center}
+.print-table{width:100%;border-collapse:collapse}
+.print-table td{border:1.2px solid #000;padding:5px 8px;font-size:10px;vertical-align:middle;height:26px}
+.print-table .lbl{width:18%;background:#f1f5f9;font-weight:900;font-size:9px;color:#111;white-space:nowrap;border-left:2px solid #000}
+.print-table .val{width:32%;font-weight:600;background:#fff;font-size:10px}
+.print-table .lbl-sm{width:14%;background:#f1f5f9;font-weight:900;font-size:8px}
+.print-table .val-sm{width:36%;font-size:9.5px}
+.print-footer{border-top:2.5px solid #000;padding-top:8px;margin-top:auto;display:flex;justify-content:space-between;font-size:9px;font-weight:700}
+.print-signature{text-align:center;line-height:1.4}
+.print-signature .line{border-top:1.2px solid #000;width:110px;margin:24px auto 6px auto}
+</style>
+</head>
+<body>
+<button id="themeToggle" class="no-print">🌙</button>
+
+<div id="fixedHeader" class="no-print">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;max-width:98%;margin:0 auto">
+    <div>
+      <h1 style="font-size:13px;font-weight:900;background:var(--fantasy1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:0">✨ نظام الموظفين v15 - Tab + رسالة 3D + طباعة نظيفة ✨</h1>
+      <p style="font-size:8px;color:var(--text2);margin:2px 0 0 0">كود تلقائي max+1 • فلتر داخل القائمة أول صف • Tab وأسهم للتنقل • طباعة A4 نظيفة احترافية</p>
+    </div>
+    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+      <span class="badge" style="background:var(--fantasy2);color:var(--acc);border-color:var(--border)" id="empCount">الموظفون: --</span>
+      <span class="badge" style="background:rgba(16,185,129,0.12);color:var(--green);border-color:rgba(16,185,129,0.25)" id="modeBadge">وضع: إضافة جديد</span>
+      <span class="badge" style="background:rgba(99,102,241,0.12);color:var(--acc);border-color:var(--border)" id="autoCodeBadge">كود تلقائي: --</span>
+    </div>
+  </div>
+</div>
+
+<div id="mainContent">
+  <div id="viewAddEmployee" class="view-section active">
+    <div class="card card-fantasy no-print" style="overflow:visible;padding:10px 12px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <b style="font-size:11px">📍 <span id="stepLabel">الخطوة 1 من 6</span> - إضافة موظف جديد</b>
+        <b style="font-size:10px;background:var(--fantasy1);-webkit-background-clip:text;-webkit-text-fill-color:transparent" id="progressText">0%</b>
+      </div>
+      <div class="progress"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+      <div class="stepper" id="stepper">
+        <div class="step active" data-step="1" onclick="goToStep(1)" tabindex="0">① البيانات الأساسية</div>
+        <div class="step" data-step="2" onclick="goToStep(2)" tabindex="0">② القطاع والمحطة</div>
+        <div class="step" data-step="3" onclick="goToStep(3)" tabindex="0">③ الإدارات</div>
+        <div class="step" data-step="4" onclick="goToStep(4)" tabindex="0">④ الوظيفة والمؤهل</div>
+        <div class="step" data-step="5" onclick="goToStep(5)" tabindex="0">⑤ العنوان والاتصال</div>
+        <div class="step" data-step="6" onclick="goToStep(6)" tabindex="0">⑥ المراجعة والحفظ</div>
+      </div>
+    </div>
+
+    <div class="card step-panel" id="panel1">
+      <div class="section-title">① البيانات الأساسية - كود تلقائي <span class="auto-badge">🔢 تلقائي</span></div>
+      <div class="grid3">
+        <div><label><span class="req">*</span>الكود البنكي - تلقائي</label><input id="الكود_البنكى" class="input" placeholder="تلقائي: أكبر رقم +1" onblur="onBankCodeBlur(this.value)" oninput="onBankCodeInput(this.value)" tabindex="1"><div id="codeExistsHint" style="font-size:9px;color:var(--green);margin-top:2px;display:none"></div></div>
+        <div><label><span class="req">*</span>اسم العامل</label><input id="اسم_العامل" class="input" placeholder="الاسم رباعي" tabindex="2"></div>
+        <div><label><span class="req">*</span>الرقم القومي - 14 رقم</label><input id="الرقم_القومى" class="input" maxlength="14" placeholder="2990101..." oninput="parseNationalID(this.value)" tabindex="3"></div>
+        <div><label>تاريخ الميلاد - DD/MM/YYYY</label><div class="date-wrap"><input id="تاريخ_الميلاد_display" class="input" placeholder="DD/MM/YYYY" oninput="onDateInput(this,'تاريخ_الميلاد')" maxlength="10" tabindex="4"><span class="date-hint">📅</span></div><input id="تاريخ_الميلاد" type="hidden"></div>
+        <div><label>جهة الميلاد</label><input id="جهة_الميلاد" class="input" placeholder="مثال: دمياط" tabindex="5"></div>
+        <div><label>الديانة</label><select id="الديانة" class="input" tabindex="6"><option value="">-- اختر --</option><option>مسلم</option><option>مسيحي</option><option>أخرى</option></select></div>
+        <div><label>النوع - تلقائي</label><select id="النوع" class="input" tabindex="7"><option value="ذكر">ذكر</option><option value="أنثى">أنثى</option></select></div>
+        <div><label>الموقف من التجنيد</label><select id="الموقف_من_التجنيد" class="input" tabindex="8"><option value="">-- اختر --</option><option>أدى الخدمة</option><option>إعفاء نهائي</option><option>إعفاء مؤقت</option><option>لم يصبه الدور</option><option>يؤجل</option></select></div>
+        <div><label>الرقم التأميني</label><input id="الرقم_التأمينى" class="input" placeholder="رقم التأمينات" tabindex="9"></div>
+        <div><label>تاريخ التعيين - DD/MM/YYYY</label><div class="date-wrap"><input id="تاريخ_التعيين_display" class="input" placeholder="DD/MM/YYYY" oninput="onDateInput(this,'تاريخ_التعيين')" maxlength="10" tabindex="10"><span class="date-hint">📅</span></div><input id="تاريخ_التعيين" type="hidden"></div>
+        <div><label>الوظيفة المعين عليها <span class="auto-badge">⏱ مؤقت تلقائي</span></label><input id="الوظيفة_المعين_عليها" class="input" placeholder="مؤقت - يحمل تلقائيا" tabindex="11"></div>
+        <div><label>ملاحظات</label><input id="ملاحظات" class="input" placeholder="ملاحظات عامة" tabindex="12"></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px" class="no-print">
+        <button class="btn btn-p" onclick="nextStep()" tabindex="13">التالي ⏭</button>
+        <button class="btn" onclick="clearForm()" tabindex="14">🧹 تفريغ</button>
+      </div>
+    </div>
+
+    <div class="card step-panel" id="panel2" style="display:none">
+      <div class="section-title">② القطاع والمحطة - فلتر داخل القائمة أول صف - Tab + أسهم</div>
+      <div class="grid2">
+        <div style="overflow:visible"><label><span class="req">*</span>القطاع</label><select id="رقم_القطاع" class="input" onchange="onSectorChange(this.value)" tabindex="15"><option value="">-- اختر القطاع --</option></select><div class="display-name" id="display_القطاع"></div><div class="display-code" id="code_القطاع"></div></div>
+        <div style="overflow:visible;position:relative;z-index:20"><label><span class="req">*</span>المحطة <span class="auto-badge">🔍 بحث داخل القائمة - Tab للتنقل - ↑↓ للتحرك</span></label><select id="رقم_المحطة" class="input" onchange="showDisplay('رقم_المحطة','المحطات')" tabindex="16"><option value="">-- اختر المحطة --</option></select><div class="display-name" id="display_المحطة"></div><div class="display-code" id="code_المحطة"></div></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px" class="no-print"><button class="btn" onclick="prevStep()">⏮ السابق</button><button class="btn btn-p" onclick="nextStep()">التالي ⏭</button></div>
+    </div>
+
+    <div class="card step-panel" id="panel3" style="display:none">
+      <div class="section-title">③ الإدارات - فلتر داخل القائمة - Tab + أسهم</div>
+      <div class="grid2">
+        <div style="overflow:visible;position:relative;z-index:20"><label>الإدارة العامة <span class="auto-badge">🔍 Tab + ↑↓</span></label><select id="رقم_الإدارة_العامة" class="input" onchange="onGenDeptChange(this.value)" tabindex="17"><option value="">-- اختر الإدارة العامة --</option></select><div class="display-name" id="display_الإدارة_العامة"></div><div class="display-code" id="code_الإدارة_العامة"></div></div>
+        <div style="overflow:visible"><label>الإدارة</label><select id="رقم_الإدارة" class="input" onchange="showDisplay('رقم_الإدارة','الإدارات')" tabindex="18"><option value="">-- اختر الإدارة --</option></select><div class="display-name" id="display_الإدارة"></div><div class="display-code" id="code_الإدارة"></div></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px" class="no-print"><button class="btn" onclick="prevStep()">⏮ السابق</button><button class="btn btn-p" onclick="nextStep()">التالي ⏭</button></div>
+    </div>
+
+    <div class="card step-panel" id="panel4" style="display:none">
+      <div class="section-title">④ الوظيفة والمؤهل</div>
+      <div class="grid3">
+        <div><label>المجموعة الوظيفية</label><select id="رقم_المجموعة" class="input" onchange="onGroupChange(this.value)" tabindex="19"><option value="">-- اختر المجموعة --</option></select><div class="display-name" id="display_المجموعة"></div></div>
+        <div style="overflow:visible;position:relative;z-index:20"><label>الوظيفة <span class="auto-badge">🔍 Tab + ↑↓</span></label><select id="رقم_الوظيفة" class="input" onchange="onJobChange(this.value)" tabindex="20"><option value="">-- اختر الوظيفة --</option></select><div class="display-name" id="display_الوظيفة"></div><div class="display-code" id="code_الوظيفة"></div></div>
+        <div><label>تخصص الوظيفة</label><select id="رقم_تخصص_الوظيفة" class="input" onchange="showDisplay('رقم_تخصص_الوظيفة','تخصصات_الوظائف')" tabindex="21"><option value="">-- اختر تخصص الوظيفة --</option></select><div class="display-name" id="display_تخصص_الوظيفة"></div></div>
+      </div>
+      <div class="section-title">المؤهلات</div>
+      <div class="grid3">
+        <div><label>فئة المؤهل</label><select id="رقم_فئة_المؤهل" class="input" onchange="onQualCatChange(this.value)" tabindex="22"><option value="">-- اختر الفئة --</option></select><div class="display-name" id="display_فئة_المؤهل"></div></div>
+        <div><label>نوع المؤهل</label><select id="رقم_نوع_المؤهل" class="input" onchange="onQualTypeChange(this.value)" tabindex="23"><option value="">-- اختر النوع --</option></select><div class="display-name" id="display_نوع_المؤهل"></div><div class="display-code" id="code_نوع_المؤهل"></div></div>
+        <div><label>تخصص المؤهل</label><select id="رقم_التخصص" class="input" onchange="showDisplay('رقم_التخصص','تخصصات_المؤهلات')" tabindex="24"><option value="">-- اختر التخصص --</option></select><div class="display-name" id="display_التخصص"></div></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px" class="no-print"><button class="btn" onclick="prevStep()">⏮ السابق</button><button class="btn btn-p" onclick="nextStep()">التالي ⏭</button></div>
+    </div>
+
+    <div class="card step-panel" id="panel5" style="display:none">
+      <div class="section-title">⑤ العنوان والاتصال</div>
+      <div class="grid3">
+        <div><label>نوع العنوان</label><select id="نوع_العنوان" class="input" tabindex="25"><option>دائم</option><option>حالي</option><option>عمل</option><option>مؤقت</option></select></div>
+        <div><label>رقم الموبايل</label><input id="رقم_الموبايل" class="input" placeholder="01xxxxxxxxx" tabindex="26"></div>
+        <div><label>الرقم الأرضي</label><input id="الرقم_الأرضى" class="input" placeholder="057..." tabindex="27"></div>
+        <div style="grid-column:1/-1"><label>العنوان الكامل</label><input id="العنوان_الكامل" class="input" placeholder="المحافظة - المركز - الشارع" tabindex="28"></div>
+        <div><label>البريد الإلكتروني</label><input id="البريد_الإلكترونى" type="email" class="input" placeholder="example@mail.com" tabindex="29"></div>
+        <div><label>رقم الهاتف الرئيسي</label><input id="رقم_الهاتف" class="input" placeholder="رقم هاتف" tabindex="30"></div>
+      </div>
+      <div class="section-title">الدرجة والصلاحيات</div>
+      <div class="grid3">
+        <div><label>اسم الدرجة</label><select id="اسم_الدرجة" class="input" tabindex="31"><option value="">-- اختر --</option><option>الدرجة السادسة</option><option>الدرجة الخامسة</option><option>الدرجة الرابعة</option><option>الدرجة الثالثة</option><option>الدرجة الثانية</option><option>الدرجة الأولى</option><option>مدير عام</option><option>العالية</option><option>الممتازة</option></select></div>
+        <div><label>رقم الدرجة</label><input id="رقم_الدرجة" type="number" class="input" placeholder="1-6" tabindex="32"></div>
+        <div><label>الفئة المالية</label><select id="الفئة_المالية" class="input" tabindex="33"><option value="">-- اختر --</option><option>أ</option><option>ب</option><option>ج</option></select></div>
+        <div><label>تاريخ الدرجة - DD/MM/YYYY</label><div class="date-wrap"><input id="تاريخ_الدرجة_display" class="input" placeholder="DD/MM/YYYY" oninput="onDateInput(this,'تاريخ_الدرجة')" maxlength="10" tabindex="34"><span class="date-hint">📅</span></div><input id="تاريخ_الدرجة" type="hidden"></div>
+        <div><label>نوع الصلاحية</label><select id="نوع_الصلاحية" class="input" tabindex="35"><option>User</option><option>Admin</option><option>Manager</option><option>HR</option><option>Viewer</option></select></div>
+        <div><label>اسم المستخدم</label><input id="اسم_المستخدم" class="input" placeholder="مثال: ahmed.mohamed" tabindex="36"></div>
+        <div><label>كلمة المرور</label><input id="كلمة_المرور" type="password" class="input" placeholder="كلمة مرور" tabindex="37"></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px" class="no-print"><button class="btn" onclick="prevStep()">⏮ السابق</button><button class="btn btn-p" onclick="nextStep()" tabindex="38">التالي ⏭</button></div>
+    </div>
+
+    <div class="card step-panel" id="panel6" style="display:none">
+      <div class="section-title">⑥ مراجعة وحفظ</div>
+      <div id="reviewArea" style="background:var(--input);border:1.5px dashed var(--border);border-radius:14px;padding:12px;font-size:11px;line-height:1.8"></div>
+      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap" class="no-print"><button class="btn" onclick="prevStep()">⏮ السابق</button><button class="btn btn-g" style="flex:1" onclick="saveEmployee()" tabindex="39">💾 حفظ الموظف</button><button class="btn btn-y" onclick="clearForm()">🧹 تفريغ</button></div>
+      <div id="saveStatus" style="margin-top:10px;font-size:10px;padding:10px;border-radius:10px;display:none" class="no-print"></div>
+    </div>
+  </div>
+
+  <div id="viewSearchEmployee" class="view-section">
+    <div class="card card-fantasy">
+      <div class="section-title" style="margin-top:0">🔍 بحث عن موظف</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 110px 110px;gap:8px;align-items:end">
+        <div><label>🔢 كود الموظف</label><input id="searchCode" class="input" placeholder="1001" onkeypress="if(event.key==='Enter') searchEmployee()"></div>
+        <div><label>🆔 الرقم القومي</label><input id="searchNational" class="input" placeholder="14 رقم" maxlength="14" onkeypress="if(event.key==='Enter') searchEmployee()"></div>
+        <div><label>👤 اسم الموظف</label><input id="searchName" class="input" placeholder="أحمد..." onkeypress="if(event.key==='Enter') searchEmployee()"></div>
+        <div><button class="btn btn-p" style="width:100%" onclick="searchEmployee()">🔍 بحث</button></div>
+        <div><button class="btn btn-g" style="width:100%" onclick="prepareNewEmployee(); switchView('add')">➕ جديد</button></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap" class="no-print"><button class="btn" onclick="clearSearch()">🧹 تفريغ</button><span class="badge" style="background:rgba(16,185,129,0.12);color:var(--green);border-color:rgba(16,185,129,0.25)" id="searchResultCount">--</span></div>
+      <div id="searchResults" style="margin-top:12px;display:none"><div style="max-height:200px;overflow:auto;border:1.5px solid var(--border);border-radius:12px"><table style="width:100%;border-collapse:collapse;font-size:10px;min-width:650px"><thead><tr><th style="position:sticky;top:0;background:var(--bg2);padding:7px;border:1px solid var(--border)">الكود</th><th style="position:sticky;top:0;background:var(--bg2);padding:7px;border:1px solid var(--border)">الاسم</th><th style="position:sticky;top:0;background:var(--bg2);padding:7px;border:1px solid var(--border)">القومي</th><th style="position:sticky;top:0;background:var(--bg2);padding:7px;border:1px solid var(--border)">المحطة</th><th style="position:sticky;top:0;background:var(--bg2);padding:7px;border:1px solid var(--border)">الوظيفة</th><th style="position:sticky;top:0;background:var(--bg2);padding:7px;border:1px solid var(--border)">إجراءات</th></tr></thead><tbody id="searchTableBody"></tbody></table></div></div>
+      <div id="employeeDisplayCard" style="display:none;margin-top:14px;padding:14px;border:2px solid var(--acc);border-radius:16px;background:var(--card)"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px" class="no-print"><b style="font-size:12px">📋 بيانات الموظف</b><div style="display:flex;gap:6px"><button class="btn btn-p" style="height:34px" onclick="loadEmployeeToForm()">✏ تحميل للتعديل</button><button class="btn" style="height:34px" onclick="document.getElementById('employeeDisplayCard').style.display='none'">✖ إغلاق</button></div></div><div id="employeeDisplayContent" style="margin-top:10px"></div></div>
+    </div>
+  </div>
+
+  <div id="bottomSpacer"></div>
+
+  <!-- رسالة حفظ 3D احترافية -->
+  <div id="saveModal3D" onclick="if(event.target===this) closeSaveModal3D()">
+    <div class="save-3d-card">
+      <div class="save-3d-icon success" id="saveModalIcon">🎉</div>
+      <div class="save-3d-title" id="saveModalTitle">تم الحفظ بنجاح!</div>
+      <div class="save-3d-msg" id="saveModalMsg">تم حفظ بيانات الموظف بنجاح في قاعدة البيانات</div>
+      <button class="save-3d-btn" onclick="closeSaveModal3D()">حسناً - ممتاز ✅</button>
+    </div>
+  </div>
+
+  <!-- طباعة A4 نظيفة - بدون checkboxes - عناوين ظاهرة -->
+  <div id="printArea">
+    <div class="print-a4 blank" id="printA4Content">
+      <div class="print-head">
+        <div>
+          <h2>شركة نقل الكهرباء - استمارة بيانات موظف جديد</h2>
+          <small>النظام المتكامل للموارد البشرية | إعداد أ/ مصطفى درويش سيد - 01092259655<br>يعرض الاسم ويحفظ الكود | كود تلقائي أكبر رقم +1 | تواريخ DD/MM/YYYY</small>
+        </div>
+        <div class="print-meta">
+          <div><b>كود مقترح:</b> <span id="printNextCode">--</span></div>
+          <div><b>تاريخ الطباعة:</b> <span id="printDate"></span></div>
+          <div style="font-size:6px;margin-top:3px">صفحة 1 من 1 - A4 - نظيفة</div>
+        </div>
+      </div>
+
+      <div class="print-sec">
+        <div class="print-sec-title"><span>📋 البيانات الأساسية - إلزامي: الكود + الاسم + الرقم القومي</span><span style="font-size:6px">البيانات الأساسية</span></div>
+        <table class="print-table">
+          <tr><td class="lbl">الكود البنكي</td><td class="val"></td><td class="lbl">اسم العامل رباعي</td><td class="val"></td></tr>
+          <tr><td class="lbl">الرقم القومي</td><td class="val"></td><td class="lbl">تاريخ الميلاد</td><td class="val"></td></tr>
+          <tr><td class="lbl">جهة الميلاد</td><td class="val"></td><td class="lbl">الديانة / النوع</td><td class="val"></td></tr>
+          <tr><td class="lbl">الموقف من التجنيد</td><td class="val"></td><td class="lbl">الرقم التأميني</td><td class="val"></td></tr>
+          <tr><td class="lbl">تاريخ التعيين</td><td class="val"></td><td class="lbl">الوظيفة المعين عليها</td><td class="val" style="background:#fffbe6"></td></tr>
+        </table>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
+        <div class="print-sec">
+          <div class="print-sec-title"><span>🏢 القطاع والمحطة</span></div>
+          <table class="print-table">
+            <tr><td class="lbl" style="width:30%">القطاع</td><td class="val"></td></tr>
+            <tr><td class="lbl">المحطة</td><td class="val"></td></tr>
+          </table>
+        </div>
+        <div class="print-sec">
+          <div class="print-sec-title"><span>🏢 الإدارات - هرمي</span></div>
+          <table class="print-table">
+            <tr><td class="lbl" style="width:30%">الإدارة العامة</td><td class="val"></td></tr>
+            <tr><td class="lbl">الإدارة</td><td class="val"></td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
+        <div class="print-sec">
+          <div class="print-sec-title"><span>💼 الوظيفة</span></div>
+          <table class="print-table">
+            <tr><td class="lbl" style="width:35%">المجموعة الوظيفية</td><td class="val"></td></tr>
+            <tr><td class="lbl">الوظيفة</td><td class="val"></td></tr>
+            <tr><td class="lbl">تخصص الوظيفة</td><td class="val"></td></tr>
+          </table>
+        </div>
+        <div class="print-sec">
+          <div class="print-sec-title"><span>🎓 المؤهل</span></div>
+          <table class="print-table">
+            <tr><td class="lbl" style="width:35%">فئة المؤهل</td><td class="val"></td></tr>
+            <tr><td class="lbl">نوع المؤهل</td><td class="val"></td></tr>
+            <tr><td class="lbl">تخصص المؤهل</td><td class="val"></td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="print-sec">
+        <div class="print-sec-title"><span>📍 العنوان والاتصال والدرجة والصلاحيات</span></div>
+        <table class="print-table">
+          <tr><td class="lbl-sm">نوع العنوان</td><td class="val-sm"></td><td class="lbl-sm">الموبايل</td><td class="val-sm"></td><td class="lbl-sm">الأرضي</td><td class="val-sm"></td><td class="lbl-sm">البريد</td><td class="val-sm"></td></tr>
+          <tr><td class="lbl-sm">العنوان الكامل</td><td class="val-sm" colspan="7" style="height:32px"></td></tr>
+          <tr><td class="lbl-sm">الدرجة</td><td class="val-sm"></td><td class="lbl-sm">رقم / فئة / تاريخ</td><td class="val-sm"></td><td class="lbl-sm">الصلاحية</td><td class="val-sm"></td><td class="lbl-sm">مستخدم / مرور</td><td class="val-sm"></td></tr>
+          <tr><td class="lbl-sm">ملاحظات</td><td class="val-sm" colspan="7" style="height:26px"></td></tr>
+        </table>
+      </div>
+
+      <div class="print-footer">
+        <div class="print-signature"><div class="line"></div>توقيع الموظف<br><span style="font-size:6px">الاسم رباعي</span></div>
+        <div style="text-align:center;font-size:6px;line-height:1.5">استمارة نظيفة احترافية • بدون checkboxes • عناوين واضحة • A4<br>تصميم مريح للعين • إطار جذاب</div>
+        <div class="print-signature"><div class="line"></div>مدير الموارد البشرية - الختم<br><span style="font-size:6px">التاريخ والتوقيع</span></div>
+      </div>
+    </div>
+
+    <div class="print-a4 filled" id="printFilledA4" style="display:none">
+      <div class="print-head">
+        <div><h2>شركة نقل الكهرباء - استمارة بيانات موظف - مملوءة - A4 احترافية</h2><small id="filledEmpTitle">--</small></div>
+        <div class="print-meta"><div>كود: <b id="filledCode">--</b></div><div>تاريخ: <span id="filledDate">--</span></div><div style="font-size:6px">صفحة 1/1 - بدون إطار خارجي</div></div>
+      </div>
+      <div id="filledContent"></div>
+      <div class="print-footer"><div class="print-signature"><div class="line"></div>توقيع الموظف</div><div style="text-align:center;font-size:6px">بدون إطار خارجي • جداول داخلية فقط • احترافي وجميل • A4 كاملة</div><div class="print-signature"><div class="line"></div>مدير HR - الختم</div></div>
+    </div>
+  </div>
+</div>
+
+<div id="mobileBottomMenu" class="no-print">
+  <button class="mob-btn active" id="btnAddView" onclick="switchView('add')"><span class="mob-icon">➕</span><span class="mob-label">إضافة موظف</span></button>
+  <button class="mob-btn" id="btnSearchView" onclick="switchView('search')"><span class="mob-icon">🔍</span><span class="mob-label">بحث بالاسم</span></button>
+  <button class="mob-btn" onclick="printBlankForm()"><span class="mob-icon">🖨</span><span class="mob-label">طباعة فارغة</span></button>
+  <button class="mob-btn" onclick="printFilledForm()"><span class="mob-icon">📄</span><span class="mob-label">طباعة مملوء</span></button>
+  <button class="mob-btn" onclick="changeThemeToggle()"><span class="mob-icon" id="mobThemeIcon">🌙</span><span class="mob-label" id="mobThemeLabel">ليلي/نهاري</span></button>
+</div>
+
+<script>
+// ============ الدوال الأصلية بدون تعديل نهائياً - محفوظة كما هي ============
+const WORKER="https://turso-api.mostafa-voic77729.workers.dev";
+let currentStep=1; const totalSteps=6;
+let cache={};
+
+async function q(sql){
+  try{
+    const r=await fetch(`${WORKER}/api/turso`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sql})});
+    const j=await r.json(); return j.rows||j.data||[];
+  }catch(e){ console.log('❌ '+e.message); return []; }
+}
+function setSaveStatus(msg,type="info"){
+  const el=document.getElementById('saveStatus'); if(!el) return; el.style.display='block'; el.textContent=msg;
+  if(type==="success"){ el.style.background='rgba(16,185,129,0.15)'; el.style.color='#065f46'; el.style.border='1px solid rgba(16,185,129,0.3)'; }
+  if(type==="error"){ el.style.background='rgba(239,68,68,0.15)'; el.style.color='#991b1b'; el.style.border='1px solid rgba(239,68,68,0.3)'; }
+  if(type==="info"){ el.style.background='rgba(99,102,241,0.15)'; el.style.color='var(--acc)'; el.style.border='1px solid var(--border)'; }
+  // عرض الرسالة 3D أيضاً
+  showSaveModal3D(msg, type);
+}
+function changeTheme(theme){
+  document.documentElement.setAttribute('data-theme',theme);
+  localStorage.setItem('theme',theme);
+  const t=document.getElementById('themeToggle'); if(t) t.textContent=theme==='dark'?'☀':'🌙';
+  const icon=document.getElementById('mobThemeIcon'); if(icon) icon.textContent=theme==='dark'?'☀':'🌙';
+}
+function changeThemeToggle(){ const cur=document.documentElement.getAttribute('data-theme'); changeTheme(cur==='dark'?'light':'dark'); }
+function updateProgress(){
+  const pct=Math.round((currentStep/totalSteps)*100);
+  const bar=document.getElementById('progressBar'); if(bar) bar.style.width=pct+'%';
+  const txt=document.getElementById('progressText'); if(txt) txt.textContent=pct+'%';
+  const lbl=document.getElementById('stepLabel'); if(lbl) lbl.textContent=`الخطوة ${currentStep} من ${totalSteps}`;
+  document.querySelectorAll('.step').forEach((s,i)=>{
+    s.classList.remove('active','done');
+    if(i+1===currentStep) s.classList.add('active');
+    else if(i+1<currentStep) s.classList.add('done');
+  });
+}
+function showStep(n){
+  document.querySelectorAll('.step-panel').forEach(p=>p.style.display='none');
+  const panel=document.getElementById('panel'+n); if(panel) panel.style.display='block';
+  currentStep=n; updateProgress();
+  if(n===6) buildReview();
+  window.scrollTo({top:80,behavior:'smooth'});
+}
+function nextStep(){ if(currentStep<totalSteps) showStep(currentStep+1); }
+function prevStep(){ if(currentStep>1) showStep(currentStep-1); }
+function goToStep(n){ showStep(n); }
+function formatDateToDisplay(isoDate){
+  if(!isoDate) return '';
+  const parts=String(isoDate).split('-');
+  if(parts.length===3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  return isoDate;
+}
+function formatDisplayToISO(display){
+  if(!display) return '';
+  const parts=display.split('/');
+  if(parts.length===3){
+    const d=parts[0].padStart(2,'0'); const m=parts[1].padStart(2,'0'); const y=parts[2];
+    if(y.length===4) return `${y}-${m}-${d}`;
+  }
+  return '';
+}
+function setDateValue(hiddenId, isoValue){
+  const hidden=document.getElementById(hiddenId);
+  const display=document.getElementById(hiddenId+'_display');
+  if(hidden) hidden.value=isoValue||'';
+  if(display) display.value=formatDateToDisplay(isoValue||'');
+}
+function onDateInput(inputEl, hiddenId){
+  let val=inputEl.value.replace(/[^0-9]/g,'');
+  if(val.length>=2) val=val.slice(0,2)+'/'+val.slice(2);
+  if(val.length>=5) val=val.slice(0,5)+'/'+val.slice(5,9);
+  inputEl.value=val.slice(0,10);
+  const iso=formatDisplayToISO(inputEl.value);
+  const hidden=document.getElementById(hiddenId);
+  if(hidden) hidden.value=iso;
+}
+function parseNationalID(val){
+  if(val.length===14){
+    const year=val.substring(1,3); const month=val.substring(3,5); const day=val.substring(5,7);
+    const century=val[0]==='2'?'19':'20'; const fullYear=century+year;
+    const isoDate=`${fullYear}-${month}-${day}`;
+    setDateValue('تاريخ_الميلاد', isoDate);
+    const genderDigit=parseInt(val[12]); const gEl=document.getElementById('النوع'); if(gEl) gEl.value=genderDigit%2===0?'أنثى':'ذكر';
+    const govCode=val.substring(7,9);
+    const govs={'01':'القاهرة','02':'الإسكندرية','03':'بورسعيد','04':'السويس','11':'دمياط','12':'الدقهلية','13':'الشرقية','14':'القليوبية','15':'كفر الشيخ','16':'الغربية','17':'المنوفية','18':'البحيرة','19':'الإسماعيلية','21':'الجيزة','22':'بني سويف','23':'الفيوم','24':'المنيا','25':'أسيوط','26':'سوهاج','27':'قنا','28':'أسوان','29':'الأقصر','31':'البحر الأحمر','32':'الوادي الجديد','33':'مطروح','34':'شمال سيناء','35':'جنوب سيناء'};
+    if(govs[govCode]){ const je=document.getElementById('جهة_الميلاد'); if(je) je.value=govs[govCode]; }
+  }
+}
+async function loadSelect(table, valueField, nameField, selectId, filterSql=""){
+  const sql=`SELECT * FROM "${table.replace(/"/g,'""')}" ${filterSql} LIMIT 200`;
+  const rows=await q(sql);
+  cache[table]=rows;
+  const sel=document.getElementById(selectId); if(!sel) return rows;
+  const currentVal=sel.value;
+  sel.innerHTML=`<option value="">-- اختر من ${table} --</option>`;
+  rows.forEach(r=>{
+    const val=r[valueField]??r[Object.keys(r)[0]];
+    const name=r[nameField]??r[Object.keys(r)[1]]??val;
+    const code=r['كود_'+table.replace('ال','')]||r['كود_المحطة']||r['كود_الإدارة']||r['كود_الوظيفة']||r['كود_المجموعة']||'';
+    const opt=document.createElement('option');
+    opt.value=val;
+    opt.textContent=`${name} ${code?'('+code+')':''}`;
+    opt.dataset.name=name;
+    opt.dataset.code=code;
+    sel.appendChild(opt);
+  });
+  if(currentVal) sel.value=currentVal;
+  return rows;
+}
+function showDisplay(selectId, tableName){
+  const sel=document.getElementById(selectId); if(!sel) return;
+  const opt=sel.options[sel.selectedIndex];
+  const displayName=document.getElementById('display_'+selectId.replace('رقم_',''));
+  const displayCode=document.getElementById('code_'+selectId.replace('رقم_',''));
+  if(displayName) displayName.textContent=opt?.dataset?.name?`الاسم: ${opt.dataset.name}`:'';
+  if(displayCode) displayCode.textContent=opt?.value?`الكود المحفوظ: ${opt.value} ${opt.dataset.code?'('+opt.dataset.code+')':''}`:'';
+  const trigger=document.getElementById('trigger_'+selectId);
+  if(trigger && opt && opt.value){ trigger.textContent = `${opt.dataset.name} (${opt.value})`; trigger.classList.add('has-value'); }
+}
+async function onSectorChange(sectorId){
+  showDisplay('رقم_القطاع','القطاعات');
+  if(sectorId){
+    await loadSelect('المحطات','رقم_المحطة','اسم_المحطة','رقم_المحطة',`WHERE رقم_القطاع=${sectorId}`);
+    await loadSelect('الإدارات_العامة','رقم_الإدارة_العامة','اسم_الإدارة_العامة','رقم_الإدارة_العامة',`WHERE رقم_القطاع=${sectorId}`);
+  }else{
+    await loadSelect('المحطات','رقم_المحطة','اسم_المحطة','رقم_المحطة');
+    await loadSelect('الإدارات_العامة','رقم_الإدارة_العامة','اسم_الإدارة_العامة','رقم_الإدارة_العامة');
+  }
+}
+async function onGenDeptChange(genId){
+  showDisplay('رقم_الإدارة_العامة','الإدارات_العامة');
+  if(genId){ await loadSelect('الإدارات','رقم_الإدارة','اسم_الإدارة','رقم_الإدارة',`WHERE رقم_الإدارة_العامة=${genId}`); }
+}
+async function onGroupChange(groupId){
+  showDisplay('رقم_المجموعة','المجموعات_الوظيفية');
+  if(groupId){ await loadSelect('الوظائف','رقم_الوظيفة','اسم_الوظيفة','رقم_الوظيفة',`WHERE رقم_المجموعة=${groupId}`); }
+}
+async function onJobChange(jobId){
+  showDisplay('رقم_الوظيفة','الوظائف');
+  if(jobId){ await loadSelect('تخصصات_الوظائف','رقم_تخصص_الوظيفة','اسم_تخصص_الوظيفة','رقم_تخصص_الوظيفة',`WHERE رقم_الوظيفة=${jobId}`); }
+}
+async function onQualCatChange(catId){
+  showDisplay('رقم_فئة_المؤهل','فئات_المؤهلات');
+  if(catId){ await loadSelect('أنواع_المؤهلات','رقم_النوع','اسم_المؤهل','رقم_نوع_المؤهل',`WHERE رقم_الفئة=${catId}`); }
+}
+async function onQualTypeChange(typeId){
+  showDisplay('رقم_نوع_المؤهل','أنواع_المؤهلات');
+  if(typeId){ await loadSelect('تخصصات_المؤهلات','رقم_التخصص','اسم_التخصص','رقم_التخصص',`WHERE رقم_النوع=${typeId}`); }
+}
+async function loadAll(){
+  await loadSelect('القطاعات','رقم_القطاع','اسم_القطاع','رقم_القطاع');
+  await loadSelect('المحطات','رقم_المحطة','اسم_المحطة','رقم_المحطة');
+  await loadSelect('الإدارات_العامة','رقم_الإدارة_العامة','اسم_الإدارة_العامة','رقم_الإدارة_العامة');
+  await loadSelect('الإدارات','رقم_الإدارة','اسم_الإدارة','رقم_الإدارة');
+  await loadSelect('المجموعات_الوظيفية','رقم_المجموعة','اسم_المجموعة','رقم_المجموعة');
+  await loadSelect('الوظائف','رقم_الوظيفة','اسم_الوظيفة','رقم_الوظيفة');
+  await loadSelect('تخصصات_الوظائف','رقم_تخصص_الوظيفة','اسم_تخصص_الوظيفة','رقم_تخصص_الوظيفة');
+  await loadSelect('فئات_المؤهلات','رقم_الفئة','اسم_الفئة','رقم_فئة_المؤهل');
+  await loadSelect('أنواع_المؤهلات','رقم_النوع','اسم_المؤهل','رقم_نوع_المؤهل');
+  await loadSelect('تخصصات_المؤهلات','رقم_التخصص','اسم_التخصص','رقم_التخصص');
+  const cnt=await q(`SELECT COUNT(*) as c FROM "الموظفون"`);
+  const el=document.getElementById('empCount'); if(el) el.textContent=`الموظفون: ${cnt[0]?.c||0}`;
+  const nextCode=await getNextEmployeeCode();
+  const badge=document.getElementById('autoCodeBadge'); if(badge) badge.textContent=`كود تلقائي: ${nextCode}`;
+  const codeEl=document.getElementById('الكود_البنكى');
+  if(codeEl && !codeEl.value){ codeEl.value=nextCode; }
+  const jobAssignedEl=document.getElementById('الوظيفة_المعين_عليها');
+  if(jobAssignedEl && !jobAssignedEl.value){ jobAssignedEl.value='مؤقت'; }
+}
+function getVal(id){ const el=document.getElementById(id); return el?el.value.trim():''; }
+function getDateDisplay(id){
+  const displayEl=document.getElementById(id+'_display');
+  if(displayEl) return displayEl.value.trim();
+  return getVal(id);
+}
+function buildReview(){
+  const fields=[
+    ['الكود البنكي',getVal('الكود_البنكى')],
+    ['اسم العامل',getVal('اسم_العامل')],
+    ['الرقم القومي',getVal('الرقم_القومى')],
+    ['تاريخ الميلاد',getDateDisplay('تاريخ_الميلاد')],
+    ['القطاع',document.getElementById('رقم_القطاع')?.options[document.getElementById('رقم_القطاع').selectedIndex]?.dataset?.name],
+    ['المحطة',document.getElementById('رقم_المحطة')?.options[document.getElementById('رقم_المحطة').selectedIndex]?.dataset?.name],
+    ['الوظيفة',document.getElementById('رقم_الوظيفة')?.options[document.getElementById('رقم_الوظيفة').selectedIndex]?.dataset?.name],
+    ['الوظيفة المعين عليها',getVal('الوظيفة_المعين_عليها')],
+  ];
+  let html='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">';
+  fields.forEach(f=>{ if(f[1] && f[1]!=='()') html+=`<div style="border:1px solid var(--border);border-radius:8px;padding:6px"><b style="color:var(--acc)">${f[0]}:</b> ${f[1]}</div>`; });
+  html+='</div>';
+  const ra=document.getElementById('reviewArea'); if(ra) ra.innerHTML=html;
+}
+async function saveEmployee(){
+  const الكود_البنكى=getVal('الكود_البنكى');
+  const اسم_العامل=getVal('اسم_العامل');
+  const الرقم_القومى=getVal('الرقم_القومى');
+  if(!الكود_البنكى||!اسم_العامل||!الرقم_القومى){ alert('الكود البنكي واسم العامل والرقم القومي إلزامي'); goToStep(1); return; }
+  if(الرقم_القومى.length!==14){ alert('الرقم القومي يجب أن يكون 14 رقم'); return; }
+  setSaveStatus('⏳ جاري الحفظ...','info');
+  try{
+    const empData={
+      الكود_البنكى, اسم_العامل, الرقم_القومى,
+      تاريخ_الميلاد:getVal('تاريخ_الميلاد')||null,
+      جهة_الميلاد:getVal('جهة_الميلاد')||null,
+      الديانة:getVal('الديانة')||null,
+      النوع:getVal('النوع')||'ذكر',
+      الموقف_من_التجنيد:getVal('الموقف_من_التجنيد')||null,
+      الرقم_التأمينى:getVal('الرقم_التأمينى')||null,
+      تاريخ_التعيين:getVal('تاريخ_التعيين')||null,
+      رقم_القطاع:getVal('رقم_القطاع')?parseInt(getVal('رقم_القطاع')):null,
+      رقم_المحطة:getVal('رقم_المحطة')?parseInt(getVal('رقم_المحطة')):null,
+      رقم_الإدارة_العامة:getVal('رقم_الإدارة_العامة')?parseInt(getVal('رقم_الإدارة_العامة')):null,
+      رقم_الإدارة:getVal('رقم_الإدارة')?parseInt(getVal('رقم_الإدارة')):null,
+      رقم_المجموعة:getVal('رقم_المجموعة')?parseInt(getVal('رقم_المجموعة')):null,
+      رقم_الوظيفة:getVal('رقم_الوظيفة')?parseInt(getVal('رقم_الوظيفة')):null,
+      رقم_تخصص_الوظيفة:getVal('رقم_تخصص_الوظيفة')?parseInt(getVal('رقم_تخصص_الوظيفة')):null,
+      رقم_فئة_المؤهل:getVal('رقم_فئة_المؤهل')?parseInt(getVal('رقم_فئة_المؤهل')):null,
+      رقم_نوع_المؤهل:getVal('رقم_نوع_المؤهل')?parseInt(getVal('رقم_نوع_المؤهل')):null,
+      رقم_التخصص:getVal('رقم_التخصص')?parseInt(getVal('رقم_التخصص')):null,
+      الوظيفة_المعين_عليها:getVal('الوظيفة_المعين_عليها')||'مؤقت',
+      رقم_الهاتف:getVal('رقم_الهاتف')||getVal('رقم_الموبايل')||null,
+      ملاحظات:getVal('ملاحظات')||null,
+    };
+    const existingByCode=await q(`SELECT "الكود_البنكى" FROM "الموظفون" WHERE "الكود_البنكى"='${الكود_البنكى.replace(/'/g,"''")}' LIMIT 1`);
+    const existingByNational=await q(`SELECT "الكود_البنكى" FROM "الموظفون" WHERE "الرقم_القومى"='${الرقم_القومى.replace(/'/g,"''")}' AND "الكود_البنكى"!='${الكود_البنكى.replace(/'/g,"''")}' LIMIT 1`);
+    if(existingByNational.length>0){ alert(`❌ الرقم القومي موجود للموظف ${existingByNational[0]['الكود_البنكى']}`); setSaveStatus(`❌ الرقم القومي موجود للموظف ${existingByNational[0]['الكود_البنكى']}`,'error'); return; }
+    let saveMode='';
+    if(isEditMode && existingByCode.length>0){
+      saveMode='تعديل';
+      const setClauses=Object.keys(empData).filter(k=>k!=='الكود_البنكى').map(k=>{
+        const v=empData[k];
+        if(v===null) return `"${k.replace(/"/g,'""')}"=NULL`;
+        if(typeof v==='number') return `"${k.replace(/"/g,'""')}"=${v}`;
+        return `"${k.replace(/"/g,'""')}"='${String(v).replace(/'/g,"''")}'`;
+      }).join(',');
+      await q(`UPDATE "الموظفون" SET ${setClauses} WHERE "الكود_البنكى"='${الكود_البنكى.replace(/'/g,"''")}'`);
+    }else{
+      if(existingByCode.length>0 && !isEditMode){
+        const next=await getNextEmployeeCode();
+        document.getElementById('الكود_البنكى').value=next;
+        setSaveStatus(`❌ الكود موجود - تم اقتراح ${next}`,'error'); return;
+      }
+      saveMode='إضافة جديد';
+      const cols=Object.keys(empData).filter(k=>empData[k]!==null&&empData[k]!=='');
+      const vals=cols.map(k=>{
+        const v=empData[k];
+        if(typeof v==='number') return v;
+        if(v===null) return 'NULL';
+        return `'${String(v).replace(/'/g,"''")}'`;
+      });
+      await q(`INSERT INTO "الموظفون" ("${cols.map(c=>c.replace(/"/g,'""')).join('","')}") VALUES (${vals.join(',')})`);
+    }
+    const عنوان=getVal('العنوان_الكامل');
+    if(عنوان){
+      await q(`DELETE FROM "عناوين_الموظفين" WHERE "الكود_البنكى"='${الكود_البنكى.replace(/'/g,"''")}' AND "هل_أساسي"=1`);
+      await q(`INSERT INTO "عناوين_الموظفين" ("الكود_البنكى","نوع_العنوان","العنوان_الكامل","رقم_الموبايل","الرقم_الأرضى","البريد_الإلكترونى","هل_أساسي") VALUES ('${الكود_البنكى.replace(/'/g,"''")}','${getVal('نوع_العنوان')}','${عنوان.replace(/'/g,"''")}','${getVal('رقم_الموبايل')}','${getVal('الرقم_الأرضى')}','${getVal('البريد_الإلكترونى')}','1')`);
+    }
+    const اسم_الدرجة=getVal('اسم_الدرجة');
+    if(اسم_الدرجة){
+      if(isEditMode){ await q(`UPDATE "الدرجات_الوظيفية" SET "هل_حالية"=0 WHERE "الكود_البنكى"='${الكود_البنكى.replace(/'/g,"''")}'`); }
+      await q(`INSERT INTO "الدرجات_الوظيفية" ("الكود_البنكى","اسم_الدرجة","رقم_الدرجة","الفئة_المالية","تاريخ_الدرجة","هل_حالية") VALUES ('${الكود_البنكى.replace(/'/g,"''")}','${اسم_الدرجة.replace(/'/g,"''")}','${getVal('رقم_الدرجة')}','${getVal('الفئة_المالية')}','${getVal('تاريخ_الدرجة')||new Date().toISOString().slice(0,10)}',1)`);
+    }
+    const اسم_المستخدم=getVal('اسم_المستخدم');
+    const كلمة_المرور=getVal('كلمة_المرور')||'123456';
+    if(اسم_المستخدم||getVal('نوع_الصلاحية')!=='User'){
+      const permExist=await q(`SELECT "الكود_البنكى" FROM "صلاحيات_المستخدمين" WHERE "الكود_البنكى"='${الكود_البنكى.replace(/'/g,"''")}' LIMIT 1`);
+      if(permExist.length>0){
+        await q(`UPDATE "صلاحيات_المستخدمين" SET "الرقم_القومى"='${الرقم_القومى.replace(/'/g,"''")}','اسم_المستخدم"='${(اسم_المستخدم||الكود_البنكى).replace(/'/g,"''")}','كلمة_المرور_المشفرة"='${كلمة_المرور.replace(/'/g,"''")}','نوع_الصلاحية"='${getVal('نوع_الصلاحية')}',"هل_نشط"=1 WHERE "الكود_البنكى"='${الكود_البنكى.replace(/'/g,"''")}'`);
+      }else{
+        await q(`INSERT INTO "صلاحيات_المستخدمين" ("الكود_البنكى","الرقم_القومى","اسم_المستخدم","كلمة_المرور_المشفرة","نوع_الصلاحية","هل_نشط") VALUES ('${الكود_البنكى.replace(/'/g,"''")}','${الرقم_القومى.replace(/'/g,"''")}','${(اسم_المستخدم||الكود_البنكى).replace(/'/g,"''")}','${كلمة_المرور.replace(/'/g,"''")}','${getVal('نوع_الصلاحية')}',1)`);
+      }
+    }
+    setSaveStatus(`🎉 تم ${saveMode} ${اسم_العامل} (${الكود_البنكى}) بنجاح`,'success');
+    const cnt=await q(`SELECT COUNT(*) as c FROM "الموظفون"`);
+    const el=document.getElementById('empCount'); if(el) el.textContent=`الموظفون: ${cnt[0]?.c||0}`;
+    const next=await getNextEmployeeCode();
+    const badge=document.getElementById('autoCodeBadge'); if(badge) badge.textContent=`كود تلقائي: ${next}`;
+  }catch(e){ setSaveStatus('❌ خطأ: '+e.message,'error'); }
+}
+function clearForm(){
+  if(!confirm('تفريغ جميع الحقول؟')) return;
+  document.querySelectorAll('.input').forEach(el=>{
+    if(el.id.startsWith('search')) return;
+    if(el.tagName==='SELECT') el.selectedIndex=0;
+    else if(!el.type || el.type!=='hidden') el.value='';
+  });
+  document.querySelectorAll('.display-name,.display-code').forEach(el=>el.textContent='');
+  const ra=document.getElementById('reviewArea'); if(ra) ra.innerHTML='';
+  setSaveStatus('','info'); const ss=document.getElementById('saveStatus'); if(ss) ss.style.display='none';
+  getNextEmployeeCode().then(next=>{
+    const codeEl=document.getElementById('الكود_البنكى'); if(codeEl) codeEl.value=next;
+    const badge=document.getElementById('autoCodeBadge'); if(badge) badge.textContent=`كود تلقائي: ${next}`;
+  });
+  const jobAssignedEl=document.getElementById('الوظيفة_المعين_عليها'); if(jobAssignedEl) jobAssignedEl.value='مؤقت';
+  const hint=document.getElementById('codeExistsHint'); if(hint) hint.style.display='none';
+  isEditMode=false; currentEditEmployee=null;
+  const badge=document.getElementById('modeBadge'); if(badge) badge.textContent='وضع: إضافة جديد';
+  showStep(1);
+  document.querySelectorAll('.custom-select-trigger').forEach(t=>{ t.textContent='-- اختر --'; t.classList.remove('has-value'); });
+}
+// ============ نهاية الدوال الأصلية بدون تعديل ============
+
+// ============ إضافات جديدة فقط - v15 ============
+let currentEditEmployee=null;
+let isEditMode=false;
+let bankCodeTimer=null;
+
+async function getNextEmployeeCode(){
+  try{
+    const rows=await q(`SELECT "الكود_البنكى" FROM "الموظفون"`);
+    let maxNum=0;
+    rows.forEach(r=>{
+      const code=r["الكود_البنكى"]||r[Object.values(r)[0]];
+      const num=parseInt(String(code).replace(/[^0-9]/g,''));
+      if(!isNaN(num) && num>maxNum) maxNum=num;
+    });
+    if(maxNum===0){
+      const m=await q(`SELECT MAX(CAST("الكود_البنكى" AS INTEGER)) as mx FROM "الموظفون"`);
+      maxNum=parseInt(m[0]?.mx||0);
+    }
+    return String(maxNum+1);
+  }catch(e){ return String(Date.now()).slice(-4); }
+}
+
+async function prepareNewEmployee(){
+  isEditMode=false; currentEditEmployee=null;
+  const badge=document.getElementById('modeBadge'); if(badge) badge.textContent='وضع: إضافة جديد';
+  document.querySelectorAll('.input').forEach(el=>{
+    if(el.id.startsWith('search')) return;
+    if(el.tagName==='SELECT') el.selectedIndex=0;
+    else if(!el.type || el.type!=='hidden') el.value='';
+  });
+  document.querySelectorAll('.display-name,.display-code').forEach(el=>el.textContent='');
+  const ra=document.getElementById('reviewArea'); if(ra) ra.innerHTML='';
+  const ss=document.getElementById('saveStatus'); if(ss) ss.style.display='none';
+  const hint=document.getElementById('codeExistsHint'); if(hint) hint.style.display='none';
+  const nextCode=await getNextEmployeeCode();
+  const codeEl=document.getElementById('الكود_البنكى'); if(codeEl){ codeEl.value=nextCode; }
+  const jobAssignedEl=document.getElementById('الوظيفة_المعين_عليها'); if(jobAssignedEl) jobAssignedEl.value='مؤقت';
+  const autoBadge=document.getElementById('autoCodeBadge'); if(autoBadge) autoBadge.textContent=`كود تلقائي: ${nextCode}`;
+  document.querySelectorAll('.custom-select-trigger').forEach(t=>{ t.textContent='-- اختر --'; t.classList.remove('has-value'); });
+  switchView('add'); showStep(1);
+}
+
+function onBankCodeInput(val){ clearTimeout(bankCodeTimer); if(!val) return; bankCodeTimer=setTimeout(()=>onBankCodeBlur(val), 800); }
+async function onBankCodeBlur(code){
+  if(!code) return;
+  const rows=await q(`SELECT * FROM "الموظفون" WHERE "الكود_البنكى"='${String(code).replace(/'/g,"''")}' LIMIT 1`);
+  const hint=document.getElementById('codeExistsHint');
+  if(rows.length>0){
+    if(hint){ hint.style.display='block'; hint.textContent=`✅ الكود موجود - تم العثور على: ${rows[0]['اسم_العامل']} - جاري تحميل البيانات للتعديل...`; }
+    currentEditEmployee=rows[0];
+    await loadEmployeeToFormSilent();
+    isEditMode=true;
+    const badge=document.getElementById('modeBadge'); if(badge) badge.textContent=`وضع: تعديل - ${code}`;
+  }else{
+    if(hint){ hint.style.display='block'; hint.style.color='#6366f1'; hint.textContent=`➕ كود جديد - سيتم الإضافة كموظف جديد`; setTimeout(()=>{ if(hint) hint.style.display='none'; },3000); }
+  }
+}
+
+// رسالة 3D احترافية
+function showSaveModal3D(msg, type){
+  const modal=document.getElementById('saveModal3D');
+  const icon=document.getElementById('saveModalIcon');
+  const title=document.getElementById('saveModalTitle');
+  const msgEl=document.getElementById('saveModalMsg');
+  if(!modal) return;
+  if(type==='success'){
+    icon.className='save-3d-icon success'; icon.textContent='🎉'; title.textContent='تم الحفظ بنجاح!';
+    msgEl.textContent=msg||'تم حفظ بيانات الموظف بنجاح في قاعدة البيانات';
+  }else if(type==='error'){
+    icon.className='save-3d-icon error'; icon.textContent='❌'; title.textContent='حدث خطأ!';
+    msgEl.textContent=msg||'حدث خطأ أثناء الحفظ، حاول مرة أخرى';
+  }else{
+    icon.className='save-3d-icon info'; icon.textContent='⏳'; title.textContent='جاري الحفظ...';
+    msgEl.textContent=msg||'يرجى الانتظار جاري حفظ البيانات...';
+    // لا نعرض modal للـ info الطويل
+    if(msg && msg.includes('جاري')) return;
+  }
+  modal.classList.add('show');
+  modal.style.display='flex';
+  if(type==='success' || type==='error'){
+    setTimeout(()=>{ closeSaveModal3D(); }, 3500);
+  }
+}
+function closeSaveModal3D(){
+  const modal=document.getElementById('saveModal3D');
+  if(modal){ modal.classList.remove('show'); setTimeout(()=>{ modal.style.display='none'; },300); }
+}
+
+// فلتر داخل القائمة مع دعم Tab و أسهم ↑↓
+function createInsideFilterSelect(selectId){
+  const sel = document.getElementById(selectId);
+  if(!sel || sel.dataset.customized) return;
+  sel.dataset.customized='1';
+  sel.style.display='none';
+  const wrapper = document.createElement('div');
+  wrapper.className='custom-select-wrapper';
+  wrapper.id='wrapper_'+selectId;
+  const trigger = document.createElement('div');
+  trigger.className='custom-select-trigger';
+  trigger.id='trigger_'+selectId;
+  trigger.tabIndex=0; // مهم لـ Tab
+  trigger.textContent = sel.options[sel.selectedIndex]?.textContent || '-- اختر --';
+  const optionsDiv = document.createElement('div');
+  optionsDiv.className='custom-options';
+  optionsDiv.id='options_'+selectId;
+  const filterRow = document.createElement('div');
+  filterRow.className='custom-filter-row';
+  filterRow.innerHTML = `<span>🔍</span><input type="text" placeholder="🔍 بحث - أول صف للفلترة - Tab للتنقل - ↑↓ للتحرك - Enter اختيار" id="insideFilter_${selectId}"><span class="custom-count" id="count_${selectId}">0</span><span style="cursor:pointer;font-size:14px" onclick="clearInsideFilter('${selectId}')">✖</span>`;
+  const listDiv = document.createElement('div');
+  listDiv.className='custom-options-list';
+  listDiv.id='list_'+selectId;
+  optionsDiv.appendChild(filterRow);
+  optionsDiv.appendChild(listDiv);
+  wrapper.appendChild(trigger);
+  wrapper.appendChild(optionsDiv);
+  sel.parentNode.insertBefore(wrapper, sel);
+
+  let highlightedIndex = -1;
+
+  function getVisibleOptions(){ return Array.from(listDiv.querySelectorAll('.custom-option')); }
+
+  function highlightOption(index){
+    const opts = getVisibleOptions();
+    opts.forEach(o=>o.classList.remove('highlighted'));
+    if(index>=0 && index < opts.length){
+      opts[index].classList.add('highlighted');
+      opts[index].scrollIntoView({block:'nearest'});
+      highlightedIndex = index;
+    }
+  }
+
+  function renderOptions(filterText=''){
+    listDiv.innerHTML='';
+    const ft = filterText.toLowerCase().trim();
+    const tableName = { 'رقم_المحطة':'المحطات','رقم_الإدارة_العامة':'الإدارات_العامة','رقم_الوظيفة':'الوظائف' }[selectId] || '';
+    const rows = cache[tableName] || [];
+    const emptyOpt = document.createElement('div');
+    emptyOpt.className='custom-option';
+    emptyOpt.innerHTML='<span>-- اختر --</span><span style="opacity:.5">مسح</span>';
+    emptyOpt.dataset.index=0;
+    emptyOpt.onclick = ()=>{ sel.value=''; trigger.textContent='-- اختر --'; trigger.classList.remove('has-value'); optionsDiv.classList.remove('open'); optionsDiv.classList.remove('open-up'); sel.dispatchEvent(new Event('change')); showDisplay(selectId, tableName); trigger.focus(); };
+    listDiv.appendChild(emptyOpt);
+    let count=0;
+    rows.forEach(r=>{
+      const val = r[selectId] ?? Object.values(r)[0];
+      const nameField = tableName==='المحطات'?'اسم_المحطة':tableName==='الإدارات_العامة'?'اسم_الإدارة_العامة':'اسم_الوظيفة';
+      const name = r[nameField] ?? Object.values(r)[1] ?? val;
+      const code = r['كود_المحطة']||r['كود_الإدارة']||r['كود_الوظيفة']||'';
+      if(ft && !String(name).toLowerCase().includes(ft) && !String(val).toLowerCase().includes(ft) && !String(code).toLowerCase().includes(ft)) return;
+      const div = document.createElement('div');
+      div.className='custom-option'+(String(sel.value)===String(val)?' selected':'');
+      div.innerHTML = `<span>${name}</span><small style="background:#f1f5f9;padding:2px 6px;border-radius:999px;font-size:9px">${val} ${code?'- '+code:''}</small>`;
+      div.dataset.val=val;
+      div.dataset.name=name;
+      div.onclick = ()=>{
+        sel.value=val;
+        trigger.textContent = `${name} (${val})`;
+        trigger.classList.add('has-value');
+        optionsDiv.classList.remove('open'); optionsDiv.classList.remove('open-up');
+        sel.dispatchEvent(new Event('change'));
+        if(selectId==='رقم_المحطة') showDisplay('رقم_المحطة','المحطات');
+        if(selectId==='رقم_الإدارة_العامة') onGenDeptChange(val);
+        if(selectId==='رقم_الوظيفة') onJobChange(val);
+        trigger.focus();
+        // الانتقال تلقائياً للحقل التالي بـ Tab
+        const nextTab = sel.tabIndex + 1;
+        const nextEl = document.querySelector(`[tabindex="${nextTab}"]`);
+        if(nextEl) setTimeout(()=>nextEl.focus(), 100);
+      };
+      listDiv.appendChild(div);
+      count++;
+    });
+    const countEl=document.getElementById('count_'+selectId);
+    if(countEl) countEl.textContent = ft?`${count} نتيجة`:`${rows.length}`;
+    highlightedIndex = -1;
+  }
+
+  // دعم Tab و Enter و أسهم
+  trigger.addEventListener('keydown', (e)=>{
+    const opts = getVisibleOptions();
+    if(e.key==='Enter' || e.key===' '){
+      e.preventDefault();
+      if(!optionsDiv.classList.contains('open')){
+        trigger.click();
+      }else{
+        // إذا فيه highlighted اختاره
+        if(highlightedIndex>=0 && opts[highlightedIndex]){
+          opts[highlightedIndex].click();
+        }
+      }
+    }else if(e.key==='ArrowDown'){
+      e.preventDefault();
+      if(!optionsDiv.classList.contains('open')) trigger.click();
+      else{
+        const next = Math.min(highlightedIndex+1, opts.length-1);
+        highlightOption(next);
+      }
+    }else if(e.key==='ArrowUp'){
+      e.preventDefault();
+      if(optionsDiv.classList.contains('open')){
+        const prev = Math.max(highlightedIndex-1, 0);
+        highlightOption(prev);
+      }
+    }else if(e.key==='Escape'){
+      optionsDiv.classList.remove('open'); optionsDiv.classList.remove('open-up');
+    }else if(e.key==='Tab'){
+      // عند Tab أغلق القائمة واسمح بالانتقال الطبيعي
+      optionsDiv.classList.remove('open'); optionsDiv.classList.remove('open-up');
+      // لا نمنع الحدث - يسمح للـ Tab بالعمل طبيعي
+    }
+  });
+
+  trigger.onclick = (e)=>{
+    e.stopPropagation();
+    const isOpen = optionsDiv.classList.contains('open');
+    document.querySelectorAll('.custom-options').forEach(o=>{ o.classList.remove('open'); o.classList.remove('open-up'); });
+    if(!isOpen){
+      const rect = wrapper.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const spaceAbove = rect.top;
+      const shouldOpenUp = spaceBelow < 280 && spaceAbove > spaceBelow;
+      optionsDiv.classList.add('open');
+      if(shouldOpenUp) optionsDiv.classList.add('open-up');
+      renderOptions(document.getElementById('insideFilter_'+selectId).value||'');
+      setTimeout(()=>document.getElementById('insideFilter_'+selectId).focus(), 50);
+    }
+  };
+  
+  document.addEventListener('click', (e)=>{ if(!wrapper.contains(e.target)) { optionsDiv.classList.remove('open'); optionsDiv.classList.remove('open-up'); } });
+
+  const filterInput = filterRow.querySelector('input');
+  filterInput.addEventListener('input', (e)=>{ renderOptions(e.target.value); });
+  filterInput.addEventListener('click', (e)=>e.stopPropagation());
+  filterInput.addEventListener('keydown', (e)=>{
+    const opts = getVisibleOptions();
+    if(e.key==='ArrowDown'){
+      e.preventDefault();
+      const next = Math.min(highlightedIndex+1, opts.length-1);
+      highlightOption(next);
+    }else if(e.key==='ArrowUp'){
+      e.preventDefault();
+      const prev = Math.max(highlightedIndex-1, 0);
+      highlightOption(prev);
+    }else if(e.key==='Enter'){
+      e.preventDefault();
+      if(highlightedIndex>=0 && opts[highlightedIndex]){
+        opts[highlightedIndex].click();
+      }
+    }else if(e.key==='Escape'){
+      optionsDiv.classList.remove('open'); optionsDiv.classList.remove('open-up'); trigger.focus();
+    }else if(e.key==='Tab'){
+      // Tab من داخل الفلتر ينتقل للحقل التالي
+      optionsDiv.classList.remove('open'); optionsDiv.classList.remove('open-up');
+      // لا نمنع Tab
+    }
+    e.stopPropagation();
+  });
+
+  sel._customRender = renderOptions;
+  sel._customTrigger = trigger;
+}
+function clearInsideFilter(selectId){
+  const inp = document.getElementById('insideFilter_'+selectId);
+  if(inp){ inp.value=''; const sel=document.getElementById(selectId); if(sel && sel._customRender) sel._customRender(''); inp.focus(); }
+}
+function initAllInsideFilters(){
+  ['رقم_المحطة','رقم_الإدارة_العامة','رقم_الوظيفة'].forEach(id=>createInsideFilterSelect(id));
+}
+
+function buildFilledA4Tables(){
+  const secName = document.getElementById('رقم_القطاع')?.options[document.getElementById('رقم_القطاع').selectedIndex]?.dataset?.name||'';
+  const staName = document.getElementById('رقم_المحطة')?.options[document.getElementById('رقم_المحطة').selectedIndex]?.dataset?.name||'';
+  const genName = document.getElementById('رقم_الإدارة_العامة')?.options[document.getElementById('رقم_الإدارة_العامة').selectedIndex]?.dataset?.name||'';
+  const deptName = document.getElementById('رقم_الإدارة')?.options[document.getElementById('رقم_الإدارة').selectedIndex]?.dataset?.name||'';
+  const groupName = document.getElementById('رقم_المجموعة')?.options[document.getElementById('رقم_المجموعة').selectedIndex]?.dataset?.name||'';
+  const jobName = document.getElementById('رقم_الوظيفة')?.options[document.getElementById('رقم_الوظيفة').selectedIndex]?.dataset?.name||'';
+  const jobSpec = document.getElementById('رقم_تخصص_الوظيفة')?.options[document.getElementById('رقم_تخصص_الوظيفة').selectedIndex]?.textContent||'';
+  const qualCat = document.getElementById('رقم_فئة_المؤهل')?.options[document.getElementById('رقم_فئة_المؤهل').selectedIndex]?.dataset?.name||'';
+  const qualType = document.getElementById('رقم_نوع_المؤهل')?.options[document.getElementById('رقم_نوع_المؤهل').selectedIndex]?.dataset?.name||'';
+  const qualSpec = document.getElementById('رقم_التخصص')?.options[document.getElementById('رقم_التخصص').selectedIndex]?.dataset?.name||'';
+  return `
+    <table class="print-table">
+      <tr><td class="lbl">الكود البنكي</td><td class="val"><b>${getVal('الكود_البنكى')}</b></td><td class="lbl">اسم العامل</td><td class="val"><b>${getVal('اسم_العامل')}</b></td></tr>
+      <tr><td class="lbl">الرقم القومي</td><td class="val">${getVal('الرقم_القومى')}</td><td class="lbl">تاريخ الميلاد</td><td class="val">${getDateDisplay('تاريخ_الميلاد')}</td></tr>
+      <tr><td class="lbl">جهة الميلاد</td><td class="val">${getVal('جهة_الميلاد')}</td><td class="lbl">الديانة / النوع</td><td class="val">${getVal('الديانة')} / ${getVal('النوع')}</td></tr>
+      <tr><td class="lbl">التجنيد / التأميني</td><td class="val">${getVal('الموقف_من_التجنيد')} / ${getVal('الرقم_التأمينى')}</td><td class="lbl">تاريخ التعيين</td><td class="val">${getDateDisplay('تاريخ_التعيين')}</td></tr>
+      <tr><td class="lbl">الوظيفة المعين عليها</td><td class="val" colspan="3" style="background:#fffbe6"><b>${getVal('الوظيفة_المعين_عليها')||'مؤقت'}</b></td></tr>
+    </table>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:5px">
+      <div class="print-sec"><div class="print-sec-title"><span>🏢 القطاع والمحطة + الإدارات</span></div><table class="print-table"><tr><td class="lbl" style="width:30%">القطاع</td><td class="val">${secName} (${getVal('رقم_القطاع')})</td></tr><tr><td class="lbl">المحطة</td><td class="val">${staName} (${getVal('رقم_المحطة')})</td></tr><tr><td class="lbl">إدارة عامة</td><td class="val">${genName}</td></tr><tr><td class="lbl">الإدارة</td><td class="val">${deptName}</td></tr></table></div>
+      <div class="print-sec"><div class="print-sec-title"><span>💼 الوظيفة + 🎓 المؤهل</span></div><table class="print-table"><tr><td class="lbl" style="width:30%">المجموعة</td><td class="val">${groupName}</td></tr><tr><td class="lbl">الوظيفة</td><td class="val">${jobName}</td></tr><tr><td class="lbl">تخصص وظيفة</td><td class="val">${jobSpec}</td></tr><tr><td class="lbl">المؤهل</td><td class="val">${qualCat} / ${qualType} / ${qualSpec}</td></tr></table></div>
+    </div>
+    <div class="print-sec" style="margin-top:5px"><div class="print-sec-title"><span>📍 العنوان والاتصال والدرجة والصلاحيات</span></div><table class="print-table"><tr><td class="lbl-sm" style="width:12%">نوع العنوان</td><td class="val-sm" style="width:13%">${getVal('نوع_العنوان')}</td><td class="lbl-sm" style="width:10%">موبايل</td><td class="val-sm" style="width:15%">${getVal('رقم_الموبايل')}</td><td class="lbl-sm" style="width:10%">أرضي</td><td class="val-sm" style="width:15%">${getVal('الرقم_الأرضى')}</td><td class="lbl-sm" style="width:10%">بريد</td><td class="val-sm" style="width:15%">${getVal('البريد_الإلكترونى')}</td></tr><tr><td class="lbl-sm">العنوان الكامل</td><td class="val-sm" colspan="7">${getVal('العنوان_الكامل')} - هاتف: ${getVal('رقم_الهاتف')}</td></tr><tr><td class="lbl-sm">الدرجة</td><td class="val-sm">${getVal('اسم_الدرجة')} ${getVal('رقم_الدرجة')} ${getVal('الفئة_المالية')} - ${getDateDisplay('تاريخ_الدرجة')}</td><td class="lbl-sm">صلاحية</td><td class="val-sm">${getVal('نوع_الصلاحية')}</td><td class="lbl-sm">مستخدم</td><td class="val-sm">${getVal('اسم_المستخدم')}</td><td class="lbl-sm">ملاحظات</td><td class="val-sm">${getVal('ملاحظات')}</td></tr></table></div>
+  `;
+}
+
+async function searchEmployee(){
+  const code=document.getElementById('searchCode')?.value.trim()||'';
+  const national=document.getElementById('searchNational')?.value.trim()||'';
+  const name=document.getElementById('searchName')?.value.trim()||'';
+  if(!code && !national && !name){ alert('أدخل كود أو قومي أو اسم للبحث'); return; }
+  let where=[];
+  if(code) where.push(`"الكود_البنكى" LIKE '%${code.replace(/'/g,"''")}%'`);
+  if(national) where.push(`"الرقم_القومى" LIKE '%${national.replace(/'/g,"''")}%'`);
+  if(name) where.push(`"اسم_العامل" LIKE '%${name.replace(/'/g,"''")}%'`);
+  const whereClause=where.length?`WHERE ${where.join(' OR ')}`:'';
+  const rows=await q(`SELECT * FROM "الموظفون" ${whereClause} LIMIT 50`);
+  const rc=document.getElementById('searchResultCount'); if(rc) rc.textContent=`نتائج: ${rows.length}`;
+  const sr=document.getElementById('searchResults'); if(sr) sr.style.display=rows.length?'block':'none';
+  const tbody=document.getElementById('searchTableBody'); if(!tbody) return;
+  tbody.innerHTML='';
+  for(let r of rows){
+    let stationName='-'; let jobName='-';
+    if(r['رقم_المحطة']){
+      const st=cache['المحطات']?.find(x=>String(x['رقم_المحطة'])===String(r['رقم_المحطة']));
+      stationName=st?st['اسم_المحطة']:r['رقم_المحطة'];
+    }
+    if(r['رقم_الوظيفة']){
+      const jb=cache['الوظائف']?.find(x=>String(x['رقم_الوظيفة'])===String(r['رقم_الوظيفة']));
+      jobName=jb?jb['اسم_الوظيفة']:r['رقم_الوظيفة'];
+    }
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td style="padding:6px;border:1px solid var(--border);text-align:center">${r['الكود_البنكى']}</td>
+      <td style="padding:6px;border:1px solid var(--border)">${r['اسم_العامل']}</td>
+      <td style="padding:6px;border:1px solid var(--border);text-align:center">${r['الرقم_القومى']||''}</td>
+      <td style="padding:6px;border:1px solid var(--border)">${stationName}</td>
+      <td style="padding:6px;border:1px solid var(--border)">${jobName}</td>
+      <td style="padding:6px;border:1px solid var(--border);text-align:center">
+        <button class="btn" style="height:28px;font-size:9px" onclick="viewEmployee('${r['الكود_البنكى']}')">👁 عرض</button>
+        <button class="btn btn-p" style="height:28px;font-size:9px" onclick="editEmployee('${r['الكود_البنكى']}')">✏ تعديل</button>
+      </td>`;
+    tbody.appendChild(tr);
+  }
+  if(rows.length===1){ viewEmployee(rows[0]['الكود_البنكى']); }
+}
+
+async function viewEmployee(code){
+  const rows=await q(`SELECT * FROM "الموظفون" WHERE "الكود_البنكى"='${String(code).replace(/'/g,"''")}' LIMIT 1`);
+  if(!rows.length){ alert('الموظف غير موجود'); return; }
+  const emp=rows[0]; currentEditEmployee=emp;
+  const addrRows=await q(`SELECT * FROM "عناوين_الموظفين" WHERE "الكود_البنكى"='${String(code).replace(/'/g,"''")}' AND "هل_أساسي"=1 LIMIT 1`);
+  const addr=addrRows[0]||{};
+  const getName=(table, idField, idVal, nameField)=>{
+    if(!idVal) return '-';
+    const row=cache[table]?.find(x=>String(x[idField])===String(idVal));
+    return row?row[nameField]:idVal;
+  };
+  const sectorName=getName('القطاعات','رقم_القطاع',emp['رقم_القطاع'],'اسم_القطاع');
+  const stationName=getName('المحطات','رقم_المحطة',emp['رقم_المحطة'],'اسم_المحطة');
+  const html=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px">
+      <div style="grid-column:1/-1;padding:10px;background:var(--fantasy2);border-radius:12px;border-right:4px solid var(--acc)">
+        <b style="font-size:14px">👤 ${emp['اسم_العامل']} - كود: ${emp['الكود_البنكى']}</b><br>
+        <span style="font-size:10px;color:var(--text2)">قومي: ${emp['الرقم_القومى']||'-'} - ميلاد: ${formatDateToDisplay(emp['تاريخ_الميلاد']||'')} - تعيين: ${formatDateToDisplay(emp['تاريخ_التعيين']||'')}</span>
+      </div>
+      <div style="border:1.5px solid var(--border);border-radius:10px;padding:8px"><b>القطاع:</b> ${sectorName}</div>
+      <div style="border:1.5px solid var(--border);border-radius:10px;padding:8px"><b>المحطة:</b> ${stationName}</div>
+      <div style="border:1.5px solid var(--border);border-radius:10px;padding:8px"><b>العنوان:</b> ${addr['العنوان_الكامل']||'-'}</div>
+      <div style="border:1.5px solid var(--border);border-radius:10px;padding:8px"><b>الموبايل:</b> ${addr['رقم_الموبايل']||'-'}</div>
+    </div>`;
+  const content=document.getElementById('employeeDisplayContent'); if(content) content.innerHTML=html;
+  const card=document.getElementById('employeeDisplayCard'); if(card){ card.style.display='block'; }
+}
+
+async function editEmployee(code){ await viewEmployee(code); setTimeout(()=>loadEmployeeToForm(),400); }
+
+async function loadEmployeeToFormSilent(){
+  if(!currentEditEmployee) return;
+  const emp=currentEditEmployee;
+  document.getElementById('الكود_البنكى').value=emp['الكود_البنكى']||'';
+  document.getElementById('اسم_العامل').value=emp['اسم_العامل']||'';
+  document.getElementById('الرقم_القومى').value=emp['الرقم_القومى']||'';
+  setDateValue('تاريخ_الميلاد', emp['تاريخ_الميلاد']||'');
+  document.getElementById('جهة_الميلاد').value=emp['جهة_الميلاد']||'';
+  document.getElementById('الديانة').value=emp['الديانة']||'';
+  document.getElementById('النوع').value=emp['النوع']||'ذكر';
+  document.getElementById('الموقف_من_التجنيد').value=emp['الموقف_من_التجنيد']||'';
+  document.getElementById('الرقم_التأمينى').value=emp['الرقم_التأمينى']||'';
+  setDateValue('تاريخ_التعيين', emp['تاريخ_التعيين']||'');
+  document.getElementById('الوظيفة_المعين_عليها').value=emp['الوظيفة_المعين_عليها']||'مؤقت';
+  document.getElementById('ملاحظات').value=emp['ملاحظات']||'';
+  document.getElementById('رقم_الهاتف').value=emp['رقم_الهاتف']||'';
+  if(emp['رقم_القطاع']){ document.getElementById('رقم_القطاع').value=emp['رقم_القطاع']; await onSectorChange(emp['رقم_القطاع']); }
+  setTimeout(async()=>{
+    if(emp['رقم_المحطة']){ document.getElementById('رقم_المحطة').value=emp['رقم_المحطة']; showDisplay('رقم_المحطة','المحطات'); }
+    if(emp['رقم_الإدارة_العامة']){ document.getElementById('رقم_الإدارة_العامة').value=emp['رقم_الإدارة_العامة']; await onGenDeptChange(emp['رقم_الإدارة_العامة']); }
+  },500);
+  setTimeout(()=>{
+    if(emp['رقم_الإدارة']){ document.getElementById('رقم_الإدارة').value=emp['رقم_الإدارة']; showDisplay('رقم_الإدارة','الإدارات'); }
+    if(emp['رقم_المجموعة']){ document.getElementById('رقم_المجموعة').value=emp['رقم_المجموعة']; onGroupChange(emp['رقم_المجموعة']); }
+  },900);
+  setTimeout(()=>{
+    if(emp['رقم_الوظيفة']){ document.getElementById('رقم_الوظيفة').value=emp['رقم_الوظيفة']; onJobChange(emp['رقم_الوظيفة']); }
+    if(emp['رقم_فئة_المؤهل']){ document.getElementById('رقم_فئة_المؤهل').value=emp['رقم_فئة_المؤهل']; onQualCatChange(emp['رقم_فئة_المؤهل']); }
+  },1300);
+  setTimeout(()=>{
+    if(emp['رقم_تخصص_الوظيفة']){ document.getElementById('رقم_تخصص_الوظيفة').value=emp['رقم_تخصص_الوظيفة']; }
+    if(emp['رقم_نوع_المؤهل']){ document.getElementById('رقم_نوع_المؤهل').value=emp['رقم_نوع_المؤهل']; onQualTypeChange(emp['رقم_نوع_المؤهل']); }
+  },1700);
+  setTimeout(()=>{ if(emp['رقم_التخصص']){ document.getElementById('رقم_التخصص').value=emp['رقم_التخصص']; } },2100);
+  q(`SELECT * FROM "عناوين_الموظفين" WHERE "الكود_البنكى"='${String(emp['الكود_البنكى']).replace(/'/g,"''")}' LIMIT 1`).then(rows=>{
+    if(rows[0]){
+      document.getElementById('العنوان_الكامل').value=rows[0]['العنوان_الكامل']||'';
+      document.getElementById('رقم_الموبايل').value=rows[0]['رقم_الموبايل']||'';
+      document.getElementById('الرقم_الأرضى').value=rows[0]['الرقم_الأرضى']||'';
+      document.getElementById('البريد_الإلكترونى').value=rows[0]['البريد_الإلكترونى']||'';
+      document.getElementById('نوع_العنوان').value=rows[0]['نوع_العنوان']||'دائم';
+    }
+  });
+  q(`SELECT * FROM "الدرجات_الوظيفية" WHERE "الكود_البنكى"='${String(emp['الكود_البنكى']).replace(/'/g,"''")}' AND "هل_حالية"=1 LIMIT 1`).then(rows=>{
+    if(rows[0]){
+      document.getElementById('اسم_الدرجة').value=rows[0]['اسم_الدرجة']||'';
+      document.getElementById('رقم_الدرجة').value=rows[0]['رقم_الدرجة']||'';
+      document.getElementById('الفئة_المالية').value=rows[0]['الفئة_المالية']||'';
+      setDateValue('تاريخ_الدرجة', rows[0]['تاريخ_الدرجة']||'');
+    }
+  });
+  q(`SELECT * FROM "صلاحيات_المستخدمين" WHERE "الكود_البنكى"='${String(emp['الكود_البنكى']).replace(/'/g,"''")}' LIMIT 1`).then(rows=>{
+    if(rows[0]){
+      document.getElementById('نوع_الصلاحية').value=rows[0]['نوع_الصلاحية']||'User';
+      document.getElementById('اسم_المستخدم').value=rows[0]['اسم_المستخدم']||'';
+    }
+  });
+}
+
+async function loadEmployeeToForm(){
+  if(!currentEditEmployee){ alert('اختر موظف أولاً'); return; }
+  isEditMode=true;
+  const emp=currentEditEmployee;
+  const badge=document.getElementById('modeBadge'); if(badge) badge.textContent=`وضع: تعديل - ${emp['الكود_البنكى']}`;
+  await loadEmployeeToFormSilent();
+  switchView('add'); showStep(1);
+}
+
+function clearSearch(){
+  const ids=['searchCode','searchNational','searchName'];
+  ids.forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  const sr=document.getElementById('searchResults'); if(sr) sr.style.display='none';
+  const ed=document.getElementById('employeeDisplayCard'); if(ed) ed.style.display='none';
+  const rc=document.getElementById('searchResultCount'); if(rc) rc.textContent='--';
+  currentEditEmployee=null;
+}
+
+function switchView(view){
+  document.querySelectorAll('.view-section').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.mob-btn').forEach(b=>b.classList.remove('active'));
+  if(view==='add'){
+    document.getElementById('viewAddEmployee').classList.add('active');
+    document.getElementById('btnAddView')?.classList.add('active');
+  }else if(view==='search'){
+    document.getElementById('viewSearchEmployee').classList.add('active');
+    document.getElementById('btnSearchView')?.classList.add('active');
+  }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+async function printBlankForm(){
+  const next=await getNextEmployeeCode();
+  document.getElementById('printNextCode').textContent=next;
+  document.getElementById('printDate').textContent=new Date().toLocaleDateString('ar-EG');
+  const area=document.getElementById('printArea');
+  area.style.display='block';
+  document.getElementById('printA4Content').style.display='flex';
+  document.getElementById('printFilledA4').style.display='none';
+  document.getElementById('printA4Content').classList.add('blank');
+  document.getElementById('printA4Content').classList.remove('filled');
+  const content=document.getElementById('printA4Content').outerHTML;
+  const win=window.open('','_blank');
+  win.document.write(`<html dir="rtl"><head><meta charset="UTF-8"><title>استمارة فارغة - A4 نظيفة - بدون checkboxes</title><style>@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;900&display=swap');*{font-family:'Cairo',sans-serif;box-sizing:border-box} @page{size:A4 portrait;margin:8mm 7mm} body{margin:0;padding:0;background:#fff} .print-a4{width:190mm;margin:0 auto;padding:6mm;background:#fff;color:#000;display:flex;flex-direction:column;gap:5px;border:1.8px solid #000;border-radius:6px} .print-head{border-bottom:3px double #000;padding-bottom:5px;margin-bottom:6px;display:flex;justify-content:space-between} .print-head h2{font-size:13px;margin:0} .print-sec{border:1.8px solid #000;border-radius:6px;overflow:hidden;margin-bottom:4px} .print-sec-title{background:#111;color:#fff;font-size:9.5px;padding:4px 10px;display:flex;justify-content:space-between} .print-table{width:100%;border-collapse:collapse} .print-table td{border:1.2px solid #000;padding:5px 8px;font-size:10px;height:26px} .lbl{width:18%;background:#f1f5f9;font-weight:900;font-size:9px} .val{width:32%} .lbl-sm{width:14%;background:#f1f5f9;font-weight:900;font-size:8px} .val-sm{width:36%;font-size:9.5px} .print-footer{border-top:2.5px solid #000;padding-top:8px;margin-top:auto;display:flex;justify-content:space-between;font-size:9px} </style></head><body>${content}</body></html>`);
+  win.document.close();
+  setTimeout(()=>{ win.print(); win.close(); area.style.display='none'; },600);
+}
+
+function printFilledForm(){
+  if(!getVal('الكود_البنكى') && !currentEditEmployee){ alert('أدخل بيانات موظف أو اختر موظف من البحث للطباعة المملوءة'); return; }
+  const filledA4 = document.getElementById('printFilledA4');
+  const filledContent = document.getElementById('filledContent');
+  const titleEl = document.getElementById('filledEmpTitle');
+  const codeEl = document.getElementById('filledCode');
+  const dateEl = document.getElementById('filledDate');
+  if(titleEl) titleEl.textContent = `${getVal('اسم_العامل')} - ${getVal('الرقم_القومى')} - جهة: ${getVal('جهة_الميلاد')}`;
+  if(codeEl) codeEl.textContent = getVal('الكود_البنكى');
+  if(dateEl) dateEl.textContent = new Date().toLocaleDateString('ar-EG');
+  filledContent.innerHTML = buildFilledA4Tables();
+  const printArea = document.getElementById('printArea');
+  printArea.style.display='block';
+  filledA4.style.display='flex';
+  document.getElementById('printA4Content').style.display='none';
+  filledA4.classList.add('filled');
+  filledA4.classList.remove('blank');
+  filledA4.style.flexDirection='column';
+  filledA4.style.gap='5px';
+  const win = window.open('','_blank');
+  win.document.write(`<html dir="rtl"><head><meta charset="UTF-8"><title>طباعة مملوءة A4 - بدون إطار خارجي - احترافي</title><style>@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;900&display=swap');*{font-family:'Cairo',sans-serif;box-sizing:border-box} @page{size:A4 portrait;margin:8mm 7mm} body{margin:0;padding:0;background:#fff} .print-a4{width:190mm;min-height:267mm;margin:0 auto;padding:6mm;background:#fff;color:#000;display:flex;flex-direction:column;gap:5px;border:none !important;box-shadow:none !important} .print-head{border-bottom:3px double #000;padding-bottom:5px;margin-bottom:6px;display:flex;justify-content:space-between} .print-head h2{font-size:13px;margin:0} .print-sec{border:1.8px solid #000;border-radius:6px;overflow:hidden;margin-bottom:4px} .print-sec-title{background:#111;color:#fff;font-size:9.5px;padding:4px 10px;display:flex;justify-content:space-between} .print-table{width:100%;border-collapse:collapse} .print-table td{border:1.2px solid #000;padding:5px 8px;font-size:10px;height:26px} .lbl{width:18%;background:#f1f5f9;font-weight:900;font-size:9px} .val{width:32%;font-weight:600} .lbl-sm{width:14%;background:#f1f5f9;font-weight:900;font-size:8px} .val-sm{width:36%;font-size:9.5px} .print-footer{border-top:2.5px solid #000;padding-top:8px;margin-top:auto;display:flex;justify-content:space-between;font-size:9px} </style></head><body><div class="print-a4">${filledA4.outerHTML}</div></body></html>`);
+  win.document.close();
+  setTimeout(()=>{ win.print(); win.close(); printArea.style.display='none'; filledA4.style.display='none'; document.getElementById('printA4Content').style.display='flex'; },700);
+}
+
+window.onload=async()=>{
+  await loadAll();
+  const saved=localStorage.getItem('theme')||'dark';
+  changeTheme(saved);
+  updateProgress();
+  const toggle=document.getElementById('themeToggle'); if(toggle) toggle.addEventListener('click',()=>changeThemeToggle());
+  setTimeout(()=>{ initAllInsideFilters(); }, 1000);
+  const origLoadSelect = loadSelect;
+  window.loadSelect = async function(...args){
+    const res = await origLoadSelect.apply(this, args);
+    const selId=args[3];
+    if(['رقم_المحطة','رقم_الإدارة_العامة','رقم_الوظيفة'].includes(selId)){
+      setTimeout(()=>{ 
+        if(!document.getElementById('wrapper_'+selId)) createInsideFilterSelect(selId);
+        else {
+          const sel=document.getElementById(selId);
+          if(sel && sel._customRender) sel._customRender(document.getElementById('insideFilter_'+selId)?.value||'');
+        }
+      }, 150);
+    }
+    return res;
+  };
+  switchView('add');
+};
+</script>
+</body>
+</html>
