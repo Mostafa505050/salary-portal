@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>نظام الموظفين - منظم جمالي - نهاري ليلي - طباعة</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0e1a; --bg2:#111827; --card:rgba(255,255,255,0.07); --cardH:rgba(255,255,255,0.11);
+  --input:rgba(255,255,255,0.06); --border:rgba(99,102,241,0.28); --border2:rgba(99,102,241,0.5);
+  --text:#f8fafc; --text2:#94a3b8; --text3:#cbd5e1;
+  --acc:#6366f1; --acc2:#8b5cf6; --acc3:#06b6d4; --green:#10b981; --red:#ef4444; --yellow:#f59e0b;
+  --shadow:0 20px 40px rgba(0,0,0,0.4); --glow:0 0 30px rgba(99,102,241,0.15);
+  --fantasy1:linear-gradient(135deg, #6366f1 0%, #8b5cf6 25%, #06b6d4 50%, #10b981 75%, #f59e0b 100%);
+  --fantasy2:linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.08), rgba(6,182,214,0.08));
+}
+[data-theme="light"]{
+  --bg:#fdf6e3; --bg2:#fffbeb; --card:rgba(255,255,255,0.97); --cardH:#fff;
+  --input:#fff; --border:rgba(0,0,0,0.18); --border2:#000;
+  --text:#1a1a1a; --text2:#5a4a3a; --text3:#7a6652;
+  --acc:#8B0000; --acc2:#b8860b; --acc3:#003366; --shadow:0 15px 30px rgba(0,0,0,0.12);
+  --fantasy1:linear-gradient(135deg, #8B0000 0%, #b8860b 30%, #003366 70%, #2e7d32 100%);
+  --fantasy2:linear-gradient(135deg, rgba(139,0,0,0.08), rgba(184,134,11,0.06), rgba(0,51,102,0.06));
+}
+*{font-family:'Cairo',sans-serif;box-sizing:border-box;transition:background .25s,color .25s,border-color .25s, box-shadow .25s}
+body{background:var(--bg);background-image:radial-gradient(1200px 600px at 15% -15%, rgba(99,102,241,0.14), transparent 60%), radial-gradient(900px 450px at 85% 5%, rgba(139,92,246,0.12), transparent 50%), radial-gradient(700px 350px at 50% 120%, rgba(6,182,214,0.08), transparent 70%);min-height:100vh;color:var(--text);margin:0;padding:12px;padding-bottom:140px;overflow-x:hidden;position:relative}
+body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(90deg, transparent, transparent 99px, rgba(99,102,241,0.02) 100px);pointer-events:none;z-index:-1;animation:fantasyMove 25s linear infinite}
+@keyframes fantasyMove{0%{transform:translateY(0)}100%{transform:translateY(100px)}}
+[data-theme="light"] body{background:var(--bg);background-image:radial-gradient(900px 450px at 50% -5%, rgba(210,180,140,0.28), transparent 70%), linear-gradient(180deg,#fdf6e3,#f5f5dc 30%, #fef9e7 100%)}
+[data-theme="light"] body::before{background:radial-gradient(600px 300px at 50% 0%, rgba(210,180,140,0.18), transparent 70%)}
+.card{background:var(--card);backdrop-filter:blur(20px) saturate(170%);border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow),var(--glow), inset 0 1px 0 rgba(255,255,255,0.08);padding:16px;margin-bottom:12px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:var(--fantasy1);opacity:.5}
+[data-theme="light"] .card{background:linear-gradient(180deg,#ffffff 0%,#fefcf6 15%,#f5e6c8 100%);border:2px solid #000;box-shadow:0 8px 0 #d2b48c,0 4px 0 #000,0 14px 28px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.9)}
+.card-fantasy{background:var(--fantasy2);border:1.5px solid var(--border2);box-shadow:0 0 40px rgba(99,102,241,0.18), var(--shadow)}
+[data-theme="light"] .card-fantasy{background:linear-gradient(135deg, #fff 0%, #fff8e1 40%, #f5e6c8 100%);border:2px solid #000}
+.btn{height:44px;padding:0 18px;border-radius:14px;border:1px solid var(--border);font-weight:800;font-size:11px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;background:var(--card);color:var(--text);justify-content:center;white-space:nowrap;position:relative;overflow:hidden}
+.btn::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);transition:left .6s}
+.btn:hover::before{left:100%}
+.btn:hover{transform:translateY(-2px);background:var(--cardH);box-shadow:0 6px 20px rgba(99,102,241,0.2)}
+.btn-p{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;border:none;box-shadow:0 8px 20px rgba(99,102,241,0.3)}
+.btn-g{background:linear-gradient(135deg,#059669,#10b981);color:#fff;border:none;box-shadow:0 8px 20px rgba(16,185,129,0.3)}
+.btn-y{background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;border:none}
+.btn-print{background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;border:none}
+[data-theme="light"] .btn{background:#fff;color:#000;border:2px solid #000;box-shadow:0 4px 0 #d2b48c,0 3px 0 #000}
+[data-theme="light"] .btn-p{background:#b71c1c;color:#fff;border:2px solid #000;box-shadow:0 4px 0 #8B0000,0 3px 0 #000}
+[data-theme="light"] .btn-g{background:#2e7d32;color:#fff}
+[data-theme="light"] .btn-print{background:#4a148c;color:#fff}
+.input{width:100%;padding:10px 12px;border-radius:12px;border:1.5px solid var(--border);background:var(--input);color:var(--text);font-weight:700;font-size:12px;text-align:right}
+.input:focus{outline:2px solid var(--acc);background:var(--cardH);border-color:var(--border2);box-shadow:0 0 0 4px rgba(99,102,241,0.12)}
+[data-theme="light"] .input{background:#fff;border:2px solid #000;color:#000}
+.input option{background:var(--bg2);color:var(--text)}
+[data-theme="light"] .input option{background:#fff;color:#000}
+label{font-size:10px;font-weight:800;margin-bottom:4px;display:block;color:var(--text2)}
+label span.req{color:var(--red);margin-right:2px}
+.badge{display:inline-flex;align-items:center;padding:5px 12px;border-radius:999px;font-size:10px;font-weight:900;border:1px solid}
+.stepper{display:flex;gap:6px;overflow-x:auto;padding:8px 2px;scrollbar-width:none}
+.stepper::-webkit-scrollbar{display:none}
+.step{display:flex;align-items:center;gap:6px;padding:9px 14px;border-radius:999px;border:1px solid var(--border);background:var(--card);font-size:10px;font-weight:900;white-space:nowrap;cursor:pointer;min-width:115px;position:relative;overflow:hidden}
+.step::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--fantasy1);opacity:0;transition:opacity .3s}
+.step.active{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;border:none;box-shadow:0 6px 16px rgba(99,102,241,0.3)}
+.step.active::before{opacity:1}
+.step.done{background:rgba(16,185,129,0.15);color:var(--green);border-color:rgba(16,185,129,0.35)}
+[data-theme="light"] .step{background:#fff;color:#000;border:2px solid #000}
+[data-theme="light"] .step.active{background:#b71c1c;color:#fff}
+.progress{height:10px;background:rgba(0,0,0,0.15);border-radius:999px;overflow:hidden;margin:10px 0;box-shadow:inset 0 2px 4px rgba(0,0,0,0.1)}
+.progress-bar{height:100%;background:var(--fantasy1);transition:width .5s cubic-bezier(0.4,0,0.2,1);border-radius:999px;box-shadow:0 0 10px rgba(99,102,241,0.4)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media(max-width:720px){.grid2,.grid3{grid-template-columns:1fr}}
+.display-name{font-size:11px;font-weight:800;color:var(--acc);margin-top:3px}
+.display-code{font-size:9px;color:var(--text2)}
+.section-title{font-size:12px;font-weight:900;margin:12px 0 8px 0;padding:8px 12px;background:var(--fantasy2);border-radius:10px;border-right:4px solid var(--acc);color:var(--text);box-shadow:inset 0 1px 0 rgba(255,255,255,0.1)}
+[data-theme="light"] .section-title{background:rgba(183,28,28,0.08);border-right-color:#b71c1c;color:#000}
+#themeToggle{position:fixed;top:12px;left:12px;width:46px;height:46px;border-radius:50%;background:var(--card);backdrop-filter:blur(20px);border:1px solid var(--border);box-shadow:var(--shadow), 0 0 20px rgba(99,102,241,0.2);cursor:pointer;z-index:10000;display:flex;align-items:center;justify-content:center;font-size:20px;transition:all .3s}
+#themeToggle:hover{transform:rotate(180deg) scale(1.1)}
+[data-theme="light"] #themeToggle{background:#fff;border:2px solid #000}
+
+/* قائمة سفلية خيالية */
+#mobileBottomMenu{position:fixed;bottom:0;left:0;right:0;z-index:9999;background:rgba(10,14,26,0.88);backdrop-filter:blur(22px) saturate(180%);border-top:1px solid rgba(99,102,241,0.35);box-shadow:0 -12px 30px rgba(0,0,0,0.35), 0 0 30px rgba(99,102,241,0.15);padding:8px 6px;display:flex;gap:6px;justify-content:space-around;align-items:center;overflow-x:auto}
+#mobileBottomMenu::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:var(--fantasy1);opacity:.6}
+[data-theme="light"] #mobileBottomMenu{background:linear-gradient(180deg,#fff 0%,#f5e6c8 100%);border-top:2px solid #000;box-shadow:0 -8px 0 #d2b48c,0 -6px 0 #000,0 -12px 24px rgba(0,0,0,0.15)}
+.mob-btn{flex:1;min-width:62px;max-width:96px;height:62px;border-radius:14px;border:1px solid var(--border);background:rgba(255,255,255,0.06);color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:8px;font-weight:900;cursor:pointer;position:relative;overflow:hidden;transition:all .3s}
+.mob-btn::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--fantasy1);opacity:0;transition:opacity .3s}
+.mob-btn.active{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;border:none;box-shadow:0 6px 18px rgba(99,102,241,0.35);transform:translateY(-3px)}
+.mob-btn.active::before{opacity:1}
+.mob-icon{font-size:20px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.2))}.mob-label{font-size:7.5px;white-space:nowrap;font-weight:900}
+[data-theme="light"] .mob-btn{background:#fff;color:#000;border:2px solid #000;box-shadow:0 4px 0 #d2b48c}
+[data-theme="light"] .mob-btn.active{background:#b71c1c;color:#fff;box-shadow:0 4px 0 #8B0000}
+
+/* إخفاء السجل القديم */
+#oldLogCard{display:none !important}
+
+/* مناطق العرض المنظمة */
+.view-section{display:none}
+.view-section.active{display:block;animation:fantasyFadeIn .5s ease}
+@keyframes fantasyFadeIn{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+
+/* طباعة */
+@media print{
+  body{padding:0;background:#fff;color:#000}
+  #themeToggle,#mobileBottomMenu,.no-print{display:none !important}
+  .card{box-shadow:none;border:2px solid #000;break-inside:avoid}
+  .view-section{display:block !important}
+}
+.print-form{border:3px double #000;padding:16px;background:#fff;color:#000;font-family:'Cairo',sans-serif}
+.print-field{border-bottom:1px dotted #000;min-height:28px;padding:4px 8px;margin:4px 0;display:flex;justify-content:space-between}
+.print-label{font-weight:900;font-size:11px}
+.print-value{border-bottom:1px solid #000;min-width:160px;display:inline-block;margin-right:8px}
+</style>
+</head>
+<body>
+<button id="themeToggle" class="no-print">🌙</button>
+
+<div class="max-w-[98%] mx-auto">
+  <!-- هيدر خيالي -->
+  <div class="card card-fantasy no-print" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+    <div>
+      <h1 style="font-size:16px;font-weight:900;background:var(--fantasy1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.1))">✨ نظام الموظفين - منظم جمالي - شركة نقل الكهرباء ✨</h1>
+      <p style="font-size:10px;color:var(--text2);margin-top:3px">🌙 نهاري / ليلي خيالي • يعرض الاسم ويحفظ الكود • بدون تعديل الدوال • طباعة استمارة فارغة</p>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <span class="badge" style="background:var(--fantasy2);color:var(--acc);border-color:var(--border)" id="empCount">الموظفون: --</span>
+      <span class="badge" style="background:rgba(16,185,129,0.12);color:var(--green);border-color:rgba(16,185,129,0.25)" id="modeBadge">وضع: إضافة جديد</span>
+    </div>
+  </div>
+
+  <!-- منطقة إضافة موظف جديد - تظهر فقط عند الضغط على زر الإضافة -->
+  <div id="viewAddEmployee" class="view-section active">
+    <div class="card card-fantasy no-print">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <b style="font-size:12px">📍 الخطوات - <span id="stepLabel">الخطوة 1 من 6</span> - إضافة موظف جديد</b>
+        <b style="font-size:11px;background:var(--fantasy1);-webkit-background-clip:text;-webkit-text-fill-color:transparent" id="progressText">0%</b>
+      </div>
+      <div class="progress"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+      <div class="stepper" id="stepper">
+        <div class="step active" data-step="1" onclick="goToStep(1)">① البيانات الأساسية</div>
+        <div class="step" data-step="2" onclick="goToStep(2)">② القطاع والمحطة</div>
+        <div class="step" data-step="3" onclick="goToStep(3)">③ الإدارات</div>
+        <div class="step" data-step="4" onclick="goToStep(4)">④ الوظيفة والمؤهل</div>
+        <div class="step" data-step="5" onclick="goToStep(5)">⑤ العنوان والاتصال</div>
+        <div class="step" data-step="6" onclick="goToStep(6)">⑥ المراجعة والحفظ</div>
+      </div>
+    </div>
+
+    <!-- الخطوة 1 - البيانات الأساسية -->
+    <div class="card step-panel" id="panel1">
+      <div class="section-title">① البيانات الأساسية - إلزامية - كود تلقائي أكبر رقم +1</div>
+      <div class="grid3">
+        <div><label><span class="req">*</span>الكود البنكي - تلقائي</label><input id="الكود_البنكى" class="input" placeholder="تلقائي: أكبر رقم +1"></div>
+        <div><label><span class="req">*</span>اسم العامل</label><input id="اسم_العامل" class="input" placeholder="الاسم رباعي"></div>
+        <div><label><span class="req">*</span>الرقم القومي - 14 رقم</label><input id="الرقم_القومى" class="input" maxlength="14" placeholder="2990101..." oninput="parseNationalID(this.value)"></div>
+        <div><label>تاريخ الميلاد - تلقائي</label><input id="تاريخ_الميلاد" type="date" class="input"></div>
+        <div><label>جهة الميلاد</label><input id="جهة_الميلاد" class="input" placeholder="مثال: دمياط"></div>
+        <div><label>الديانة</label><select id="الديانة" class="input"><option value="">-- اختر --</option><option>مسلم</option><option>مسيحي</option><option>أخرى</option></select></div>
+        <div><label>النوع - تلقائي</label><select id="النوع" class="input"><option value="ذكر">ذكر</option><option value="أنثى">أنثى</option></select></div>
+        <div><label>الموقف من التجنيد</label><select id="الموقف_من_التجنيد" class="input"><option value="">-- اختر --</option><option>أدى الخدمة</option><option>إعفاء نهائي</option><option>إعفاء مؤقت</option><option>لم يصبه الدور</option><option>يؤجل</option></select></div>
+        <div><label>الرقم التأميني</label><input id="الرقم_التأمينى" class="input" placeholder="رقم التأمينات"></div>
+        <div><label>تاريخ التعيين</label><input id="تاريخ_التعيين" type="date" class="input"></div>
+        <div><label>الوظيفة المعين عليها</label><input id="الوظيفة_المعين_عليها" class="input" placeholder="مثال: مهندس ثالث"></div>
+        <div><label>ملاحظات</label><input id="ملاحظات" class="input" placeholder="ملاحظات عامة"></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px" class="no-print">
+        <button class="btn btn-p" onclick="nextStep()">التالي ⏭️</button>
+        <button class="btn" onclick="clearForm()">🧹 تفريغ</button>
+      </div>
+    </div>
+
+    <!-- الخطوة 2 -->
+    <div class="card step-panel" id="panel2" style="display:none">
+      <div class="section-title">② القطاع والمحطة - يعرض الاسم ويحفظ الكود</div>
+      <div class="grid2">
+        <div>
+          <label><span class="req">*</span>القطاع - يعرض الاسم ويحفظ رقم القطاع</label>
+          <select id="رقم_القطاع" class="input" onchange="onSectorChange(this.value)">
+            <option value="">-- اختر القطاع --</option>
+          </select>
+          <div class="display-name" id="display_القطاع"></div>
+          <div class="display-code" id="code_القطاع"></div>
+        </div>
+        <div>
+          <label><span class="req">*</span>المحطة - يعرض الاسم ويحفظ كود المحطة</label>
+          <select id="رقم_المحطة" class="input" onchange="showDisplay('رقم_المحطة','المحطات')">
+            <option value="">-- اختر المحطة --</option>
+          </select>
+          <div class="display-name" id="display_المحطة"></div>
+          <div class="display-code" id="code_المحطة"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px" class="no-print">
+        <button class="btn" onclick="prevStep()">⏮️ السابق</button>
+        <button class="btn btn-p" onclick="nextStep()">التالي ⏭️</button>
+      </div>
+    </div>
+
+    <!-- الخطوة 3 -->
+    <div class="card step-panel" id="panel3" style="display:none">
+      <div class="section-title">③ الإدارات - هرمي</div>
+      <div class="grid2">
+        <div>
+          <label>الإدارة العامة - يعرض الاسم ويحفظ الرقم</label>
+          <select id="رقم_الإدارة_العامة" class="input" onchange="onGenDeptChange(this.value)">
+            <option value="">-- اختر الإدارة العامة --</option>
+          </select>
+          <div class="display-name" id="display_الإدارة_العامة"></div>
+          <div class="display-code" id="code_الإدارة_العامة"></div>
+        </div>
+        <div>
+          <label>الإدارة - يعرض الاسم ويحفظ كود الإدارة</label>
+          <select id="رقم_الإدارة" class="input" onchange="showDisplay('رقم_الإدارة','الإدارات')">
+            <option value="">-- اختر الإدارة --</option>
+          </select>
+          <div class="display-name" id="display_الإدارة"></div>
+          <div class="display-code" id="code_الإدارة"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px" class="no-print">
+        <button class="btn" onclick="prevStep()">⏮️ السابق</button>
+        <button class="btn btn-p" onclick="nextStep()">التالي ⏭️</button>
+      </div>
+    </div>
+
+    <!-- الخطوة 4 -->
+    <div class="card step-panel" id="panel4" style="display:none">
+      <div class="section-title">④ الوظيفة والمؤهل - يعرض الاسم ويحفظ الكود</div>
+      <div class="grid3">
+        <div>
+          <label>المجموعة الوظيفية</label>
+          <select id="رقم_المجموعة" class="input" onchange="onGroupChange(this.value)">
+            <option value="">-- اختر المجموعة --</option>
+          </select>
+          <div class="display-name" id="display_المجموعة"></div>
+          <div class="display-code" id="code_المجموعة"></div>
+        </div>
+        <div>
+          <label>الوظيفة - يعرض الاسم ويحفظ الكود</label>
+          <select id="رقم_الوظيفة" class="input" onchange="onJobChange(this.value)">
+            <option value="">-- اختر الوظيفة --</option>
+          </select>
+          <div class="display-name" id="display_الوظيفة"></div>
+          <div class="display-code" id="code_الوظيفة"></div>
+        </div>
+        <div>
+          <label>تخصص الوظيفة</label>
+          <select id="رقم_تخصص_الوظيفة" class="input" onchange="showDisplay('رقم_تخصص_الوظيفة','تخصصات_الوظائف')">
+            <option value="">-- اختر تخصص الوظيفة --</option>
+          </select>
+          <div class="display-name" id="display_تخصص_الوظيفة"></div>
+        </div>
+      </div>
+      <div class="section-title">المؤهلات - هرمي: فئة → نوع → تخصص</div>
+      <div class="grid3">
+        <div>
+          <label>فئة المؤهل</label>
+          <select id="رقم_فئة_المؤهل" class="input" onchange="onQualCatChange(this.value)">
+            <option value="">-- اختر الفئة --</option>
+          </select>
+          <div class="display-name" id="display_فئة_المؤهل"></div>
+        </div>
+        <div>
+          <label>نوع المؤهل - يعرض الاسم ويحفظ الكود</label>
+          <select id="رقم_نوع_المؤهل" class="input" onchange="onQualTypeChange(this.value)">
+            <option value="">-- اختر النوع --</option>
+          </select>
+          <div class="display-name" id="display_نوع_المؤهل"></div>
+          <div class="display-code" id="code_نوع_المؤهل"></div>
+        </div>
+        <div>
+          <label>تخصص المؤهل</label>
+          <select id="رقم_التخصص" class="input" onchange="showDisplay('رقم_التخصص','تخصصات_المؤهلات')">
+            <option value="">-- اختر التخصص --</option>
+          </select>
+          <div class="display-name" id="display_التخصص"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px" class="no-print">
+        <button class="btn" onclick="prevStep()">⏮️ السابق</button>
+        <button class="btn btn-p" onclick="nextStep()">التالي ⏭️</button>
+      </div>
+    </div>
+
+    <!-- الخطوة 5 -->
+    <div class="card step-panel" id="panel5" style="display:none">
+      <div class="section-title">⑤ العنوان والاتصال</div>
+      <div class="grid3">
+        <div><label>نوع العنوان</label><select id="نوع_العنوان" class="input"><option>دائم</option><option>حالي</option><option>عمل</option><option>مؤقت</option></select></div>
+        <div><label>رقم الموبايل</label><input id="رقم_الموبايل" class="input" placeholder="01xxxxxxxxx"></div>
+        <div><label>الرقم الأرضي</label><input id="الرقم_الأرضى" class="input" placeholder="057..."></div>
+        <div style="grid-column:1/-1"><label>العنوان الكامل</label><input id="العنوان_الكامل" class="input" placeholder="المحافظة - المركز - الشارع - رقم المنزل"></div>
+        <div><label>البريد الإلكتروني</label><input id="البريد_الإلكترونى" type="email" class="input" placeholder="example@mail.com"></div>
+        <div><label>رقم الهاتف (الرئيسي)</label><input id="رقم_الهاتف" class="input" placeholder="رقم هاتف"></div>
+      </div>
+      <div class="section-title">الدرجة والصلاحيات</div>
+      <div class="grid3">
+        <div><label>اسم الدرجة</label><select id="اسم_الدرجة" class="input"><option value="">-- اختر --</option><option>الدرجة السادسة</option><option>الدرجة الخامسة</option><option>الدرجة الرابعة</option><option>الدرجة الثالثة</option><option>الدرجة الثانية</option><option>الدرجة الأولى</option><option>مدير عام</option><option>العالية</option><option>الممتازة</option></select></div>
+        <div><label>رقم الدرجة</label><input id="رقم_الدرجة" type="number" class="input" placeholder="1-6"></div>
+        <div><label>الفئة المالية</label><select id="الفئة_المالية" class="input"><option value="">-- اختر --</option><option>أ</option><option>ب</option><option>ج</option></select></div>
+        <div><label>تاريخ الدرجة</label><input id="تاريخ_الدرجة" type="date" class="input"></div>
+        <div><label>نوع الصلاحية</label><select id="نوع_الصلاحية" class="input"><option>User</option><option>Admin</option><option>Manager</option><option>HR</option><option>Viewer</option></select></div>
+        <div><label>اسم المستخدم</label><input id="اسم_المستخدم" class="input" placeholder="مثال: ahmed.mohamed"></div>
+        <div><label>كلمة المرور</label><input id="كلمة_المرور" type="password" class="input" placeholder="كلمة مرور"></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px" class="no-print">
+        <button class="btn" onclick="prevStep()">⏮️ السابق</button>
+        <button class="btn btn-p" onclick="nextStep()">التالي ⏭️</button>
+      </div>
+    </div>
+
+    <!-- الخطوة 6 -->
+    <div class="card step-panel" id="panel6" style="display:none">
+      <div class="section-title">⑥ مراجعة وحفظ</div>
+      <div id="reviewArea" style="background:var(--input);border:1.5px dashed var(--border);border-radius:14px;padding:12px;font-size:11px;line-height:1.8"></div>
+      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap" class="no-print">
+        <button class="btn" onclick="prevStep()">⏮️ السابق</button>
+        <button class="btn btn-g" style="flex:1" onclick="saveEmployee()">💾 حفظ الموظف</button>
+        <button class="btn btn-y" onclick="clearForm()">🧹 تفريغ</button>
+      </div>
+      <div id="saveStatus" style="margin-top:10px;font-size:10px;padding:10px;border-radius:10px;display:none" class="no-print"></div>
+    </div>
+  </div>
+
+  <!-- منطقة البحث عن موظف - تظهر فقط عند الضغط على زر البحث -->
+  <div id="viewSearchEmployee" class="view-section">
+    <div class="card card-fantasy">
+      <div class="section-title" style="margin-top:0">🔍 بحث عن موظف بالاسم - عرض احترافي - تعديل</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 110px 110px;gap:8px;align-items:end">
+        <div><label>🔢 كود الموظف</label><input id="searchCode" class="input" placeholder="1001" onkeypress="if(event.key==='Enter') searchEmployee()"></div>
+        <div><label>🆔 الرقم القومي</label><input id="searchNational" class="input" placeholder="14 رقم" maxlength="14" onkeypress="if(event.key==='Enter') searchEmployee()"></div>
+        <div><label>👤 اسم الموظف</label><input id="searchName" class="input" placeholder="أحمد..." onkeypress="if(event.key==='Enter') searchEmployee()"></div>
+        <div><button class="btn btn-p" style="width:100%" onclick="searchEmployee()">🔍 بحث</button></div>
+        <div><button class="btn btn-g" style="width:100%" onclick="prepareNewEmployee(); switchView('add')">➕ جديد</button></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap" class="no-print">
+        <button class="btn" onclick="clearSearch()">🧹 تفريغ</button>
+        <span class="badge" style="background:rgba(16,185,129,0.12);color:var(--green);border-color:rgba(16,185,129,0.25)" id="searchResultCount">--</span>
+      </div>
+
+      <div id="searchResults" style="margin-top:12px;display:none">
+        <div style="max-height:200px;overflow:auto;border:1.5px solid var(--border);border-radius:12px">
+          <table style="width:100%;border-collapse:collapse;font-size:10px;min-width:650px" id="searchTable">
+            <thead><tr>
+              <th style="position:sticky;top:0;background:var(--bg2);padding:7px;border:1px solid var(--border)">الكود</th>
+              <th style="position:sticky;top:0;background:var(--bg2);padding:7px;border:1px solid var(--border)">الاسم</th>
+              <th style="position:sticky;top:0;background:var(--bg2);padding:7px;border:1px solid var(--border)">القومي</th>
+              <th style="position:sticky;top:0;background:var(--bg2);padding:7px;border:1px solid var(--border)">المحطة</th>
+              <th style="position:sticky;top:0;background:var(--bg2);padding:7px;border:1px solid var(--border)">الوظيفة</th>
+              <th style="position:sticky;top:0;background:var(--bg2);padding:7px;border:1px solid var(--border)">إجراءات</th>
+            </tr></thead>
+            <tbody id="searchTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="employeeDisplayCard" style="display:none;margin-top:14px;padding:14px;border:2px solid var(--acc);border-radius:16px;background:var(--card)">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px" class="no-print">
+          <b style="font-size:12px">📋 بيانات الموظف - عرض احترافي خيالي</b>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-p" style="height:34px" onclick="loadEmployeeToForm()">✏️ تحميل للتعديل</button>
+            <button class="btn" style="height:34px" onclick="document.getElementById('employeeDisplayCard').style.display='none'">✖ إغلاق</button>
+          </div>
+        </div>
+        <div id="employeeDisplayContent" style="margin-top:10px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- منطقة طباعة استمارة فارغة - مخفية للطباعة -->
+  <div id="printArea" style="display:none">
+    <div class="print-form">
+      <div style="text-align:center;border-bottom:3px double #000;padding-bottom:10px;margin-bottom:12px">
+        <h2 style="font-size:18px;font-weight:900;margin:0">شركة نقل الكهرباء - استمارة بيانات موظف جديد</h2>
+        <p style="font-size:10px;margin:4px 0">يُملأ يدوياً بواسطة الموظف - جميع الحقول المدرجة في النظام</p>
+        <p style="font-size:9px">تاريخ الطباعة: <span id="printDate"></span> - كود مقترح: <span id="printNextCode"></span></p>
+      </div>
+
+      <h3 style="background:#000;color:#fff;padding:5px 10px;font-size:12px;margin:12px 0 6px 0">① البيانات الأساسية</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div class="print-field"><span class="print-label">الكود البنكي:</span><span class="print-value" style="min-width:200px"></span></div>
+        <div class="print-field"><span class="print-label">اسم العامل (رباعي):</span><span class="print-value" style="min-width:250px"></span></div>
+        <div class="print-field"><span class="print-label">الرقم القومي (14 رقم):</span><span class="print-value" style="min-width:220px"></span></div>
+        <div class="print-field"><span class="print-label">تاريخ الميلاد:</span><span class="print-value"></span></div>
+        <div class="print-field"><span class="print-label">جهة الميلاد:</span><span class="print-value"></span></div>
+        <div class="print-field"><span class="print-label">الديانة:</span> ☐ مسلم ☐ مسيحي ☐ أخرى</div>
+        <div class="print-field"><span class="print-label">النوع:</span> ☐ ذكر ☐ أنثى</div>
+        <div class="print-field"><span class="print-label">الموقف من التجنيد:</span><span class="print-value"></span></div>
+        <div class="print-field"><span class="print-label">الرقم التأميني:</span><span class="print-value"></span></div>
+        <div class="print-field"><span class="print-label">تاريخ التعيين:</span><span class="print-value"></span></div>
+        <div class="print-field"><span class="print-label">الوظيفة المعين عليها:</span><span class="print-value" style="min-width:220px"></span></div>
+      </div>
+
+      <h3 style="background:#000;color:#fff;padding:5px 10px;font-size:12px;margin:12px 0 6px 0">② القطاع والمحطة</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div class="print-field"><span class="print-label">القطاع:</span><span class="print-value" style="min-width:220px"></span> الكود: ________</div>
+        <div class="print-field"><span class="print-label">المحطة (الاسم والكود):</span><span class="print-value" style="min-width:220px"></span></div>
+      </div>
+
+      <h3 style="background:#000;color:#fff;padding:5px 10px;font-size:12px;margin:12px 0 6px 0">③ الإدارات</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div class="print-field"><span class="print-label">الإدارة العامة:</span><span class="print-value" style="min-width:220px"></span></div>
+        <div class="print-field"><span class="print-label">الإدارة:</span><span class="print-value" style="min-width:220px"></span></div>
+      </div>
+
+      <h3 style="background:#000;color:#fff;padding:5px 10px;font-size:12px;margin:12px 0 6px 0">④ الوظيفة والمؤهل</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div class="print-field"><span class="print-label">المجموعة الوظيفية:</span><span class="print-value"></span></div>
+        <div class="print-field"><span class="print-label">الوظيفة (الاسم والكود):</span><span class="print-value" style="min-width:220px"></span></div>
+        <div class="print-field"><span class="print-label">تخصص الوظيفة:</span><span class="print-value"></span></div>
+        <div class="print-field"><span class="print-label">فئة المؤهل:</span> ☐ دكتوراه ☐ ماجستير ☐ بكالوريوس ☐ ليسانس ☐ معهد عالي ☐ معهد فني ☐ دبلوم ☐ ثانوية ☐ إعدادية ☐ بدون</div>
+        <div class="print-field"><span class="print-label">نوع المؤهل:</span><span class="print-value" style="min-width:220px"></span></div>
+        <div class="print-field"><span class="print-label">تخصص المؤهل:</span><span class="print-value"></span></div>
+      </div>
+
+      <h3 style="background:#000;color:#fff;padding:5px 10px;font-size:12px;margin:12px 0 6px 0">⑤ العنوان والاتصال</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div class="print-field"><span class="print-label">نوع العنوان:</span> ☐ دائم ☐ حالي ☐ عمل ☐ مؤقت</div>
+        <div class="print-field"><span class="print-label">رقم الموبايل:</span><span class="print-value"></span></div>
+        <div class="print-field"><span class="print-label">الرقم الأرضي:</span><span class="print-value"></span></div>
+        <div class="print-field"><span class="print-label">البريد الإلكتروني:</span><span class="print-value" style="min-width:220px"></span></div>
+        <div class="print-field" style="grid-column:1/-1"><span class="print-label">العنوان الكامل (المحافظة - المركز - الشارع - رقم المنزل):</span><span class="print-value" style="min-width:500px"></span></div>
+        <div class="print-field"><span class="print-label">رقم الهاتف الرئيسي:</span><span class="print-value"></span></div>
+      </div>
+
+      <h3 style="background:#000;color:#fff;padding:5px 10px;font-size:12px;margin:12px 0 6px 0">⑥ الدرجة والصلاحيات</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div class="print-field"><span class="print-label">اسم الدرجة:</span> ☐ السادسة ☐ الخامسة ☐ الرابعة ☐ الثالثة ☐ الثانية ☐ الأولى ☐ مدير عام ☐ العالية ☐ الممتازة</div>
+        <div class="print-field"><span class="print-label">رقم الدرجة:</span><span class="print-value"></span> الفئة: ☐ أ ☐ ب ☐ ج</div>
+        <div class="print-field"><span class="print-label">تاريخ الدرجة:</span><span class="print-value"></span></div>
+        <div class="print-field"><span class="print-label">نوع الصلاحية:</span> ☐ User ☐ Admin ☐ Manager ☐ HR ☐ Viewer</div>
+        <div class="print-field"><span class="print-label">اسم المستخدم:</span><span class="print-value"></span></div>
+        <div class="print-field"><span class="print-label">كلمة المرور:</span><span class="print-value"></span></div>
+        <div class="print-field" style="grid-column:1/-1"><span class="print-label">ملاحظات:</span><span class="print-value" style="min-width:500px"></span></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px;border-top:2px solid #000;padding-top:12px">
+        <div style="text-align:center"><br><br>_______________________<br>توقيع الموظف</div>
+        <div style="text-align:center"><br><br>_______________________<br>توقيع مدير الموارد البشرية - الختم</div>
+      </div>
+
+      <div style="text-align:center;font-size:8px;margin-top:16px;border-top:1px dashed #000;padding-top:6px">
+        تم تطوير هذا النموذج بواسطة أ/ مصطفى درويش سيد درويش - محمول 01092259655 - يعرض الاسم ويحفظ الكود - نظام نقل الكهرباء
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- قائمة سفلية خيالية منظمة - إضافة + بحث + طباعة + نهاري ليلي -->
+<div id="mobileBottomMenu" class="no-print">
+  <button class="mob-btn active" id="btnAddView" onclick="switchView('add')">
+    <span class="mob-icon">➕</span><span class="mob-label">إضافة موظف</span>
+  </button>
+  <button class="mob-btn" id="btnSearchView" onclick="switchView('search')">
+    <span class="mob-icon">🔍</span><span class="mob-label">بحث بالاسم</span>
+  </button>
+  <button class="mob-btn" onclick="printBlankForm()">
+    <span class="mob-icon">🖨️</span><span class="mob-label">طباعة فارغة</span>
+  </button>
+  <button class="mob-btn" onclick="printFilledForm()">
+    <span class="mob-icon">📄</span><span class="mob-label">طباعة مملوء</span>
+  </button>
+  <button class="mob-btn" onclick="changeThemeToggle()">
+    <span class="mob-icon" id="mobThemeIcon">🌙</span><span class="mob-label" id="mobThemeLabel">ليلي/نهاري</span>
+  </button>
+</div>
+
+<script>
+// ============ الدوال الأصلية بدون تعديل نهائياً - محفوظة كما هي ============
+const WORKER="https://turso-api.mostafa-voic77729.workers.dev";
+let currentStep=1; const totalSteps=6;
+let cache={};
+
+async function q(sql){
+  try{
+    const r=await fetch(`${WORKER}/api/turso`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sql})});
+    const j=await r.json(); return j.rows||j.data||[];
+  }catch(e){ console.log('❌ '+e.message); return []; }
+}
+function setSaveStatus(msg,type="info"){
+  const el=document.getElementById('saveStatus'); if(!el) return; el.style.display='block'; el.textContent=msg;
+  if(type==="success") el.style.background='rgba(16,185,129,0.15)'; el.style.color='#065f46'; el.style.border='1px solid rgba(16,185,129,0.3)';
+  if(type==="error") el.style.background='rgba(239,68,68,0.15)'; el.style.color='#991b1b'; el.style.border='1px solid rgba(239,68,68,0.3)';
+  if(type==="info") el.style.background='rgba(99,102,241,0.15)'; el.style.color='var(--acc)'; el.style.border='1px solid var(--border)';
+}
+function changeTheme(theme){
+  document.documentElement.setAttribute('data-theme',theme);
+  localStorage.setItem('theme',theme);
+  document.getElementById('themeToggle').textContent=theme==='dark'?'☀️':'🌙';
+  const icon=document.getElementById('mobThemeIcon'); if(icon) icon.textContent=theme==='dark'?'☀️':'🌙';
+}
+function changeThemeToggle(){ const cur=document.documentElement.getAttribute('data-theme'); changeTheme(cur==='dark'?'light':'dark'); }
+function updateProgress(){
+  const pct=Math.round((currentStep/totalSteps)*100);
+  const bar=document.getElementById('progressBar'); if(bar) bar.style.width=pct+'%';
+  const txt=document.getElementById('progressText'); if(txt) txt.textContent=pct+'%';
+  const lbl=document.getElementById('stepLabel'); if(lbl) lbl.textContent=`الخطوة ${currentStep} من ${totalSteps}`;
+  document.querySelectorAll('.step').forEach((s,i)=>{
+    s.classList.remove('active','done');
+    if(i+1===currentStep) s.classList.add('active');
+    else if(i+1<currentStep) s.classList.add('done');
+  });
+}
+function showStep(n){
+  document.querySelectorAll('.step-panel').forEach(p=>p.style.display='none');
+  const panel=document.getElementById('panel'+n); if(panel) panel.style.display='block';
+  currentStep=n; updateProgress();
+  if(n===6) buildReview();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function nextStep(){ if(currentStep<totalSteps) showStep(currentStep+1); }
+function prevStep(){ if(currentStep>1) showStep(currentStep-1); }
+function goToStep(n){ showStep(n); }
+function parseNationalID(val){
+  if(val.length===14){
+    const year=val.substring(1,3); const month=val.substring(3,5); const day=val.substring(5,7);
+    const century=val[0]==='2'?'19':'20'; const fullYear=century+year;
+    const el=document.getElementById('تاريخ_الميلاد'); if(el) el.value=`${fullYear}-${month}-${day}`;
+    const genderDigit=parseInt(val[12]); const gEl=document.getElementById('النوع'); if(gEl) gEl.value=genderDigit%2===0?'أنثى':'ذكر';
+    const govCode=val.substring(7,9);
+    const govs={'01':'القاهرة','02':'الإسكندرية','03':'بورسعيد','04':'السويس','11':'دمياط','12':'الدقهلية','13':'الشرقية','14':'القليوبية','15':'كفر الشيخ','16':'الغربية','17':'المنوفية','18':'البحيرة','19':'الإسماعيلية','21':'الجيزة','22':'بني سويف','23':'الفيوم','24':'المنيا','25':'أسيوط','26':'سوهاج','27':'قنا','28':'أسوان','29':'الأقصر','31':'البحر الأحمر','32':'الوادي الجديد','33':'مطروح','34':'شمال سيناء','35':'جنوب سيناء'};
+    if(govs[govCode]){ const je=document.getElementById('جهة_الميلاد'); if(je) je.value=govs[govCode]; }
+  }
+}
+async function loadSelect(table, valueField, nameField, selectId, filterSql=""){
+  const sql=`SELECT * FROM "${table.replace(/"/g,'""')}" ${filterSql} LIMIT 200`;
+  const rows=await q(sql);
+  cache[table]=rows;
+  const sel=document.getElementById(selectId); if(!sel) return rows;
+  const currentVal=sel.value;
+  sel.innerHTML=`<option value="">-- اختر من ${table} --</option>`;
+  rows.forEach(r=>{
+    const val=r[valueField]??r[Object.keys(r)[0]];
+    const name=r[nameField]??r[Object.keys(r)[1]]??val;
+    const code=r['كود_'+table.replace('ال','')]||r['كود_المحطة']||r['كود_الإدارة']||r['كود_الوظيفة']||r['كود_المجموعة']||'';
+    const opt=document.createElement('option');
+    opt.value=val;
+    opt.textContent=`${name} ${code?'('+code+')':''}`;
+    opt.dataset.name=name;
+    opt.dataset.code=code;
+    sel.appendChild(opt);
+  });
+  if(currentVal) sel.value=currentVal;
+  return rows;
+}
+function showDisplay(selectId, tableName){
+  const sel=document.getElementById(selectId); if(!sel) return;
+  const opt=sel.options[sel.selectedIndex];
+  const displayName=document.getElementById('display_'+selectId.replace('رقم_',''));
+  const displayCode=document.getElementById('code_'+selectId.replace('رقم_',''));
+  if(displayName) displayName.textContent=opt?.dataset?.name?`الاسم: ${opt.dataset.name}`:'';
+  if(displayCode) displayCode.textContent=opt?.value?`الكود المحفوظ: ${opt.value} ${opt.dataset.code?'('+opt.dataset.code+')':''}`:'';
+}
+async function onSectorChange(sectorId){
+  showDisplay('رقم_القطاع','القطاعات');
+  if(sectorId){
+    await loadSelect('المحطات','رقم_المحطة','اسم_المحطة','رقم_المحطة',`WHERE رقم_القطاع=${sectorId}`);
+    await loadSelect('الإدارات_العامة','رقم_الإدارة_العامة','اسم_الإدارة_العامة','رقم_الإدارة_العامة',`WHERE رقم_القطاع=${sectorId}`);
+  }else{
+    await loadSelect('المحطات','رقم_المحطة','اسم_المحطة','رقم_المحطة');
+    await loadSelect('الإدارات_العامة','رقم_الإدارة_العامة','اسم_الإدارة_العامة','رقم_الإدارة_العامة');
+  }
+}
+async function onGenDeptChange(genId){
+  showDisplay('رقم_الإدارة_العامة','الإدارات_العامة');
+  if(genId){ await loadSelect('الإدارات','رقم_الإدارة','اسم_الإدارة','رقم_الإدارة',`WHERE رقم_الإدارة_العامة=${genId}`); }
+}
+async function onGroupChange(groupId){
+  showDisplay('رقم_المجموعة','المجموعات_الوظيفية');
+  if(groupId){ await loadSelect('الوظائف','رقم_الوظيفة','اسم_الوظيفة','رقم_الوظيفة',`WHERE رقم_المجموعة=${groupId}`); }
+}
+async function onJobChange(jobId){
+  showDisplay('رقم_الوظيفة','الوظائف');
+  if(jobId){ await loadSelect('تخصصات_الوظائف','رقم_تخصص_الوظيفة','اسم_تخصص_الوظيفة','رقم_تخصص_الوظيفة',`WHERE رقم_الوظيفة=${jobId}`); }
+}
+async function onQualCatChange(catId){
+  showDisplay('رقم_فئة_المؤهل','فئات_المؤهلات');
+  if(catId){ await loadSelect('أنواع_المؤهلات','رقم_النوع','اسم_المؤهل','رقم_نوع_المؤهل',`WHERE رقم_الفئة=${catId}`); }
+}
+async function onQualTypeChange(typeId){
+  showDisplay('رقم_نوع_المؤهل','أنواع_المؤهلات');
+  if(typeId){ await loadSelect('تخصصات_المؤهلات','رقم_التخصص','اسم_التخصص','رقم_التخصص',`WHERE رقم_النوع=${typeId}`); }
+}
+async function loadAll(){
+  await loadSelect('القطاعات','رقم_القطاع','اسم_القطاع','رقم_القطاع');
+  await loadSelect('المحطات','رقم_المحطة','اسم_المحطة','رقم_المحطة');
+  await loadSelect('الإدارات_العامة','رقم_الإدارة_العامة','اسم_الإدارة_العامة','رقم_الإدارة_العامة');
+  await loadSelect('الإدارات','رقم_الإدارة','اسم_الإدارة','رقم_الإدارة');
+  await loadSelect('المجموعات_الوظيفية','رقم_المجموعة','اسم_المجموعة','رقم_المجموعة');
+  await loadSelect('الوظائف','رقم_الوظيفة','اسم_الوظيفة','رقم_الوظيفة');
+  await loadSelect('تخصصات_الوظائف','رقم_تخصص_الوظيفة','اسم_تخصص_الوظيفة','رقم_تخصص_الوظيفة');
+  await loadSelect('فئات_المؤهلات','رقم_الفئة','اسم_الفئة','رقم_فئة_المؤهل');
+  await loadSelect('أنواع_المؤهلات','رقم_النوع','اسم_المؤهل','رقم_نوع_المؤهل');
+  await loadSelect('تخصصات_المؤهلات','رقم_التخصص','اسم_التخصص','رقم_التخصص');
+  const cnt=await q(`SELECT COUNT(*) as c FROM "الموظفون"`);
+  const el=document.getElementById('empCount'); if(el) el.textContent=`الموظفون: ${cnt[0]?.c||0}`;
+}
+function getVal(id){ const el=document.getElementById(id); return el?el.value.trim():''; }
+function buildReview(){
+  const fields=[
+    ['الكود البنكي',getVal('الكود_البنكى')],
+    ['اسم العامل',getVal('اسم_العامل')],
+    ['الرقم القومي',getVal('الرقم_القومى')],
+    ['تاريخ الميلاد',getVal('تاريخ_الميلاد')],
+    ['جهة الميلاد',getVal('جهة_الميلاد')],
+    ['الديانة',getVal('الديانة')],
+    ['النوع',getVal('النوع')],
+    ['التجنيد',getVal('الموقف_من_التجنيد')],
+    ['الرقم التأميني',getVal('الرقم_التأمينى')],
+    ['تاريخ التعيين',getVal('تاريخ_التعيين')],
+    ['القطاع',document.getElementById('رقم_القطاع')?.options[document.getElementById('رقم_القطاع').selectedIndex]?.dataset?.name+' (كود:'+getVal('رقم_القطاع')+')'],
+    ['المحطة',document.getElementById('رقم_المحطة')?.options[document.getElementById('رقم_المحطة').selectedIndex]?.dataset?.name+' (كود:'+getVal('رقم_المحطة')+')'],
+    ['الإدارة العامة',document.getElementById('رقم_الإدارة_العامة')?.options[document.getElementById('رقم_الإدارة_العامة').selectedIndex]?.dataset?.name],
+    ['الإدارة',document.getElementById('رقم_الإدارة')?.options[document.getElementById('رقم_الإدارة').selectedIndex]?.dataset?.name],
+    ['المجموعة',document.getElementById('رقم_المجموعة')?.options[document.getElementById('رقم_المجموعة').selectedIndex]?.dataset?.name],
+    ['الوظيفة',document.getElementById('رقم_الوظيفة')?.options[document.getElementById('رقم_الوظيفة').selectedIndex]?.dataset?.name],
+    ['تخصص الوظيفة',document.getElementById('رقم_تخصص_الوظيفة')?.options[document.getElementById('رقم_تخصص_الوظيفة').selectedIndex]?.textContent],
+    ['فئة المؤهل',document.getElementById('رقم_فئة_المؤهل')?.options[document.getElementById('رقم_فئة_المؤهل').selectedIndex]?.dataset?.name],
+    ['نوع المؤهل',document.getElementById('رقم_نوع_المؤهل')?.options[document.getElementById('رقم_نوع_المؤهل').selectedIndex]?.dataset?.name],
+    ['تخصص المؤهل',document.getElementById('رقم_التخصص')?.options[document.getElementById('رقم_التخصص').selectedIndex]?.dataset?.name],
+    ['العنوان',getVal('العنوان_الكامل')],
+    ['الموبايل',getVal('رقم_الموبايل')],
+    ['البريد',getVal('البريد_الإلكترونى')],
+    ['الدرجة',getVal('اسم_الدرجة')+' '+getVal('رقم_الدرجة')+' '+getVal('الفئة_المالية')],
+    ['الصلاحية',getVal('نوع_الصلاحية')],
+  ];
+  let html='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">';
+  fields.forEach(f=>{ if(f[1]) html+=`<div style="border:1px solid var(--border);border-radius:8px;padding:6px"><b style="color:var(--acc)">${f[0]}:</b> ${f[1]}</div>`; });
+  html+='</div>';
+  const ra=document.getElementById('reviewArea'); if(ra) ra.innerHTML=html;
+}
+async function saveEmployee(){
+  const الكود_البنكى=getVal('الكود_البنكى');
+  const اسم_العامل=getVal('اسم_العامل');
+  const الرقم_القومى=getVal('الرقم_القومى');
+  if(!الكود_البنكى||!اسم_العامل||!الرقم_القومى){ alert('الكود البنكي واسم العامل والرقم القومي إلزامي'); goToStep(1); return; }
+  if(الرقم_القومى.length!==14){ alert('الرقم القومي يجب أن يكون 14 رقم'); return; }
+  setSaveStatus('⏳ جاري الحفظ...','info');
+  try{
+    const empData={
+      الكود_البنكى, اسم_العامل, الرقم_القومى,
+      تاريخ_الميلاد:getVal('تاريخ_الميلاد')||null,
+      جهة_الميلاد:getVal('جهة_الميلاد')||null,
+      الديانة:getVal('الديانة')||null,
+      النوع:getVal('النوع')||'ذكر',
+      الموقف_من_التجنيد:getVal('الموقف_من_التجنيد')||null,
+      الرقم_التأمينى:getVal('الرقم_التأمينى')||null,
+      تاريخ_التعيين:getVal('تاريخ_التعيين')||null,
+      رقم_القطاع:getVal('رقم_القطاع')?parseInt(getVal('رقم_القطاع')):null,
+      رقم_المحطة:getVal('رقم_المحطة')?parseInt(getVal('رقم_المحطة')):null,
+      رقم_الإدارة_العامة:getVal('رقم_الإدارة_العامة')?parseInt(getVal('رقم_الإدارة_العامة')):null,
+      رقم_الإدارة:getVal('رقم_الإدارة')?parseInt(getVal('رقم_الإدارة')):null,
+      رقم_المجموعة:getVal('رقم_المجموعة')?parseInt(getVal('رقم_المجموعة')):null,
+      رقم_الوظيفة:getVal('رقم_الوظيفة')?parseInt(getVal('رقم_الوظيفة')):null,
+      رقم_تخصص_الوظيفة:getVal('رقم_تخصص_الوظيفة')?parseInt(getVal('رقم_تخصص_الوظيفة')):null,
+      رقم_فئة_المؤهل:getVal('رقم_فئة_المؤهل')?parseInt(getVal('رقم_فئة_المؤهل')):null,
+      رقم_نوع_المؤهل:getVal('رقم_نوع_المؤهل')?parseInt(getVal('رقم_نوع_المؤهل')):null,
+      رقم_التخصص:getVal('رقم_التخصص')?parseInt(getVal('رقم_التخصص')):null,
+      الوظيفة_المعين_عليها:getVal('الوظيفة_المعين_عليها')||null,
+      رقم_الهاتف:getVal('رقم_الهاتف')||getVal('رقم_الموبايل')||null,
+      ملاحظات:getVal('ملاحظات')||null,
+    };
+    const existingByCode=await q(`SELECT "الكود_البنكى" FROM "الموظفون" WHERE "الكود_البنكى"='${الكود_البنكى.replace(/'/g,"''")}' LIMIT 1`);
+    const existingByNational=await q(`SELECT "الكود_البنكى" FROM "الموظفون" WHERE "الرقم_القومى"='${الرقم_القومى.replace(/'/g,"''")}' AND "الكود_البنكى"!='${الكود_البنكى.replace(/'/g,"''")}' LIMIT 1`);
+    if(existingByNational.length>0){ alert(`❌ الرقم القومي موجود للموظف ${existingByNational[0]['الكود_البنكى']}`); setSaveStatus(`❌ قومي مكرر`,'error'); return; }
+    let saveMode='';
+    if(isEditMode && existingByCode.length>0){
+      saveMode='تعديل';
+      const setClauses=Object.keys(empData).filter(k=>k!=='الكود_البنكى').map(k=>{
+        const v=empData[k];
+        if(v===null) return `"${k.replace(/"/g,'""')}"=NULL`;
+        if(typeof v==='number') return `"${k.replace(/"/g,'""')}"=${v}`;
+        return `"${k.replace(/"/g,'""')}"='${String(v).replace(/'/g,"''")}'`;
+      }).join(',');
+      await q(`UPDATE "الموظفون" SET ${setClauses} WHERE "الكود_البنكى"='${الكود_البنكى.replace(/'/g,"''")}'`);
+    }else{
+      if(existingByCode.length>0 && !isEditMode){
+        const next=await getNextEmployeeCode();
+        document.getElementById('الكود_البنكى').value=next;
+        alert(`❌ الكود موجود - تم اقتراح ${next}`); setSaveStatus(`❌ كود موجود`,'error'); return;
+      }
+      saveMode='إضافة جديد';
+      const cols=Object.keys(empData).filter(k=>empData[k]!==null&&empData[k]!=='');
+      const vals=cols.map(k=>{
+        const v=empData[k];
+        if(typeof v==='number') return v;
+        if(v===null) return 'NULL';
+        return `'${String(v).replace(/'/g,"''")}'`;
+      });
+      await q(`INSERT INTO "الموظفون" ("${cols.map(c=>c.replace(/"/g,'""')).join('","')}") VALUES (${vals.join(',')})`);
+    }
+    const عنوان=getVal('العنوان_الكامل');
+    if(عنوان){
+      await q(`DELETE FROM "عناوين_الموظفين" WHERE "الكود_البنكى"='${الكود_البنكى.replace(/'/g,"''")}' AND "هل_أساسي"=1`);
+      await q(`INSERT INTO "عناوين_الموظفين" ("الكود_البنكى","نوع_العنوان","العنوان_الكامل","رقم_الموبايل","الرقم_الأرضى","البريد_الإلكترونى","هل_أساسي") VALUES ('${الكود_البنكى.replace(/'/g,"''")}','${getVal('نوع_العنوان')}','${عنوان.replace(/'/g,"''")}','${getVal('رقم_الموبايل')}','${getVal('الرقم_الأرضى')}','${getVal('البريد_الإلكترونى')}','1')`);
+    }
+    const اسم_الدرجة=getVal('اسم_الدرجة');
+    if(اسم_الدرجة){
+      if(isEditMode){ await q(`UPDATE "الدرجات_الوظيفية" SET "هل_حالية"=0 WHERE "الكود_البنكى"='${الكود_البنكى.replace(/'/g,"''")}'`); }
+      await q(`INSERT INTO "الدرجات_الوظيفية" ("الكود_البنكى","اسم_الدرجة","رقم_الدرجة","الفئة_المالية","تاريخ_الدرجة","هل_حالية") VALUES ('${الكود_البنكى.replace(/'/g,"''")}','${اسم_الدرجة.replace(/'/g,"''")}','${getVal('رقم_الدرجة')}','${getVal('الفئة_المالية')}','${getVal('تاريخ_الدرجة')||new Date().toISOString().slice(0,10)}',1)`);
+    }
+    const اسم_المستخدم=getVal('اسم_المستخدم');
+    const كلمة_المرور=getVal('كلمة_المرور')||'123456';
+    if(اسم_المستخدم||getVal('نوع_الصلاحية')!=='User'){
+      const permExist=await q(`SELECT "الكود_البنكى" FROM "صلاحيات_المستخدمين" WHERE "الكود_البنكى"='${الكود_البنكى.replace(/'/g,"''")}' LIMIT 1`);
+      if(permExist.length>0){
+        await q(`UPDATE "صلاحيات_المستخدمين" SET "الرقم_القومى"='${الرقم_القومى.replace(/'/g,"''")}','اسم_المستخدم"='${(اسم_المستخدم||الكود_البنكى).replace(/'/g,"''")}','كلمة_المرور_المشفرة"='${كلمة_المرور.replace(/'/g,"''")}','نوع_الصلاحية"='${getVal('نوع_الصلاحية')}',"هل_نشط"=1 WHERE "الكود_البنكى"='${الكود_البنكى.replace(/'/g,"''")}'`);
+      }else{
+        await q(`INSERT INTO "صلاحيات_المستخدمين" ("الكود_البنكى","الرقم_القومى","اسم_المستخدم","كلمة_المرور_المشفرة","نوع_الصلاحية","هل_نشط") VALUES ('${الكود_البنكى.replace(/'/g,"''")}','${الرقم_القومى.replace(/'/g,"''")}','${(اسم_المستخدم||الكود_البنكى).replace(/'/g,"''")}','${كلمة_المرور.replace(/'/g,"''")}','${getVal('نوع_الصلاحية')}',1)`);
+      }
+    }
+    setSaveStatus(`🎉 تم ${saveMode} ${اسم_العامل} (${الكود_البنكى}) بنجاح`,'success');
+    alert(`تم ${saveMode} بنجاح!\nالكود: ${الكود_البنكى}\nالاسم: ${اسم_العامل}`);
+    const cnt=await q(`SELECT COUNT(*) as c FROM "الموظفون"`);
+    const el=document.getElementById('empCount'); if(el) el.textContent=`الموظفون: ${cnt[0]?.c||0}`;
+  }catch(e){ setSaveStatus('❌ خطأ: '+e.message,'error'); alert('خطأ: '+e.message); }
+}
+function clearForm(){
+  if(!confirm('تفريغ جميع الحقول؟')) return;
+  document.querySelectorAll('.input').forEach(el=>{
+    if(el.id.startsWith('search')) return;
+    if(el.tagName==='SELECT') el.selectedIndex=0;
+    else el.value='';
+  });
+  document.querySelectorAll('.display-name,.display-code').forEach(el=>el.textContent='');
+  const ra=document.getElementById('reviewArea'); if(ra) ra.innerHTML='';
+  setSaveStatus('','info'); const ss=document.getElementById('saveStatus'); if(ss) ss.style.display='none';
+  showStep(1);
+}
+// ============ نهاية الدوال الأصلية بدون تعديل ============
+
+// ============ إضافات جديدة فقط - بحث + كود تلقائي + تعديل + تنظيم عرض + طباعة - بدون تعديل الدوال القديمة ============
+let currentEditEmployee=null;
+let isEditMode=false;
+
+async function getNextEmployeeCode(){
+  try{
+    const rows=await q(`SELECT "الكود_البنكى" FROM "الموظفون"`);
+    let maxNum=0;
+    rows.forEach(r=>{
+      const code=r["الكود_البنكى"]||r[Object.values(r)[0]];
+      const num=parseInt(String(code).replace(/[^0-9]/g,''));
+      if(!isNaN(num) && num>maxNum) maxNum=num;
+    });
+    if(maxNum===0){
+      const m=await q(`SELECT MAX(CAST("الكود_البنكى" AS INTEGER)) as mx FROM "الموظفون"`);
+      maxNum=parseInt(m[0]?.mx||0);
+    }
+    return String(maxNum+1);
+  }catch(e){ return String(Date.now()).slice(-4); }
+}
+
+async function prepareNewEmployee(){
+  isEditMode=false;
+  currentEditEmployee=null;
+  const badge=document.getElementById('modeBadge'); if(badge) badge.textContent='وضع: إضافة جديد';
+  document.querySelectorAll('.input').forEach(el=>{
+    if(el.id.startsWith('search')) return;
+    if(el.tagName==='SELECT') el.selectedIndex=0;
+    else el.value='';
+  });
+  document.querySelectorAll('.display-name,.display-code').forEach(el=>el.textContent='');
+  const ra=document.getElementById('reviewArea'); if(ra) ra.innerHTML='';
+  const ss=document.getElementById('saveStatus'); if(ss) ss.style.display='none';
+  const nextCode=await getNextEmployeeCode();
+  const codeEl=document.getElementById('الكود_البنكى'); if(codeEl){ codeEl.value=nextCode; codeEl.style.background='rgba(16,185,129,0.15)'; setTimeout(()=>codeEl.style.background='',2000); }
+  switchView('add');
+  showStep(1);
+}
+
+async function searchEmployee(){
+  const code=document.getElementById('searchCode')?.value.trim()||'';
+  const national=document.getElementById('searchNational')?.value.trim()||'';
+  const name=document.getElementById('searchName')?.value.trim()||'';
+  if(!code && !national && !name){ alert('أدخل كود أو قومي أو اسم للبحث'); return; }
+  let where=[];
+  if(code) where.push(`"الكود_البنكى" LIKE '%${code.replace(/'/g,"''")}%'`);
+  if(national) where.push(`"الرقم_القومى" LIKE '%${national.replace(/'/g,"''")}%'`);
+  if(name) where.push(`"اسم_العامل" LIKE '%${name.replace(/'/g,"''")}%'`);
+  const whereClause=where.length?`WHERE ${where.join(' OR ')}`:'';
+  const rows=await q(`SELECT * FROM "الموظفون" ${whereClause} LIMIT 50`);
+  const rc=document.getElementById('searchResultCount'); if(rc) rc.textContent=`نتائج: ${rows.length}`;
+  const sr=document.getElementById('searchResults'); if(sr) sr.style.display=rows.length?'block':'none';
+  const tbody=document.getElementById('searchTableBody'); if(!tbody) return;
+  tbody.innerHTML='';
+  for(let r of rows){
+    let stationName='-'; let jobName='-';
+    if(r['رقم_المحطة']){
+      const st=cache['المحطات']?.find(x=>String(x['رقم_المحطة'])===String(r['رقم_المحطة']));
+      stationName=st?st['اسم_المحطة']:r['رقم_المحطة'];
+    }
+    if(r['رقم_الوظيفة']){
+      const jb=cache['الوظائف']?.find(x=>String(x['رقم_الوظيفة'])===String(r['رقم_الوظيفة']));
+      jobName=jb?jb['اسم_الوظيفة']:r['رقم_الوظيفة'];
+    }
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td style="padding:6px;border:1px solid var(--border);text-align:center">${r['الكود_البنكى']}</td>
+      <td style="padding:6px;border:1px solid var(--border)">${r['اسم_العامل']}</td>
+      <td style="padding:6px;border:1px solid var(--border);text-align:center">${r['الرقم_القومى']||''}</td>
+      <td style="padding:6px;border:1px solid var(--border)">${stationName}</td>
+      <td style="padding:6px;border:1px solid var(--border)">${jobName}</td>
+      <td style="padding:6px;border:1px solid var(--border);text-align:center">
+        <button class="btn" style="height:28px;font-size:9px" onclick="viewEmployee('${r['الكود_البنكى']}')">👁️ عرض</button>
+        <button class="btn btn-p" style="height:28px;font-size:9px" onclick="editEmployee('${r['الكود_البنكى']}')">✏️ تعديل</button>
+      </td>`;
+    tbody.appendChild(tr);
+  }
+  if(rows.length===1){ viewEmployee(rows[0]['الكود_البنكى']); }
+}
+
+async function viewEmployee(code){
+  const rows=await q(`SELECT * FROM "الموظفون" WHERE "الكود_البنكى"='${String(code).replace(/'/g,"''")}' LIMIT 1`);
+  if(!rows.length){ alert('الموظف غير موجود'); return; }
+  const emp=rows[0];
+  currentEditEmployee=emp;
+  const addrRows=await q(`SELECT * FROM "عناوين_الموظفين" WHERE "الكود_البنكى"='${String(code).replace(/'/g,"''")}' AND "هل_أساسي"=1 LIMIT 1`);
+  const addr=addrRows[0]||{};
+  const gradeRows=await q(`SELECT * FROM "الدرجات_الوظيفية" WHERE "الكود_البنكى"='${String(code).replace(/'/g,"''")}' AND "هل_حالية"=1 LIMIT 1`);
+  const grade=gradeRows[0]||{};
+  const permRows=await q(`SELECT * FROM "صلاحيات_المستخدمين" WHERE "الكود_البنكى"='${String(code).replace(/'/g,"''")}' LIMIT 1`);
+  const perm=permRows[0]||{};
+  const getName=(table, idField, idVal, nameField)=>{
+    if(!idVal) return '-';
+    const row=cache[table]?.find(x=>String(x[idField])===String(idVal));
+    return row?row[nameField]:idVal;
+  };
+  const sectorName=getName('القطاعات','رقم_القطاع',emp['رقم_القطاع'],'اسم_القطاع');
+  const stationName=getName('المحطات','رقم_المحطة',emp['رقم_المحطة'],'اسم_المحطة');
+  const genDeptName=getName('الإدارات_العامة','رقم_الإدارة_العامة',emp['رقم_الإدارة_العامة'],'اسم_الإدارة_العامة');
+  const deptName=getName('الإدارات','رقم_الإدارة',emp['رقم_الإدارة'],'اسم_الإدارة');
+  const groupName=getName('المجموعات_الوظيفية','رقم_المجموعة',emp['رقم_المجموعة'],'اسم_المجموعة');
+  const jobName=getName('الوظائف','رقم_الوظيفة',emp['رقم_الوظيفة'],'اسم_الوظيفة');
+  const jobSpecName=getName('تخصصات_الوظائف','رقم_تخصص_الوظيفة',emp['رقم_تخصص_الوظيفة'],'اسم_تخصص_الوظيفة');
+  const qualCatName=getName('فئات_المؤهلات','رقم_الفئة',emp['رقم_فئة_المؤهل'],'اسم_الفئة');
+  const qualTypeName=getName('أنواع_المؤهلات','رقم_النوع',emp['رقم_نوع_المؤهل'],'اسم_المؤهل');
+  const qualSpecName=getName('تخصصات_المؤهلات','رقم_التخصص',emp['رقم_التخصص'],'اسم_التخصص');
+  const html=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px">
+      <div style="grid-column:1/-1;padding:10px;background:var(--fantasy2);border-radius:12px;border-right:4px solid var(--acc)">
+        <b style="font-size:14px">👤 ${emp['اسم_العامل']} - كود: ${emp['الكود_البنكى']}</b><br>
+        <span style="font-size:10px;color:var(--text2)">قومي: ${emp['الرقم_القومى']||'-'} - ميلاد: ${emp['تاريخ_الميلاد']||'-'} - تعيين: ${emp['تاريخ_التعيين']||'-'}</span>
+      </div>
+      <div style="border:1.5px solid var(--border);border-radius:10px;padding:8px"><b>القطاع:</b> ${sectorName} <small style="color:var(--text2)">(كود:${emp['رقم_القطاع']||'-'})</small></div>
+      <div style="border:1.5px solid var(--border);border-radius:10px;padding:8px"><b>المحطة:</b> ${stationName} <small style="color:var(--text2)">(كود:${emp['رقم_المحطة']||'-'})</small></div>
+      <div style="border:1.5px solid var(--border);border-radius:10px;padding:8px"><b>الإدارة العامة:</b> ${genDeptName}</div>
+      <div style="border:1.5px solid var(--border);border-radius:10px;padding:8px"><b>الإدارة:</b> ${deptName}</div>
+      <div style="border:1.5px solid var(--border);border-radius:10px;padding:8px"><b>المجموعة:</b> ${groupName}</div>
+      <div style="border:1.5px solid var(--border);border-radius:10px;padding:8px"><b>الوظيفة:</b> ${jobName} <small style="color:var(--text2)">(كود:${emp['رقم_الوظيفة']||'-'})</small></div>
+      <div style="border:1.5px solid var(--border);border-radius:10px;padding:8px"><b>تخصص الوظيفة:</b> ${jobSpecName}</div>
+      <div style="border:1.5px solid var(--border);border-radius:10px;padding:8px"><b>فئة المؤهل:</b> ${qualCatName}</div>
+      <div style="border:1.5px solid var(--border);border-radius:10px;padding:8px"><b>نوع المؤهل:</b> ${qualTypeName}</div>
+      <div style="border:1.5px solid var(--border);border-radius:10px;padding:8px"><b>تخصص المؤهل:</b> ${qualSpecName}</div>
+      <div style="border:1.5px solid var(--border);border-radius:10px;padding:8px"><b>العنوان:</b> ${addr['العنوان_الكامل']||'-'}</div>
+      <div style="border:1.5px solid var(--border);border-radius:10px;padding:8px"><b>الموبايل:</b> ${addr['رقم_الموبايل']||emp['رقم_الهاتف']||'-'}</div>
+      <div style="border:1.5px solid var(--border);border-radius:10px;padding:8px"><b>الدرجة:</b> ${grade['اسم_الدرجة']||'-'} ${grade['رقم_الدرجة']||''}</div>
+      <div style="border:1.5px solid var(--border);border-radius:10px;padding:8px"><b>الصلاحية:</b> ${perm['نوع_الصلاحية']||'-'}</div>
+    </div>`;
+  const content=document.getElementById('employeeDisplayContent'); if(content) content.innerHTML=html;
+  const card=document.getElementById('employeeDisplayCard'); if(card){ card.style.display='block'; card.scrollIntoView({behavior:'smooth'}); }
+}
+
+async function editEmployee(code){
+  await viewEmployee(code);
+  setTimeout(()=>loadEmployeeToForm(),400);
+}
+
+async function loadEmployeeToForm(){
+  if(!currentEditEmployee){ alert('اختر موظف أولاً'); return; }
+  const emp=currentEditEmployee;
+  isEditMode=true;
+  const badge=document.getElementById('modeBadge'); if(badge) badge.textContent=`وضع: تعديل - ${emp['الكود_البنكى']}`;
+  document.getElementById('الكود_البنكى').value=emp['الكود_البنكى']||'';
+  document.getElementById('اسم_العامل').value=emp['اسم_العامل']||'';
+  document.getElementById('الرقم_القومى').value=emp['الرقم_القومى']||'';
+  document.getElementById('تاريخ_الميلاد').value=emp['تاريخ_الميلاد']||'';
+  document.getElementById('جهة_الميلاد').value=emp['جهة_الميلاد']||'';
+  document.getElementById('الديانة').value=emp['الديانة']||'';
+  document.getElementById('النوع').value=emp['النوع']||'ذكر';
+  document.getElementById('الموقف_من_التجنيد').value=emp['الموقف_من_التجنيد']||'';
+  document.getElementById('الرقم_التأمينى').value=emp['الرقم_التأمينى']||'';
+  document.getElementById('تاريخ_التعيين').value=emp['تاريخ_التعيين']||'';
+  document.getElementById('الوظيفة_المعين_عليها').value=emp['الوظيفة_المعين_عليها']||'';
+  document.getElementById('ملاحظات').value=emp['ملاحظات']||'';
+  document.getElementById('رقم_الهاتف').value=emp['رقم_الهاتف']||'';
+  if(emp['رقم_القطاع']){
+    document.getElementById('رقم_القطاع').value=emp['رقم_القطاع'];
+    await onSectorChange(emp['رقم_القطاع']);
+  }
+  setTimeout(async()=>{
+    if(emp['رقم_المحطة']){ document.getElementById('رقم_المحطة').value=emp['رقم_المحطة']; showDisplay('رقم_المحطة','المحطات'); }
+    if(emp['رقم_الإدارة_العامة']){ document.getElementById('رقم_الإدارة_العامة').value=emp['رقم_الإدارة_العامة']; await onGenDeptChange(emp['رقم_الإدارة_العامة']); }
+  },400);
+  setTimeout(()=>{
+    if(emp['رقم_الإدارة']){ document.getElementById('رقم_الإدارة').value=emp['رقم_الإدارة']; showDisplay('رقم_الإدارة','الإدارات'); }
+    if(emp['رقم_المجموعة']){ document.getElementById('رقم_المجموعة').value=emp['رقم_المجموعة']; onGroupChange(emp['رقم_المجموعة']); }
+  },800);
+  setTimeout(()=>{
+    if(emp['رقم_الوظيفة']){ document.getElementById('رقم_الوظيفة').value=emp['رقم_الوظيفة']; onJobChange(emp['رقم_الوظيفة']); }
+    if(emp['رقم_فئة_المؤهل']){ document.getElementById('رقم_فئة_المؤهل').value=emp['رقم_فئة_المؤهل']; onQualCatChange(emp['رقم_فئة_المؤهل']); }
+  },1200);
+  setTimeout(()=>{
+    if(emp['رقم_تخصص_الوظيفة']){ document.getElementById('رقم_تخصص_الوظيفة').value=emp['رقم_تخصص_الوظيفة']; }
+    if(emp['رقم_نوع_المؤهل']){ document.getElementById('رقم_نوع_المؤهل').value=emp['رقم_نوع_المؤهل']; onQualTypeChange(emp['رقم_نوع_المؤهل']); }
+  },1600);
+  setTimeout(()=>{ if(emp['رقم_التخصص']){ document.getElementById('رقم_التخصص').value=emp['رقم_التخصص']; } },2000);
+  q(`SELECT * FROM "عناوين_الموظفين" WHERE "الكود_البنكى"='${String(emp['الكود_البنكى']).replace(/'/g,"''")}' LIMIT 1`).then(rows=>{
+    if(rows[0]){
+      document.getElementById('العنوان_الكامل').value=rows[0]['العنوان_الكامل']||'';
+      document.getElementById('رقم_الموبايل').value=rows[0]['رقم_الموبايل']||'';
+      document.getElementById('الرقم_الأرضى').value=rows[0]['الرقم_الأرضى']||'';
+      document.getElementById('البريد_الإلكترونى').value=rows[0]['البريد_الإلكترونى']||'';
+      document.getElementById('نوع_العنوان').value=rows[0]['نوع_العنوان']||'دائم';
+    }
+  });
+  q(`SELECT * FROM "الدرجات_الوظيفية" WHERE "الكود_البنكى"='${String(emp['الكود_البنكى']).replace(/'/g,"''")}' AND "هل_حالية"=1 LIMIT 1`).then(rows=>{
+    if(rows[0]){
+      document.getElementById('اسم_الدرجة').value=rows[0]['اسم_الدرجة']||'';
+      document.getElementById('رقم_الدرجة').value=rows[0]['رقم_الدرجة']||'';
+      document.getElementById('الفئة_المالية').value=rows[0]['الفئة_المالية']||'';
+      document.getElementById('تاريخ_الدرجة').value=rows[0]['تاريخ_الدرجة']||'';
+    }
+  });
+  q(`SELECT * FROM "صلاحيات_المستخدمين" WHERE "الكود_البنكى"='${String(emp['الكود_البنكى']).replace(/'/g,"''")}' LIMIT 1`).then(rows=>{
+    if(rows[0]){
+      document.getElementById('نوع_الصلاحية').value=rows[0]['نوع_الصلاحية']||'User';
+      document.getElementById('اسم_المستخدم').value=rows[0]['اسم_المستخدم']||'';
+    }
+  });
+  switchView('add');
+  showStep(1);
+}
+
+function clearSearch(){
+  const ids=['searchCode','searchNational','searchName'];
+  ids.forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  const sr=document.getElementById('searchResults'); if(sr) sr.style.display='none';
+  const ed=document.getElementById('employeeDisplayCard'); if(ed) ed.style.display='none';
+  const rc=document.getElementById('searchResultCount'); if(rc) rc.textContent='--';
+  currentEditEmployee=null;
+}
+
+// تنظيم العرض - أزرار سفلية
+function switchView(view){
+  document.querySelectorAll('.view-section').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.mob-btn').forEach(b=>b.classList.remove('active'));
+  if(view==='add'){
+    document.getElementById('viewAddEmployee').classList.add('active');
+    document.getElementById('btnAddView')?.classList.add('active');
+  }else if(view==='search'){
+    document.getElementById('viewSearchEmployee').classList.add('active');
+    document.getElementById('btnSearchView')?.classList.add('active');
+  }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// طباعة استمارة فارغة
+async function printBlankForm(){
+  const next=await getNextEmployeeCode();
+  document.getElementById('printNextCode').textContent=next;
+  document.getElementById('printDate').textContent=new Date().toLocaleDateString('ar-EG');
+  const area=document.getElementById('printArea');
+  area.style.display='block';
+  const win=window.open('','_blank');
+  win.document.write(`<html dir="rtl"><head><meta charset="UTF-8"><title>استمارة موظف فارغة</title><style>@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@600;700&display=swap');*{font-family:'Cairo',sans-serif} body{margin:0;padding:10px} @media print{ @page{margin:10mm} }</style></head><body>${area.innerHTML}</body></html>`);
+  win.document.close();
+  setTimeout(()=>{ win.print(); win.close(); area.style.display='none'; },500);
+}
+
+// طباعة مملوءة
+function printFilledForm(){
+  if(!getVal('الكود_البنكى') && !currentEditEmployee){ alert('أدخل بيانات موظف أو اختر موظف من البحث للطباعة المملوءة'); return; }
+  const empData={
+    الكود_البنكى:getVal('الكود_البنكى'),
+    اسم_العامل:getVal('اسم_العامل'),
+    الرقم_القومى:getVal('الرقم_القومى'),
+    تاريخ_الميلاد:getVal('تاريخ_الميلاد'),
+    جهة_الميلاد:getVal('جهة_الميلاد'),
+    الديانة:getVal('الديانة'),
+    النوع:getVal('النوع'),
+    العنوان_الكامل:getVal('العنوان_الكامل'),
+    رقم_الموبايل:getVal('رقم_الموبايل'),
+    اسم_الدرجة:getVal('اسم_الدرجة'),
+  };
+  let html=`<div style="border:3px double #000;padding:16px;font-family:Cairo"><h2 style="text-align:center">شركة نقل الكهرباء - استمارة بيانات موظف - مملوءة</h2><p style="text-align:center;font-size:10px">تاريخ الطباعة: ${new Date().toLocaleDateString('ar-EG')}</p>`;
+  html+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px">`;
+  Object.entries(empData).forEach(([k,v])=>{ html+=`<div style="border:1px solid #000;padding:6px"><b>${k}:</b> ${v||'-'}</div>`; });
+  const sector=document.getElementById('رقم_القطاع')?.options[document.getElementById('رقم_القطاع').selectedIndex]?.dataset?.name||'';
+  const station=document.getElementById('رقم_المحطة')?.options[document.getElementById('رقم_المحطة').selectedIndex]?.dataset?.name||'';
+  const job=document.getElementById('رقم_الوظيفة')?.options[document.getElementById('رقم_الوظيفة').selectedIndex]?.dataset?.name||'';
+  html+=`<div style="border:1px solid #000;padding:6px"><b>القطاع:</b> ${sector}</div>`;
+  html+=`<div style="border:1px solid #000;padding:6px"><b>المحطة:</b> ${station}</div>`;
+  html+=`<div style="border:1px solid #000;padding:6px"><b>الوظيفة:</b> ${job}</div>`;
+  html+=`</div></div>`;
+  const win=window.open('','_blank');
+  win.document.write(`<html dir="rtl"><head><meta charset="UTF-8"><title>طباعة مملوءة</title><style>@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@600&display=swap');*{font-family:'Cairo'} </style></head><body>${html}</body></html>`);
+  win.document.close();
+  setTimeout(()=>{ win.print(); win.close(); },500);
+}
+
+window.onload=async()=>{
+  await loadAll();
+  const saved=localStorage.getItem('theme')||'dark';
+  changeTheme(saved);
+  updateProgress();
+  const toggle=document.getElementById('themeToggle'); if(toggle) toggle.addEventListener('click',()=>changeThemeToggle());
+  if(!document.getElementById('الكود_البنكى').value){
+    const next=await getNextEmployeeCode();
+    const el=document.getElementById('الكود_البنكى'); if(el) el.placeholder=`تلقائي: ${next} (أكبر رقم +1)`;
+  }
+  // افتراضي: عرض الإضافة فقط
+  switchView('add');
+};
+</script>
+</body>
+</html>
