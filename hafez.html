@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<script src="auth-guard.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حافز - V53 - نوع الحافز من قوالب_ترتيب_الحوافز فقط + بحث + حافز إضافى</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&display=swap');
+*{box-sizing:border-box; font-family:'Cairo',Tahoma; font-weight:800}
+body{background:#06110a;background-image:radial-gradient(800px 400px at 20% 10%, rgba(16,185,129,0.12), transparent 60%),radial-gradient(600px 400px at 90% 80%, rgba(5,95,70,0.18), transparent 60%);margin:0;min-height:100vh;transition:background 0.5s; color:#ffffff}
+body *{font-weight:800!important}
+body.light{background:#c9b896!important;background-image:none!important; color:#000000!important}
+body.light *{color:#000!important; font-weight:800!important}
+body.light .card{background:linear-gradient(180deg, rgba(255,248,220,0.97), rgba(222,184,135,0.9));box-shadow:0 12px 30px rgba(101,67,33,0.35);border-color:#8d6e63}
+body.light h2{color:#000000!important}
+body.light .frame{background:#fff8e1;border:1px solid #a1887f;overflow:visible!important}
+body.light input{background:#ffffff!important;color:#000000!important;border:1.5px solid #8d6e63!important;box-shadow:0 2px 0 #8d6e63!important}
+body.light .select-display{background:#ffffff!important;color:#000000!important;border:1.5px solid #8d6e63!important;box-shadow:0 2px 0 #8d6e63!important}
+body.light .select-display span{color:#000000!important}
+body.light th{background:#8d6e63!important;color:#ffffff!important;border:1px solid #5d4037!important}
+body.light td{color:#000000!important;font-weight:900!important;border:1px solid #d7ccc8!important}
+body.light .label-box{background:#8d6e63!important;color:#fff8e1!important;border-color:#5d4037!important}
+body.light .badge{background:#8d6e63!important;color:#fff8e1!important}
+body.light .dropdown-list{background:linear-gradient(180deg, #fff8e1 0%, #ffecb3 100%)!important;border:2px solid #8d6e63!important;box-shadow:0 15px 40px rgba(62,39,35,0.4)!important}
+body.light .dropdown-search{background:#ffe0b2!important;border-bottom:1px solid #8d6e63!important}
+body.light .dropdown-search input{background:#fff!important;color:#000!important;border:1px solid #8d6e63!important}
+body.light .option-item{background:#fff!important;color:#000000!important;border:1px solid #d7ccc8!important}
+body.light .option-item:hover{background:#8d6e63!important;color:#fff8e1!important}
+body.light .preview-bar{background:#5d4037!important;color:#ffecb3!important;border-color:#3e2723!important}
+body.light #saveResult{background:#5d4037!important;color:#ffecb3!important;border-color:#3e2723!important}
+.card{max-width:1380px;margin:16px auto;background:linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.05));backdrop-filter:blur(22px);border-radius:20px;padding:18px 20px;box-shadow:0 25px 60px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,0.15),0 0 40px rgba(16,185,129,0.12);border:1px solid rgba(255,255,255,0.12)}
+h2{margin:0;font-size:21px;font-weight:900;color:#ffffff;text-shadow:0 0 20px rgba(16,185,129,0.4)}
+.badge{display:inline-flex;background:linear-gradient(180deg,rgba(16,185,129,0.2),rgba(5,150,105,0.2));border:1px solid rgba(52,211,153,0.3);padding:5px 11px;border-radius:999px;font-size:11px;font-weight:900;color:#ffffff}
+.frame{background:linear-gradient(180deg,rgba(255,255,255,0.06),rgba(0,0,0,0.2));border:1px solid rgba(255,255,255,0.1);padding:14px;border-radius:16px;margin-top:10px;overflow:visible!important;position:relative;z-index:10}
+.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:7px;overflow:visible!important}
+input{width:100%;border:1.5px solid rgba(255,255,255,0.15);border-radius:11px;font-size:12.5px;background:linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.2));color:#ffffff;height:36px;padding:0 10px;box-shadow:0 3px 0 rgba(0,0,0,0.25),inset 0 1px 0 rgba(255,255,255,0.08); font-weight:800}
+.label-box{height:36px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(16,185,129,0.25),rgba(5,150,105,0.4));border:1.5px solid rgba(16,185,129,0.4);border-radius:11px;font-weight:900;font-size:12px;color:#ffffff;min-width:84px;box-shadow:0 3px 0 rgba(0,0,0,0.2)}
+.pension{color:#ff0000!important;background:linear-gradient(180deg,rgba(239,68,68,0.35),rgba(185,28,28,0.6))!important;border-color:rgba(139,0,0,0.8)!important}
+.col-station{width:165px;position:relative;z-index:50}
+.col-admin{width:165px;position:relative;z-index:49}
+.col-arrow{width:44px}.col-type{width:145px}.col-num{width:75px}.col-month{width:110px}.col-year{width:75px}
+.col-edit-check{width:70px;display:flex;align-items:center;justify-content:center;gap:3px;background:linear-gradient(180deg,rgba(251,191,36,0.15),rgba(245,158,11,0.2));border:1px solid rgba(251,191,36,0.3);border-radius:8px;height:36px}
+.col-resp-header{width:210px}
+.col-code{width:82px}.col-emp{flex:1.2;min-width:170px;position:relative}.col-emp-search{width:44px}.btn-emp-search{width:100%;height:36px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;background:linear-gradient(180deg,#34d399,#059669);border:1.5px solid #047857;border-radius:11px;color:#fff;cursor:pointer;box-shadow:0 3px 0 #065f46;transition:0.15s;margin:0!important;}.btn-emp-search:hover{transform:translateY(-1px);filter:brightness(1.1)}.col-amount{width:105px}.col-doc{flex:0.5;min-width:90px;max-width:50%;}
+#numberInput{background:linear-gradient(180deg,rgba(251,191,36,0.22),rgba(245,158,11,0.32))!important;border-color:rgba(251,191,36,0.45)!important;color:#ffffff!important;font-weight:900;text-align:center}
+body.light #numberInput{background:#5d4037!important;color:#ffecb3!important;border-color:#3e2723!important}
+.btn-arrow{width:100%;height:36px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;background:linear-gradient(180deg,#818cf8,#4f46e5);border:1.5px solid #4338ca;border-radius:11px;color:#fff;cursor:pointer;box-shadow:0 3px 0 #3730a3, 0 0 15px rgba(129,140,248,0.4);transition:0.15s}
+.btn-arrow:hover{transform:translateY(-1px); box-shadow:0 4px 0 #3730a3, 0 0 20px rgba(129,140,248,0.6); filter:brightness(1.1)}
+.btn{height:38px;padding:0 14px;border:1.5px solid rgba(0,0,0,0.15);border-radius:11px;font-weight:900;font-size:11.5px;color:#fff;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;box-shadow:0 4px 0 rgba(0,0,0,0.28),0 6px 18px rgba(0,0,0,0.18),inset 0 1px 0 rgba(255,255,255,0.25);transition:0.12s;min-width:88px;justify-content:center;text-shadow:0 1px 1px rgba(0,0,0,0.4)}
+.btn:hover{transform:translateY(-2px); box-shadow:0 6px 0 rgba(0,0,0,0.28),0 10px 22px rgba(0,0,0,0.25),inset 0 1px 0 rgba(255,255,255,0.35); filter:brightness(1.12)}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,0.25)}
+.btn-add{background:linear-gradient(180deg,#5eead4 0%,#38bdf8 20%,#0ea5e9 60%,#0284c7 100%);box-shadow:0 4px 0 #0369a1;min-width:95px}
+.btn-query{background:linear-gradient(180deg,#c4b5fd 0%,#a78bfa 20%,#7c3aed 60%,#6d28d9 100%);box-shadow:0 4px 0 #5b21b6;min-width:115px}
+.btn-edit{background:linear-gradient(180deg,#fed7aa 0%,#fb923c 20%,#ea580c 60%,#c2410c 100%);box-shadow:0 4px 0 #9a3412;min-width:115px;color:#fff}
+.btn-nav{background:linear-gradient(180deg,#6ee7b7 0%,#34d399 20%,#059669 60%,#047857 100%);box-shadow:0 4px 0 #065f46;min-width:75px}
+.btn-save{background:linear-gradient(180deg,#86efac 0%,#4ade80 20%,#16a34a 60%,#15803d 100%);color:#000;box-shadow:0 4px 0 #166534;min-width:110px}
+.btn-print{background:linear-gradient(180deg,#cbd5e1 0%,#94a3b8 20%,#475569 60%,#334155 100%);box-shadow:0 4px 0 #1e293b;min-width:90px}
+.btn-clear{background:linear-gradient(180deg,#fde68a 0%,#fcd34d 20%,#f59e0b 60%,#d97706 100%);color:#000;box-shadow:0 4px 0 #92400e;min-width:95px}
+.btn-send{background:linear-gradient(180deg,#fda4af 0%,#fb7185 20%,#e11d48 60%,#be123c 100%);box-shadow:0 4px 0 #881337;min-width:85px}
+.btn-delete{background:linear-gradient(180deg,#fca5a5 0%,#ef4444 20%,#b91c1c 60%,#7f1d1d 100%);box-shadow:0 4px 0 #450a0a;min-width:90px}
+.btn-theme{background:linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0.06));border:1px solid rgba(255,255,255,0.18);color:#ffffff;height:32px;min-width:95px;font-size:11px;border-radius:8px;cursor:pointer;box-shadow:0 2px 0 rgba(0,0,0,0.2)}
+body.light .btn-theme{background:#3e2723!important;color:#ffecb3!important;border-color:#5d4037!important}
+.btn-home{background:linear-gradient(180deg,#f9a8d4,#ec4899,#be185d);box-shadow:0 3px 0 #831843;min-width:70px;height:32px;font-size:10px;border-radius:8px}
+.btn:disabled{opacity:0.5;cursor:not-allowed}
+.preview-bar{margin-top:8px;padding:8px 14px;background:linear-gradient(180deg,rgba(16,185,129,0.22),rgba(5,150,105,0.35));border:1.5px solid rgba(16,185,129,0.5);border-radius:10px;font-size:13px;font-weight:900;color:#ffffff;text-align:center;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;box-shadow:0 3px 0 rgba(0,0,0,0.2)}
+.preview-bar span.sep{width:1px;height:18px;background:rgba(255,255,255,0.3)}
+#previewText{padding:5px 14px;background:linear-gradient(180deg,rgba(16,185,129,0.28),rgba(5,95,70,0.45));border:1px solid rgba(16,185,129,0.6);border-radius:999px;color:#ffffff;font-weight:900;font-size:12px;box-shadow:0 2px 0 rgba(0,0,0,0.2)}
+body.light #previewText{background:#5d4037!important;color:#ffecb3!important;border-color:#3e2723!important}
+#saveResult{padding:5px 12px;background:linear-gradient(180deg,rgba(16,185,129,0.28),rgba(5,95,70,0.45));border:1px solid rgba(16,185,129,0.6);border-radius:999px;font-size:12px;font-weight:900;color:#ffffff;text-align:center;display:inline-flex;align-items:center;box-shadow:0 2px 0 rgba(0,0,0,0.2)}
+.table-wrap{max-width:1080px;margin:14px auto 0 auto;overflow-x:auto}
+table{width:100%;border-collapse:collapse!important;border-spacing:0;background:linear-gradient(180deg,rgba(255,255,255,0.08),rgba(0,0,0,0.2));backdrop-filter:blur(10px);border-radius:14px;overflow:hidden;border:1.5px solid rgba(255,255,255,0.2);table-layout:fixed}
+th{background:linear-gradient(180deg,rgba(255,255,255,0.15),rgba(0,0,0,0.3))!important;color:#ffffff!important;padding:10px 6px!important;font-size:13px!important;font-weight:900!important;border:1.5px solid rgba(16,185,129,0.4)!important;border-bottom:2.5px solid rgba(16,185,129,0.7)!important;cursor:pointer;position:relative;user-select:none;white-space:nowrap;text-align:center!important}
+td{padding:8px 6px;border:1px solid rgba(255,255,255,0.15)!important;font-size:13px;font-weight:900;text-align:center;color:#ffffff!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+th.col-emp-name{width:200px!important}
+td.col-emp-name{width:200px!important;max-width:200px;text-align:right!important;padding-right:8px; color:#ffffff!important; font-weight:900!important}
+body.light td.col-emp-name{color:#000000!important}
+.resizer{position:absolute;top:0;left:0;width:8px;height:100%;cursor:col-resize;z-index:5;background:transparent}
+.editable-input.amount-input{color:#8B0000!important;background:rgba(255,255,255,0.92)!important;border:2px solid #8B0000!important;font-weight:900!important;font-size:15px!important}
+body.light .editable-input.amount-input{color:#8B0000!important;background:#ffffff!important;border:2.5px solid #8B0000!important}
+.editable-input{width:85%!important;padding:5px!important;height:30px!important;background:rgba(0,0,0,0.45)!important;color:#ffffff!important;border-radius:8px!important;border:1.5px solid rgba(251,191,36,0.4)!important;text-align:center;font-weight:900;font-size:13px}
+body.light .editable-input{background:#ffffff!important;color:#000000!important;border-color:#8d6e63!important}
+.del-btn{background:linear-gradient(180deg,#fca5a5,#ef4444);color:#fff;border:none;padding:4px 9px;border-radius:8px;font-weight:900;cursor:pointer;font-size:11px;box-shadow:0 2px 0 #dc2626}
+#loading{padding:10px;text-align:center;color:#ffffff;font-size:11px; font-weight:900}
+body.light #loading{color:#000000!important}
+.custom-select{position:relative;width:100%}
+.select-display{height:36px;border:1.5px solid rgba(255,255,255,0.15);border-radius:11px;background:linear-gradient(180deg, rgba(0,0,0,0.4), rgba(0,0,0,0.25));color:#ffffff;display:flex;align-items:center;padding:0 11px;cursor:pointer;font-size:12.5px;justify-content:space-between;box-shadow:0 3px 0 rgba(0,0,0,0.3);transition:0.15s; font-weight:900; white-space:nowrap!important; overflow:hidden!important;}
+.select-display span:first-child{white-space:nowrap!important; overflow:hidden!important; text-overflow:ellipsis!important; flex:1!important; min-width:0!important;}
+.select-display span:last-child{flex:none!important;}
+.option-item{white-space:nowrap!important; overflow:hidden!important; text-overflow:ellipsis!important;}
+.option-item .emp-name{white-space:nowrap!important; overflow:hidden!important; text-overflow:ellipsis!important; display:block!important;}
+.col-station .select-display, .col-admin .select-display, .col-type .select-display, .col-emp .select-display{white-space:nowrap!important; font-size:11px!important;}
+.select-display.open{border-color:#10b981!important}
+.select-display.type{background:linear-gradient(180deg, rgba(168,85,247,0.18), rgba(0,0,0,0.3))!important;border-color:rgba(168,85,247,0.35)!important}
+.select-display.month{background:linear-gradient(180deg, rgba(56,189,248,0.18), rgba(0,0,0,0.3))!important;border-color:rgba(56,189,248,0.35)!important}
+.select-display.year{background:linear-gradient(180deg, rgba(52,211,153,0.18), rgba(0,0,0,0.3))!important;border-color:rgba(52,211,153,0.35)!important}
+.select-display.resp{background:linear-gradient(180deg, rgba(251,113,133,0.15), rgba(0,0,0,0.3))!important;border-color:rgba(251,113,133,0.3)!important}
+.select-display.admin{background:linear-gradient(180deg, rgba(251,191,36,0.18), rgba(0,0,0,0.3))!important;border-color:rgba(251,191,36,0.35)!important}
+.dropdown-list{position:absolute;top:calc(100% + 6px);left:0;right:0;background:linear-gradient(180deg, rgba(12,25,18,0.98), rgba(6,17,10,0.98));border:1.5px solid rgba(16,185,129,0.3);border-radius:12px;z-index:9999;max-height:340px;overflow:hidden;display:none;flex-direction:column;box-shadow:0 20px 50px rgba(0,0,0,0.7)}
+#dropdownStation{min-width:350px!important;width:280%!important;right:0!important;left:auto!important;max-width:450px;z-index:10000!important}
+#dropdownAdmin{min-width:380px!important;width:300%!important;right:0!important;left:auto!important;max-width:500px;z-index:9999!important}
+#dropdownEmp{min-width:350px!important;width:280%!important;right:0!important;left:auto!important;max-width:450px!important;z-index:100!important;max-height:340px!important;}
+#wrapEmp{position:relative;z-index:5; width:100%;}
+.col-emp{width:165px!important;position:relative;z-index:5!important;flex:none!important;min-width:165px!important;max-width:165px!important;margin:0!important;padding:0!important;}
+.col-emp{width:165px!important;position:relative;z-index:5!important;flex:none!important;min-width:165px!important;max-width:165px!important;margin:0!important;padding:0!important;}
+.col-emp .custom-select{width:100%;}
+.col-emp .select-display{height:36px!important;}
+.col-emp-search{width:44px!important;flex:none!important;margin:0 2px 0 2px!important;}
+.col-amount{width:105px!important;flex:none!important;margin:0 2px!important;}
+.col-doc{flex:1!important;min-width:180px!important;margin:0 2px!important;}
+.col-code{width:82px!important;flex:none!important;margin:0 2px!important;}
+.row.second-row{gap:2px!important;display:flex!important;align-items:center!important;flex-wrap:nowrap!important;}
+.row.second-row .custom-select{margin:0!important;}
+
+
+
+.col-emp{flex:0.6!important;min-width:90px!important;max-width:50%!important;}
+.col-emp .emp-code{color:#8B0000!important;font-weight:900!important;}
+.dropdown-search{padding:6px;border-bottom:1px solid rgba(255,255,255,0.08);background:rgba(0,0,0,0.25)}
+.dropdown-search input{height:32px!important;background:rgba(255,255,255,0.07)!important;border:1px solid rgba(16,185,129,0.25)!important;border-radius:9px!important; color:#fff!important}
+body.light .dropdown-search input{color:#000!important}
+.options-container{overflow:auto;max-height:280px;padding:4px}
+.option-item{padding:8px 11px;font-size:13px;color:#000000!important;cursor:pointer;border-radius:9px;margin-bottom:3px;background:#ffffff!important;border:1px solid rgba(0,0,0,0.08)!important;transition:0.15s; font-weight:800!important; box-shadow:0 2px 0 rgba(0,0,0,0.1); white-space:nowrap!important; overflow:hidden!important; text-overflow:ellipsis!important; display:flex!important; align-items:center!important; gap:6px!important; flex-wrap:nowrap!important;}
+.option-item .emp-name{white-space:nowrap!important; overflow:hidden!important; text-overflow:ellipsis!important; flex:1!important;}
+.option-item .emp-code{white-space:nowrap!important; flex-shrink:0!important;}
+#optionsEmp .option-item{flex-direction:row!important; justify-content:space-between!important;}
+
+.option-item .emp-name{color:#000000!important; font-weight:900!important}
+.option-item .emp-code{color:#0d5d0d!important; font-weight:900!important; font-size:11px}
+.option-item.pension-item{background:linear-gradient(180deg, #ffebee, #ffcdd2)!important;color:#8B0000!important;border:2px solid #8B0000!important}
+.option-item:hover{background:linear-gradient(180deg, rgba(16,185,129,0.28), rgba(5,95,70,0.38))!important;border-color:rgba(16,185,129,0.35)!important;transform:translateY(-1px);color:#fff!important}
+.option-item:hover .emp-name{color:#fff!important}
+.filter-bar{display:flex;gap:6px;align-items:center;justify-content:center;margin:10px auto 8px auto;padding:8px 12px;background:linear-gradient(180deg,rgba(16,185,129,0.12),rgba(0,0,0,0.15));border:1px solid rgba(16,185,129,0.25);border-radius:10px;max-width:1080px;flex-wrap:wrap}
+.filter-label{font-size:11px;color:#ffffff;font-weight:900}
+body.light .filter-label{color:#000000!important}
+.filter-select{height:32px;min-width:220px;border-radius:8px;background:rgba(0,0,0,0.35);color:#ffffff;border:1.5px solid rgba(16,185,129,0.3);padding:0 8px;font-size:12px;font-weight:900}
+body.light .filter-select{background:#fff!important;color:#000!important}
+.filter-total{background:linear-gradient(180deg,#fbbf24,#f59e0b);color:#000!important;padding:4px 10px;border-radius:8px;font-weight:900;font-size:12px;box-shadow:0 2px 0 #d97706}
+.btn-reseq{width:22px;height:18px;font-size:10px;background:linear-gradient(180deg,#fbbf24,#f59e0b);color:#000;border:none;border-radius:5px;cursor:pointer;font-weight:900;margin-right:4px;box-shadow:0 1px 0 #d97706}
+.modal-3d-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;z-index:10000}
+.modal-3d-box{background:linear-gradient(145deg, #1a3a2a, #0d2216);border:2px solid rgba(16,185,129,0.5);border-radius:20px;padding:24px 28px;min-width:400px;max-width:520px;box-shadow:0 25px 50px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1) inset, 0 0 40px rgba(16,185,129,0.2), 0 15px 0 rgba(0,0,0,0.4);position:relative}
+.modal-3d-box::before{content:'';position:absolute;top:-2px;left:-2px;right:-2px;bottom:-2px;background:linear-gradient(45deg, #10b981, #34d399, #10b981);border-radius:20px;z-index:-1;filter:blur(12px);opacity:0.5}
+.modal-3d-title{font-size:18px;font-weight:900;color:#fff;text-align:center;margin-bottom:18px;text-shadow:0 2px 10px rgba(16,185,129,0.5)}
+.modal-3d-buttons{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn-3d{padding:12px 22px;border:none;border-radius:12px;font-weight:900;font-size:13px;color:#fff;cursor:pointer;transition:all 0.15s;box-shadow:0 8px 0 rgba(0,0,0,0.3), 0 10px 20px rgba(0,0,0,0.3);position:relative;min-width:140px}
+.btn-3d:active{transform:translateY(6px);box-shadow:0 2px 0 rgba(0,0,0,0.3)}
+.btn-3d-email{background:linear-gradient(145deg, #3b82f6, #1d4ed8);box-shadow:0 8px 0 #1e3a8a, 0 10px 20px rgba(59,130,246,0.4)}
+.btn-3d-whatsapp{background:linear-gradient(145deg, #25D366, #128C7E);box-shadow:0 8px 0 #0d6b5e, 0 10px 20px rgba(37,211,102,0.4)}
+.btn-3d-close{position:absolute;top:10px;left:12px;background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.4);color:#fca5a5;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px}
+.input-3d, .select-3d{width:100%;height:40px;background:rgba(255,255,255,0.08);border:1.5px solid rgba(16,185,129,0.3);border-radius:10px;padding:0 12px;color:#fff;font-size:12px;margin-top:12px;text-align:center}
+.select-3d option{background:#0d2216;color:#fff}
+.modal-3d-success{background:linear-gradient(145deg, #065f46, #064e3b);border-color:rgba(16,185,129,0.7)}
+.edit-mode td{white-space:normal!important;overflow:visible!important}
+.edit-mode .editable-input{width:95%!important}
+
+body.light .modal-3d-overlay{background:rgba(255,248,220,0.75)!important;backdrop-filter:blur(10px)!important}
+body.light .modal-3d-box{background:linear-gradient(145deg, #fff8e1, #ffecb3)!important;border:2px solid #8d6e63!important;box-shadow:0 25px 50px rgba(62,39,35,0.4), 0 0 0 1px rgba(255,255,255,0.5) inset!important}
+body.light .modal-3d-box::before{background:linear-gradient(45deg, #8d6e63, #d7ccc8, #8d6e63)!important;opacity:0.3!important}
+body.light .modal-3d-title{color:#3e2723!important;text-shadow:none!important}
+body.light #quickLoadInfo{color:#5d4037!important}
+body.light #quickLoadStatus{color:#5d4037!important}
+body.light .modal-3d-box .btn-3d{filter:brightness(1.05)}
+
+.m-fixed{background:rgba(0,0,0,0.35)!important;color:#fde68a!important;font-weight:900!important;padding:8px!important;border-radius:6px;display:inline-block;min-width:30px}
+
+/* عمود المحطة خط صغير - اسم المستند من جدول الحوافز */
+#tbody td:nth-child(5){font-size:9px!important; line-height:1.2!important; font-weight:700!important; white-space:normal!important; word-wrap:break-word!important; max-width:300px!important;}
+.col-emp-name{font-size:12px!important;}
+</style>
+</head>
+<body>
+<div class="card">
+
+<div id="globalLoadingBar" style="display:none; position:fixed; top:0; left:0; right:0; height:4px; background:linear-gradient(90deg,#10b981,#34d399,#f59e0b); z-index:99999; animation: loadingSlide 1s infinite linear; box-shadow:0 2px 10px rgba(16,185,129,0.6)"></div>
+<style>@keyframes loadingSlide{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}} @keyframes pulse3D{0%,100%{transform:scale(1) translateY(0)}50%{transform:scale(1.05) translateY(-2px)}}
+/* عمود المحطة خط صغير - اسم المستند من جدول الحوافز */
+#tbody td:nth-child(5){font-size:9px!important; line-height:1.2!important; font-weight:700!important; white-space:normal!important; word-wrap:break-word!important; max-width:300px!important;}
+.col-emp-name{font-size:12px!important;}
+</style>
+<div id="modal3DMessage" class="modal-3d-overlay" style="z-index:11000" onclick="if(event.target===this) this.style.display='none'"><div class="modal-3d-box" id="modal3DMessageBox" style="min-width:360px"><div class="btn-3d-close" onclick="document.getElementById('modal3DMessage').style.display='none'">✕</div><div class="modal-3d-title" id="modal3DMessageTitle">رسالة</div><div id="modal3DMessageText" style="text-align:center; font-size:13px; color:#fde68a; margin:12px 0; line-height:1.6"></div><div style="display:flex; justify-content:center; margin-top:14px"><button class="btn-3d" style="background:linear-gradient(145deg,#10b981,#059669); min-width:120px" onclick="document.getElementById('modal3DMessage').style.display='none'">✅ حسناً</button></div></div></div>
+
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+  <h2>إضافة حافز - <span id="countInfo" style="font-size:11px;color:#94a3b8"></span> - V45 - شهر جديد بدون كشوفات يظهر رقم 1 - لا يعرض بيانات أشهر أخرى</h2>
+  <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+    <button class="btn btn-home" onclick="window.location.href='index.html'">🏠 Home</button>
+    <div class="col-resp-header"><div class="custom-select" id="wrapResp"><div class="select-display resp" id="displayResp" onclick="toggleDropdown('Resp')"><span id="textResp">مسئول الحافز *</span><span>▼</span></div><div class="dropdown-list" id="dropdownResp"><div class="options-container" id="optionsResp"></div></div></div></div>
+    <button class="btn-theme" id="themeBtn" onclick="toggleTheme()">☀ فاتح / غامق</button>
+    <span class="badge" id="badge">⏳ جاري...</span>
+    <span class="badge" id="plusAuthBtn" onclick="window.location.href='AddHafez1.html'" style="cursor:pointer; min-width:32px; justify-content:center; background:linear-gradient(180deg,rgba(251,191,36,0.25),rgba(245,158,11,0.35)); border-color:rgba(251,191,36,0.5); font-size:16px; line-height:1">+</span>
+  </div>
+</div>
+<div class="frame">
+  <div class="row">
+    <div class="col-station"><div class="custom-select" id="wrapStation"><div class="select-display" id="displayStation" onclick="toggleDropdown('Station')"><span id="textStation">المحطات (م.م)</span><span>▼</span></div><div class="dropdown-list" id="dropdownStation"><div class="dropdown-search"><input type="text" id="searchStation" placeholder="🔍 بحث محطة م.م..." oninput="filterDropdown('Station')"></div><div class="options-container" id="optionsStation"></div></div></div></div>
+    <div class="col-admin"><div class="custom-select" id="wrapAdmin"><div class="select-display admin" id="displayAdmin" onclick="toggleDropdown('Admin')"><span id="textAdmin">الإدارات</span><span>▼</span></div><div class="dropdown-list" id="dropdownAdmin"><div class="dropdown-search"><input type="text" id="searchAdmin" placeholder="🔍 بحث إدارة..." oninput="filterDropdown('Admin')"></div><div class="options-container" id="optionsAdmin"></div></div></div></div>
+    <div class="col-type"><div class="custom-select" id="wrapType"><div class="select-display type" id="displayType" onclick="toggleDropdown('Type')"><span id="textType">نوع الحافز</span><span>▼</span></div><div class="dropdown-list" id="dropdownType"><div class="dropdown-search"><input type="text" id="searchType" placeholder="🔍 بحث نوع..." oninput="filterDropdown('Type')"></div><div class="options-container" id="optionsType"></div></div></div></div>
+    <div class="col-arrow"><button class="btn-arrow" onclick="handleQuickLoad()" title="تحميل محطات م.م / إدارات / نوع حافز"> << </button></div>
+    <div class="col-num"><input type="text" id="numberInput" list="numberList" placeholder="رقم"><datalist id="numberList"></datalist></div>
+    <div class="col-month"><div class="custom-select" id="wrapMonth"><div class="select-display month" id="displayMonth" onclick="toggleDropdown('Month')"><span id="textMonth">الشهر</span><span>▼</span></div><div class="dropdown-list" id="dropdownMonth"><div class="options-container" id="optionsMonth"></div></div></div></div>
+    <div class="col-year"><div class="custom-select" id="wrapYear"><div class="select-display year" id="displayYear" onclick="toggleDropdown('Year')"><span id="textYear">السنة</span><span>▼</span></div><div class="dropdown-list" id="dropdownYear"><div class="options-container" id="optionsYear"></div></div></div></div>
+    <div class="col-edit-check" title="تفعيل وضع التعديل المباشر - عند الإلغاء عمود م لا يقبل التعديل"><input type="checkbox" id="editModeChk" onchange="toggleEditMode()" style="width:18px;height:18px;accent-color:#f59e0b"><label for="editModeChk" style="font-size:10px;color:#fde68a;cursor:pointer">✏ تعديل</label></div>
+  </div>
+  <div class="row" style="gap:0!important;">
+    <div class="col-code"><div id="codeLabel" class="label-box">-</div></div>
+    <div class="col-emp" style="margin-left:0!important;"><div class="custom-select" id="wrapEmp"><div class="select-display" id="displayEmp" onclick="toggleDropdown('Emp')"><span id="textEmp">جاري التحميل...</span><span>▼</span></div><div class="dropdown-list" id="dropdownEmp"><div class="dropdown-search"><input type="text" id="searchEmp" placeholder="🔍 بحث بأى جزء من الاسم..." oninput="filterDropdown('Emp')"></div><div class="options-container" id="optionsEmp"></div></div></div></div>
+    <div class="col-emp-search"><button class="btn-emp-search" onclick="searchAllHafezForEmployee()" title="بحث كل حوافز الموظف لجميع الشهور">🔍</button></div>
+    <div class="col-amount"><input type="number" id="amount" placeholder="المبلغ" min="0"></div>
+    <div class="col-doc"><input type="text" id="incentiveName" placeholder="اسم الحافز / المستند *" oninput="updatePreview()"></div>
+  </div>
+  <div class="row" style="justify-content:center; margin-top:12px; gap:6px; flex-wrap:wrap">
+    <button class="btn btn-add" onclick="addToTable()">➕ إضافة</button>
+    <button class="btn btn-query" id="btnInfo" onclick="queryByNumber()">🔍 استعلام</button>
+    <button class="btn btn-edit" id="btnEdit" onclick="editDisclosure()">✏️ تحديث</button>
+    <button class="btn btn-nav" id="btnPrev" onclick="navigateDisclosure(-1)">⏪ السابق</button>
+    <button class="btn btn-nav" id="btnNext" onclick="navigateDisclosure(1)">التالي ⏩</button>
+    <button class="btn btn-save" onclick="saveLocal()">📊 حفظ إكسل</button>
+    <button class="btn btn-save" id="btnSaveTurso" style="background:linear-gradient(180deg,#fbbf24,#f59e0b);color:#000" onclick="saveToTurso()">💾 حفظ قاعدة</button>
+    <button class="btn btn-print" onclick="printTable()">🖨️ طباعة</button>
+    <button class="btn btn-clear" onclick="clearAll()">🗑️ مسح الجدول</button>
+    <button class="btn btn-delete" id="btnDelete" onclick="deleteDisclosure()">❌ حذف الكشف</button>
+    <button class="btn btn-send" onclick="showSendModal3D()">📤 إرسال</button>
+  </div>
+  <div id="previewBar" class="preview-bar" style="display:none"><span id="previewText"></span><span class="sep" id="sepSave" style="display:none"></span><span id="saveResult" style="display:none"></span></div>
+</div>
+<div class="filter-bar" id="filterBar" style="display:none"><span class="filter-label">🔍 فلترة المحطة:</span><select id="stationFilterSelect" class="filter-select" onchange="applyStationFilter()"><option value="">-- كل المحطات --</option></select><span class="filter-total" id="filterTotal">الإجمالي: 0</span><span class="filter-total" id="filterCount" style="background:linear-gradient(180deg,#34d399,#059669);color:#fff">العدد: 0</span><button class="btn btn-clear" style="height:28px;min-width:60px;font-size:10px" onclick="clearStationFilter()">إلغاء الفلتر</button></div>
+<div class="table-wrap" id="printArea"><table id="mainTable"><thead><tr><th style="width:75px" data-col="m" id="thM"><div style="display:flex;align-items:center;justify-content:center;gap:3px"><span onclick="sortByM()" style="flex:1">م <span id="arrowM">▼</span></span><button class="btn-reseq" onclick="event.stopPropagation(); resequenceM()">123</button></div><div class="resizer"></div></th><th style="width:85px" data-col="code">الكود<div class="resizer"></div></th><th class="col-emp-name" style="width:200px" data-col="name">اسم الموظف<div class="resizer"></div></th><th style="width:115px" data-col="amount"><div style="display:flex;align-items:center;justify-content:center;gap:4px"><span>المبلغ</span><span onclick="event.stopPropagation(); showAmountExcelModal()" title="إدخال مبالغ Excel" style="cursor:pointer; width:22px; height:22px; display:flex; align-items:center; justify-content:center; background:linear-gradient(180deg,#fbbf24,#f59e0b); border-radius:5px; color:#000; font-size:14px; font-weight:900; box-shadow:0 2px 0 #d97706">+</span></div><div class="resizer"></div></th><th style="width:150px" data-col="station">المحطة<div class="resizer"></div></th><th style="width:70px"><div style="display:flex;align-items:center;justify-content:center;gap:4px"><span>حذف</span><span onclick="event.stopPropagation(); triggerExcelImport()" title="إدراج Excel (م - كود - اسم - مبلغ - إدارة)" style="cursor:pointer; width:22px; height:22px; display:flex; align-items:center; justify-content:center; background:linear-gradient(180deg,#4ade80,#16a34a); border-radius:5px; color:#000; font-size:14px; font-weight:900; box-shadow:0 2px 0 #15803d">+</span></div><div class="resizer"></div></th></tr></thead><tbody id="tbody"></tbody><tfoot id="tfoot"></tfoot></table></div>
+<input type="file" id="excelImportInput" style="display:none" accept=".xlsx,.xls,.csv" onchange="handleExcelImport(event)">
+<div id="loading">⏳ جاري التحميل...</div>
+</div>
+
+<!-- Modal احترافي لزر >> - 3 خيارات -->
+<div id="quickLoadModal" class="modal-3d-overlay" onclick="if(event.target===this) closeQuickLoadModal()">
+  <div class="modal-3d-box" style="min-width:480px; max-width:560px">
+    <div class="btn-3d-close" onclick="closeQuickLoadModal()">✕</div>
+    <div class="modal-3d-title">📥 تحميل من اختيارك الحالي<br><span style="font-size:11px; color:#6ee7b7">بدون اختيار مزدوج - احترافي</span></div>
+    <div id="quickLoadInfo" style="text-align:center; font-size:12px; color:#fde68a; margin:10px 0"></div>
+    <div class="modal-3d-buttons" style="flex-direction:column; gap:12px">
+      <button id="btnLoadFromStation" class="btn-3d" style="background:linear-gradient(145deg,#10b981,#059669);box-shadow:0 8px 0 #047857; display:none; width:100%" onclick="confirmLoadStation()">🏭 تحميل بيانات المحطات</button>
+      <button id="btnLoadFromAdmin" class="btn-3d" style="background:linear-gradient(145deg,#f59e0b,#d97706);box-shadow:0 8px 0 #92400e; display:none; width:100%; color:#000" onclick="confirmLoadAdmin()">🏢 تحميل الإدارات</button>
+      <button id="btnLoadFromType" class="btn-3d" style="background:linear-gradient(145deg,#8b5cf6,#7c3aed);box-shadow:0 6px 0 #6d28d9; display:none; width:100%" onclick="confirmLoadType()">📋 تحميل نوع الحافز</button>
+    </div>
+    <div id="quickLoadStatus" style="margin-top:14px; text-align:center; font-size:11px; color:#6ee7b7; display:none"></div>
+  </div>
+</div>
+
+<div id="send3DModal" class="modal-3d-overlay" onclick="if(event.target===this) closeSendModal3D()">
+  <div class="modal-3d-box" id="send3DBox">
+    <div class="btn-3d-close" onclick="closeSendModal3D()">✕</div>
+    <div class="modal-3d-title" id="modalTitle">📤 اختيار طريقة الإرسال</div>
+    <div id="modalContent">
+      <div class="modal-3d-buttons" id="chooseButtons">
+        <button class="btn-3d btn-3d-email" onclick="chooseSendEmail()">📧 إرسال بالإيميل</button>
+        <button class="btn-3d btn-3d-whatsapp" onclick="chooseSendWhatsapp()">💬 إرسال واتساب</button>
+      </div>
+      <div id="emailChooseArea" style="display:none">
+        <select id="modalEmailSelect" class="select-3d" onchange="onEmailSelectChange()"><option value="">-- اختر الإيميل --</option><option value="hanamokhtar_2882010@yahoo.com">1. hanamokhtar_2882010@yahoo.com</option><option value="Mostafa.voic77729@gmail.com">2. Mostafa.voic77729@gmail.com</option><option value="Mostafa.voic77@gmail.com">3. Mostafa.voic77@gmail.com</option><option value="__custom__">4. + أدخل إيميل آخر</option></select>
+        <input type="email" id="modalEmailInput" class="input-3d" placeholder="📧 أدخل إيميل آخر..." style="display:none">
+        <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap">
+          <button class="btn-3d btn-3d-email" style="flex:1; min-width:140px; font-size:11px" onclick="sendOutlookDirect()">📧 فتح Outlook مباشرة</button>
+          <button class="btn-3d" style="flex:1; min-width:140px; background:linear-gradient(145deg,#EA4335,#D93025); font-size:11px" onclick="sendGmailDirect()">📮 فتح Gmail مباشرة</button>
+          <button class="btn-3d" style="flex:1; min-width:140px; background:linear-gradient(145deg,#107C41,#0D5F32); font-size:11px" onclick="downloadEmlFile()">📎 تحميل EML بملف مرفق</button>
+        </div>
+      </div>
+      <div id="waChooseArea" style="display:none">
+        <select id="modalWaSelect" class="select-3d" onchange="onWaSelectChange()"><option value="">-- اختر رقم الواتساب --</option><option value="01002657234">1. 01002657234 - إبراهيم محمد سعيد</option><option value="01098519997">2. 01098519997 - أيمن حسنى أحمد</option><option value="01092259655">3. 01092259655 - مصطفى درويش سيد</option><option value="01007749609">4. 01007749609 - خالد سليمان</option><option value="01067773497">5. 01067773497 - محمد مختار</option><option value="01007043970">6. 01007043970 - أيمن ناصف</option><option value="__custom__">7. + أدخل رقم هاتف</option></select>
+        <input type="text" id="modalWaInput" class="input-3d" placeholder="📱 أدخل رقم هاتف آخر..." style="display:none">
+      </div>
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:14px"><button id="btnConfirmSend" class="btn-3d" style="background:linear-gradient(145deg,#10b981,#059669);display:none;min-width:180px" onclick="confirmSend()">✈ تأكيد الإرسال</button></div>
+    </div>
+    <div id="modalStatus" style="margin-top:14px;text-align:center;font-size:12px;color:#6ee7b7;display:none"></div>
+  </div>
+</div>
+
+<div id="loadChoiceModal" class="modal-3d-overlay" onclick="if(event.target===this) closeLoadChoiceModal()">
+  <div class="modal-3d-box" style="min-width:520px; max-width:680px">
+    <div class="btn-3d-close" onclick="closeLoadChoiceModal()">✕</div>
+    <div class="modal-3d-title">📥 اختيار مصدر التحميل القديم</div>
+    <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:12px">
+      <div style="flex:1; min-width:240px; background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.2); border-radius:12px; padding:12px">
+        <div style="font-size:13px; font-weight:900; color:#6ee7b7; margin-bottom:8px; text-align:center">🏭 المحطات</div>
+        <select id="modalStationSelect" class="select-3d" style="margin-top:0"><option value="">-- اختر المحطة --</option></select>
+        <button class="btn-3d" style="width:100%; margin-top:10px; background:linear-gradient(145deg,#10b981,#059669); box-shadow:0 6px 0 #047857; min-width:auto; font-size:12px" onclick="loadFromStationModal()">🏭 تحميل بيانات المحطة</button>
+      </div>
+      <div style="flex:1; min-width:240px; background:rgba(168,85,247,0.08); border:1px solid rgba(168,85,247,0.2); border-radius:12px; padding:12px">
+        <div style="font-size:13px; font-weight:900; color:#c4b5fd; margin-bottom:8px; text-align:center">📋 نوع الحافز</div>
+        <select id="modalTemplateSelect" class="select-3d" style="margin-top:0"><option value="">-- اختر نوع الحافز --</option></select>
+        <button class="btn-3d" style="width:100%; margin-top:10px; background:linear-gradient(145deg,#8b5cf6,#7c3aed); box-shadow:0 6px 0 #6d28d9; min-width:auto; font-size:12px" onclick="loadFromTemplateModal()">📋 تحميل من القوالب</button>
+      </div>
+    </div>
+    <div id="loadChoiceStatus" style="margin-top:12px; text-align:center; font-size:11px; color:#6ee7b7; display:none"></div>
+  </div>
+</div>
+
+<div id="amountExcelModal" class="modal-3d-overlay" onclick="if(event.target===this) closeAmountExcelModal()">
+  <div class="modal-3d-box" style="min-width:720px; max-width:90vw; max-height:85vh; overflow:auto">
+    <div class="btn-3d-close" onclick="closeAmountExcelModal()">✕</div>
+    <div class="modal-3d-title">💰 إدخال المبالغ - جدول Excel</div>
+    <div style="max-height:55vh; overflow:auto; margin-top:12px; border:1px solid rgba(255,255,255,0.1); border-radius:10px">
+      <table id="excelEditTable" style="width:100%; border-collapse:collapse; background:rgba(0,0,0,0.2)">
+        <thead><tr><th style="width:50px; position:sticky; top:0; background:#065f46">م</th><th style="width:70px; position:sticky; top:0; background:#065f46">كود</th><th style="width:180px; position:sticky; top:0; background:#065f46">اسم الموظف</th><th style="width:120px; position:sticky; top:0; background:#065f46">المحطة</th><th style="width:110px; position:sticky; top:0; background:#d97706; color:#000">المبلغ +</th></tr></thead>
+        <tbody id="excelEditTbody"></tbody>
+        <tfoot><tr><td colspan="4" style="text-align:left; background:rgba(16,185,129,0.15); color:#fff; font-weight:900">الإجمالي</td><td id="excelEditTotal" style="background:#f59e0b; color:#000; font-weight:900; text-align:center">0</td></tr></tfoot>
+      </table>
+    </div>
+    <div style="display:flex; gap:10px; justify-content:center; margin-top:14px">
+      <button class="btn-3d" style="background:linear-gradient(145deg,#f59e0b,#d97706); box-shadow:0 8px 0 #92400e; min-width:160px" onclick="applyAmountExcel()">✅ OK - حفظ المبالغ</button>
+      <button class="btn-3d" style="background:linear-gradient(145deg,#6b7280,#4b5563); box-shadow:0 8px 0 #1f2937; min-width:100px" onclick="closeAmountExcelModal()">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<div id="plusAuthModal" class="modal-3d-overlay" onclick="if(event.target===this) closePlusAuthModal()">
+  <div class="modal-3d-box" style="min-width:360px; max-width:420px">
+    <div class="btn-3d-close" onclick="closePlusAuthModal()">✕</div>
+    <div class="modal-3d-title">🔐 كلمة مرور إدارة المعاشات</div>
+    <input type="password" id="plusPasswordInput" class="input-3d" placeholder="أدخل كلمة المرور..." style="text-align:center; font-size:14px; height:44px">
+    <div style="display:flex; gap:10px; justify-content:center; margin-top:16px">
+      <button class="btn-3d" style="background:linear-gradient(145deg,#f59e0b,#d97706); box-shadow:0 8px 0 #92400e; min-width:140px" onclick="verifyPlusPassword()">🔓 دخول</button>
+      <button class="btn-3d" style="background:linear-gradient(145deg,#6b7280,#4b5563); box-shadow:0 8px 0 #1f2937; min-width:100px" onclick="closePlusAuthModal()">إلغاء</button>
+    </div>
+    <div id="plusAuthStatus" style="margin-top:14px; text-align:center; font-size:12px; color:#fca5a5; display:none"></div>
+  </div>
+</div>
+
+<script>
+
+// تثبيت رسائل التنبيه ثلاثية الأبعاد - بشكل صارم
+function show3DMessage(msg, isError=false){
+  try{
+    const modal=document.getElementById('modal3DMessage');
+    const box=document.getElementById('modal3DMessageBox');
+    const title=document.getElementById('modal3DMessageTitle');
+    const text=document.getElementById('modal3DMessageText');
+    if(!modal||!box) { window.originalAlert && window.originalAlert(msg); return; }
+    if(isError){ box.style.background='linear-gradient(145deg, #7f1d1d, #450a0a)'; box.style.borderColor='rgba(239,68,68,0.6)'; if(title) title.innerText='❌ تنبيه'; }
+    else{ box.style.background='linear-gradient(145deg, #1a3a2a, #0d2216)'; box.style.borderColor='rgba(16,185,129,0.5)'; if(title) title.innerText='✅ رسالة'; }
+    if(text) text.innerText=String(msg);
+    modal.style.display='flex';
+    if(box){ box.style.animation='pulse3D 0.6s ease'; setTimeout(()=>{ box.style.animation=''; },600); }
+    try{ playSound(isError?'error':'save'); }catch(e){}
+  }catch(e){ window.originalAlert && window.originalAlert(msg); }
+}
+if(!window.originalAlert){ window.originalAlert = window.alert; }
+window.alert = function(msg){ show3DMessage(String(msg), true); };
+
+const API_BASE = "https://turso-api.mostafa-voic77729.workers.dev";
+const HAFEZ_API_BASE = "https://hafez-api.mostafa-voic77729.workers.dev";
+let isSaving=false;
+let allEmployees=[], filteredEmployees=[], selectedEmp=null, tableData=[], sortAsc=true;
+let selectedStation='', selectedAdmin='', selectedType='', selectedMonth='', selectedYear='', selectedResp='';
+let dropdownStates={Station:false,Admin:false,Type:false,Month:false,Year:false,Resp:false,Emp:false};
+let currentQueryNumber=null;
+let isSavedInDB=false;
+let stationFilterValue='';
+let currentFullDocName='';
+let sendMode = '';
+let isEditMode=false;
+
+function safeArray(d){ if(!d) return []; if(Array.isArray(d)) return d; if(d.rows && Array.isArray(d.rows)) return d.rows; return []; }
+function normalizeStation(station){
+  if(!station) return station||'';
+  const s = String(station).trim();
+  if(s.startsWith('م.م') || s.startsWith('م.م.') || s.includes('م.م')){
+    return 'الإدارة العامة لشبكات بنى سويف';
+  }
+  return s;
+}
+function isRetired(birth){ if(!birth) return false; const s=String(birth).trim(); if(s.includes('معاش')||s.includes('محال')) return true; try{ let year=0; const m=s.match(/(\d{4})/); if(m) year=parseInt(m[1]); if(year&&year<100) year+=1900; if(year>1900 && year<=1966) return true; if(year>1900 && new Date().getFullYear()-year>=60) return true; }catch(e){} return false; }
+
+// أصوات
+let audioCtx=null;
+function getAudioCtx(){ if(!audioCtx){ try{ audioCtx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } return audioCtx; }
+function playSound(type){
+  try{
+    const ctx=getAudioCtx(); if(!ctx) return;
+    const o=ctx.createOscillator(); const g=ctx.createGain(); o.connect(g); g.connect(ctx.destination);
+    const now=ctx.currentTime;
+    if(type==='click'){ o.frequency.setValueAtTime(650,now); o.frequency.exponentialRampToValueAtTime(900,now+0.08); g.gain.setValueAtTime(0.25,now); g.gain.exponentialRampToValueAtTime(0.01,now+0.15); o.start(now); o.stop(now+0.15); }
+    else if(type==='save'){ o.frequency.setValueAtTime(400,now); o.frequency.linearRampToValueAtTime(900,now+0.25); g.gain.setValueAtTime(0.35,now); g.gain.exponentialRampToValueAtTime(0.01,now+0.35); o.start(now); o.stop(now+0.35); }
+    else if(type==='nav'){ o.frequency.setValueAtTime(500,now); o.frequency.setValueAtTime(700,now+0.07); g.gain.setValueAtTime(0.2,now); g.gain.exponentialRampToValueAtTime(0.01,now+0.2); o.start(now); o.stop(now+0.2); }
+    else if(type==='error'){ o.frequency.setValueAtTime(300,now); o.frequency.setValueAtTime(150,now+0.3); g.gain.setValueAtTime(0.3,now); g.gain.exponentialRampToValueAtTime(0.01,now+0.35); o.start(now); o.stop(now+0.35); }
+    else if(type==='focus'){ o.frequency.setValueAtTime(800,now); g.gain.setValueAtTime(0.12,now); g.gain.exponentialRampToValueAtTime(0.01,now+0.08); o.start(now); o.stop(now+0.08); }
+  }catch(e){}
+}
+
+window.DB={
+  async query(sql){
+    const res=await fetch(API_BASE+'/api/turso',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sql})});
+    const text=await res.text(); let data; try{ data=JSON.parse(text); }catch(e){ throw new Error(text.substring(0,500)); }
+    if(!res.ok) throw new Error(data.error||`HTTP ${res.status}`);
+    if(data.results){ const r=data.results[0]; if(r.error) throw new Error(r.error.message); if(r.response?.result?.rows){ const cols=r.response.result.cols||[]; const names=cols.map(c=>c.name); return r.response.result.rows.map(row=>{ let o={}; row.forEach((v,i)=>{ const val=(v&&typeof v==='object'&&'value' in v)?v.value:v; o[names[i]]=val; }); return o; }); } return r.rows||[]; }
+    if(Array.isArray(data)) return data; if(data.rows) return data.rows; return data;
+  },
+  async queryHafezByFull(num,year,month){
+    try{ const url=`${HAFEZ_API_BASE}/api/hafez/by-full?number=${encodeURIComponent(num)}&year=${encodeURIComponent(year)}&month=${encodeURIComponent(month)}`; const res=await fetch(url); const j=JSON.parse(await res.text()); if(j.ok && Array.isArray(j.rows)) return j.rows; return []; }catch(e){ return []; }
+  },
+  async getNextNumberFromHafez(){
+    try{ const res=await fetch(`${HAFEZ_API_BASE}/api/hafez/next-number`); const j=JSON.parse(await res.text()); if(j.ok) return parseInt(j.maxNum||0)||0; return null; }catch(e){ return null; }
+  }
+}
+async function fetchEmployeesViaHafezAPI(){
+  try{ const res = await fetch(`${HAFEZ_API_BASE}/api/hafez/employees/public`); const data = JSON.parse(await res.text()); if(data.ok && Array.isArray(data.rows)){ return data.rows.map(r=>{ const birth=String(r.birth||'').trim(); return {code:String(r.code||'').trim(),name:String(r.name||'').trim(),station:String(r.station||'').trim(),birth,retired:isRetired(birth)}; }).filter(e=>e.name); } }catch(e){}
+  let rows = await window.DB.query('SELECT * FROM "موظفين_مرتبات" LIMIT 10000'); rows=safeArray(rows); return rows.map(r=>({code:String(r['الكود_البنكى']||'').trim(),name:String(r['اسم_العامل']||'').trim(),station:String(r['المحطات']||'').trim(),birth:r['تاريخ_الميلاد']||'',retired:isRetired(r['تاريخ_الميلاد']||'')})).filter(e=>e.name);
+}
+function toggleTheme(){ const isLight=document.body.classList.toggle('light'); localStorage.setItem('theme',isLight?'light':'dark'); document.getElementById('themeBtn').innerText=isLight?'🌙 غامق':'☀ فاتح / غامق'; playSound('click'); }
+async function fetchNextNumber(){
+  try{
+    const months=["يناير","فبراير","مارس","ابريل","مايو","يونيو","يوليو","اغسطس","سبتمبر","اكتوبر","نوفمبر","ديسمبر"];
+    const curMonth = selectedMonth || months[new Date().getMonth()];
+    const curYear = selectedYear || String(new Date().getFullYear());
+    let lastForCurrentMonth = null;
+    try{
+      let rows = await window.DB.query(`SELECT MAX(CAST("رقم_الكشف" AS INTEGER)) as maxNum FROM "الحوافز" WHERE "الشهر"='${curMonth.replace(/'/g,"''")}' AND "السنة"='${curYear.replace(/'/g,"''")}'`);
+      rows=safeArray(rows);
+      if(rows.length>0 && rows[0].maxNum!=null && String(rows[0].maxNum).trim()!==''){
+        lastForCurrentMonth = parseInt(rows[0].maxNum)||0;
+      }
+    }catch(e){ lastForCurrentMonth=null; }
+
+    // اجلب MAX عام للاستخدام كمرجع
+    let maxOverall = 0;
+    try{
+      let m = await window.DB.getNextNumberFromHafez();
+      if(m!==null) maxOverall = parseInt(m)||0;
+      else{
+        let r = await window.DB.query('SELECT MAX(CAST("رقم_الكشف" AS INTEGER)) as maxNum FROM "الحوافز"');
+        r=safeArray(r); maxOverall = r.length>0?parseInt(r[0].maxNum||0)||0:0;
+      }
+    }catch(e){ maxOverall=0; }
+
+    let displayNum;
+    if(lastForCurrentMonth && lastForCurrentMonth>0){
+      // التعديل 4: عند تحميل الصفحة إضافة +1 لرقم الكشف الحالي فقط
+      displayNum = lastForCurrentMonth + 1;
+      document.getElementById('numberInput').value=displayNum;
+      tableData=[]; renderTable(); buildStationFilter();
+      document.getElementById('incentiveName').value='';
+      document.getElementById('previewBar').style.display='none';
+      currentFullDocName=''; isSavedInDB=false; currentQueryNumber=null;
+      showSaveResult(`📄 ${curMonth} ${curYear} - كشف فارغ جديد رقم ${displayNum} (آخر كشف كان ${lastForCurrentMonth} +1)`, false);
+    }else{
+      displayNum = 1;
+      document.getElementById('numberInput').value=displayNum;
+      tableData=[]; renderTable(); buildStationFilter();
+      document.getElementById('incentiveName').value='';
+      document.getElementById('previewBar').style.display='none';
+      currentFullDocName=''; isSavedInDB=false; currentQueryNumber=null;
+      showSaveResult(`📄 ${curMonth} ${curYear} لا يوجد به كشوفات - كشف فارغ جديد رقم 1 (لا يعرض بيانات أكتوبر أو سبتمبر)`, false);
+    }
+    const dl=document.getElementById('numberList'); dl.innerHTML='';
+    const maxList = Math.max((displayNum||0)+30, maxOverall+30, 200);
+    for(let i=1;i<=maxList;i++){ const o=document.createElement('option'); o.value=i; dl.appendChild(o); }
+  }catch(e){
+    if(!document.getElementById('numberInput').value) document.getElementById('numberInput').value=1;
+  }
+}
+async function fetchLastForMonth(monthName, yearName){
+  // دالة عامة لأي شهر - تستخدم عند تغيير القائمة المنسدلة
+  try{
+    let rows = await window.DB.query(`SELECT MAX(CAST("رقم_الكشف" AS INTEGER)) as maxNum FROM "الحوافز" WHERE "الشهر"='${String(monthName).replace(/'/g,"''")}' AND "السنة"='${String(yearName).replace(/'/g,"''")}'`);
+    rows=safeArray(rows);
+    if(rows.length>0 && rows[0].maxNum!=null && String(rows[0].maxNum).trim()!==''){
+      return parseInt(rows[0].maxNum)||0;
+    }
+  }catch(e){}
+  return 0;
+}
+
+const dataLists={ Station:[], Admin:[], Type:["جهود","مميز","طاقة","إنتاج-أرباح","عيد الفطر","عيد الأضحى","يوم على الشامل","جلسات إدارة الخطوط","جلسات إدارة الشبكات","التصوير الحرارى","التسلق","المولد النبوى الشريف","117 الشهرى","382 الشهرى","50% وسائل النقل","25% بدل صيانة وسائل النقل","إدارة خطوط","إدارة شبكات","إضافى"], Month:["يناير","فبراير","مارس","ابريل","مايو","يونيو","يوليو","اغسطس","سبتمبر","اكتوبر","نوفمبر","ديسمبر"], Year:[], Resp:["أ.مصطفى درويش سيد درويش","أ.محمد مصطفى كامل عبد الجواد"] };
+async function loadTypeFromTemplates(){
+  const HAFEZ_API_BASE = "https://hafez-api.mostafa-voic77729.workers.dev";
+  
+// تثبيت رسائل التنبيه ثلاثية الأبعاد - بشكل صارم
+function show3DMessage(msg, isError=false){
+  try{
+    const modal=document.getElementById('modal3DMessage');
+    const box=document.getElementById('modal3DMessageBox');
+    const title=document.getElementById('modal3DMessageTitle');
+    const text=document.getElementById('modal3DMessageText');
+    if(!modal||!box) { window.originalAlert && window.originalAlert(msg); return; }
+    if(isError){ box.style.background='linear-gradient(145deg, #7f1d1d, #450a0a)'; box.style.borderColor='rgba(239,68,68,0.6)'; if(title) title.innerText='❌ تنبيه'; }
+    else{ box.style.background='linear-gradient(145deg, #1a3a2a, #0d2216)'; box.style.borderColor='rgba(16,185,129,0.5)'; if(title) title.innerText='✅ رسالة'; }
+    if(text) text.innerText=String(msg);
+    modal.style.display='flex';
+    if(box){ box.style.animation='pulse3D 0.6s ease'; setTimeout(()=>{ box.style.animation=''; },600); }
+    try{ playSound(isError?'error':'save'); }catch(e){}
+  }catch(e){ window.originalAlert && window.originalAlert(msg); }
+}
+if(!window.originalAlert){ window.originalAlert = window.alert; }
+window.alert = function(msg){ show3DMessage(String(msg), true); };
+
+const API_BASE = "https://turso-api.mostafa-voic77729.workers.dev";
+  try{
+    // المحاولة 1: عبر API template-types (الأضمن)
+    try{
+      const res = await fetch(`${HAFEZ_API_BASE}/api/hafez/template-types`);
+      const txt = await res.text();
+      let j; try{ j=JSON.parse(txt); }catch{ j={}; }
+      if(j && j.rows && Array.isArray(j.rows) && j.rows.length>0){
+        let distinct = j.rows.map(r=>String(r.type||r['نوع_الحافز']||'').trim()).filter(v=>v && v!=='[object Object]');
+        distinct = [...new Set(distinct)].sort();
+        if(distinct.length>0){
+          dataLists.Type = distinct;
+          if(!dataLists.Type.includes('حافز إضافى')) dataLists.Type.push('حافز إضافى');
+          renderOptions('Type', dataLists.Type);
+          console.log('Loaded types from template-types API:', distinct.length);
+          return;
+        }
+      }
+    }catch(e){ console.log('template-types API failed', e); }
+
+    // المحاولة 2: عبر Turso مباشر DISTINCT
+    let rows = await window.DB.query('SELECT DISTINCT "نوع_الحافز" as t FROM "قوالب_ترتيب_الحوافز" WHERE "نوع_الحافز" IS NOT NULL AND TRIM("نوع_الحافز")<>"" ORDER BY "نوع_الحافز" ASC');
+    rows=safeArray(rows);
+    let distinct = rows.map(r=>String(r.t||r['نوع_الحافز']||r['t']||'').trim()).filter(v=>v && v!=='[object Object]');
+    distinct = [...new Set(distinct)].sort();
+    if(distinct.length>0){
+      dataLists.Type = distinct;
+      if(!dataLists.Type.includes('حافز إضافى')) dataLists.Type.push('حافز إضافى');
+      renderOptions('Type', dataLists.Type);
+      return;
+    }
+    
+    // المحاولة 3: بدون DISTINCT
+    rows = await window.DB.query('SELECT "نوع_الحافز" as t FROM "قوالب_ترتيب_الحوافز" GROUP BY "نوع_الحافز" ORDER BY "نوع_الحافز" ASC');
+    rows=safeArray(rows);
+    distinct = rows.map(r=>String(r.t||r['نوع_الحافز']||'').trim()).filter(v=>v);
+    distinct = [...new Set(distinct)].sort();
+    if(distinct.length>0){
+      dataLists.Type = distinct;
+      if(!dataLists.Type.includes('حافز إضافى')) dataLists.Type.push('حافز إضافى');
+      renderOptions('Type', dataLists.Type);
+      return;
+    }
+
+    // fallback أخير
+    dataLists.Type = ['حافز إضافى'];
+    renderOptions('Type', dataLists.Type);
+  }catch(e){
+    console.error('loadTypeFromTemplates error', e);
+    try{
+      // حاول API مرة أخيرة
+      const res = await fetch(`${HAFEZ_API_BASE}/api/hafez/template-types`);
+      const j = JSON.parse(await res.text());
+      if(j.rows){
+        let distinct = j.rows.map(r=>String(r.type||'').trim()).filter(v=>v);
+        distinct = [...new Set(distinct)];
+        dataLists.Type = distinct;
+        if(!dataLists.Type.includes('حافز إضافى')) dataLists.Type.push('حافز إضافى');
+        renderOptions('Type', dataLists.Type);
+        return;
+      }
+    }catch{}
+    dataLists.Type = ['حافز إضافى'];
+    renderOptions('Type', dataLists.Type);
+  }
+}
+function initStaticLists(){ const y=new Date().getFullYear(); dataLists.Year=[]; for(let i=y-2;i<=y+3;i++) dataLists.Year.push(String(i)); renderOptions('Type', dataLists.Type); renderOptions('Month', dataLists.Month); renderOptions('Year', dataLists.Year); renderOptions('Resp', dataLists.Resp); const months=["يناير","فبراير","مارس","ابريل","مايو","يونيو","يوليو","اغسطس","سبتمبر","اكتوبر","نوفمبر","ديسمبر"]; selectOption('Month', months[new Date().getMonth()], months[new Date().getMonth()]); selectOption('Year', String(y), String(y)); 
+  // جلب أنواع الحوافز من جدول قوالب_ترتيب_الحوافز بدون تكرار
+  setTimeout(()=>{ loadTypeFromTemplates(); }, 800);
+  setTimeout(()=>{ loadTypeFromTemplates(); }, 2000);
+}
+
+function renderOptions(type, list){
+  const cont=document.getElementById('options'+type); if(!cont) return; cont.innerHTML='';
+  list.forEach(val=>{
+    if(!val) return;
+    let displayVal = (typeof val==='string') ? val : (val.name||val.station||val.type||val.title||'');
+    if(typeof displayVal !== 'string') displayVal = String(displayVal||'');
+    if(displayVal.includes('[object') || displayVal==='[object Object]' || !displayVal.trim()) return;
+    displayVal = displayVal.trim();
+    const div=document.createElement('div'); div.className='option-item'; div.innerHTML=`<span class="emp-name" style="white-space:nowrap!important; overflow:hidden; text-overflow:ellipsis;">${displayVal}</span>`;
+    div.onclick=()=>{ playSound('click'); selectOption(type, displayVal, displayVal); };
+    cont.appendChild(div);
+  });
+}
+function selectOption(type, value, displayText){
+  if(type==='Station'){ selectedStation=value; selectedAdmin=''; document.getElementById('textStation').innerText=displayText; document.getElementById('textAdmin').innerText='الإدارات'; }
+  if(type==='Admin'){ selectedAdmin=value; selectedStation=''; document.getElementById('textAdmin').innerText=displayText; document.getElementById('textStation').innerText='المحطات (م.م)'; }
+  if(type==='Type') selectedType=value, document.getElementById('textType').innerText=displayText;
+  if(type==='Month'){
+    selectedMonth=value; document.getElementById('textMonth').innerText=displayText;
+    // عند تغيير الشهر - اعرض آخر رقم للشهر الجديد فقط
+    if(selectedYear){
+      (async()=>{
+        const last = await fetchLastForMonth(selectedMonth, selectedYear);
+        if(last>0){
+          document.getElementById('numberInput').value=last;
+          await queryByNumber();
+          showSaveResult(`📅 آخر كشف في ${selectedMonth} ${selectedYear} هو رقم ${last}`, false);
+        }else{
+          // التصحيح: أي شهر جديد بدون كشوفات → رقم 1 فارغ وليس 12
+          const nextEmpty = 1;
+          document.getElementById('numberInput').value=nextEmpty;
+          tableData=[]; renderTable(); buildStationFilter();
+          document.getElementById('incentiveName').value=''; document.getElementById('previewBar').style.display='none';
+          currentFullDocName=''; isSavedInDB=false; currentQueryNumber=null;
+          showSaveResult(`📄 ${selectedMonth} ${selectedYear} لا يوجد به كشوفات - كشف فارغ جديد رقم 1`, false);
+        }
+      })();
+    }
+  }
+  if(type==='Year'){
+    selectedYear=value; document.getElementById('textYear').innerText=displayText;
+    if(selectedMonth){
+      (async()=>{
+        const last = await fetchLastForMonth(selectedMonth, selectedYear);
+        if(last>0){
+          document.getElementById('numberInput').value=last;
+          await queryByNumber();
+          showSaveResult(`📅 آخر كشف في ${selectedMonth} ${selectedYear} هو رقم ${last}`, false);
+        }else{
+          let maxOverall=0;
+          try{ let r=await window.DB.query('SELECT MAX(CAST("رقم_الكشف" AS INTEGER)) as maxNum FROM "الحوافز"'); r=safeArray(r); maxOverall= r.length>0?parseInt(r[0].maxNum||0)||0:0; }catch(e){}
+          const nextEmpty = maxOverall+1;
+          document.getElementById('numberInput').value=nextEmpty;
+          tableData=[]; renderTable(); buildStationFilter();
+          document.getElementById('incentiveName').value=''; document.getElementById('previewBar').style.display='none';
+          currentFullDocName=''; isSavedInDB=false; currentQueryNumber=null;
+          showSaveResult(`📄 ${selectedMonth} ${selectedYear} لا يوجد به كشوفات - كشف فارغ جديد رقم ${nextEmpty}`, false);
+        }
+      })();
+    }
+  }
+  if(type==='Resp') selectedResp=value, document.getElementById('textResp').innerText=displayText;
+  closeDropdown(type); updatePreview(); playSound('nav');
+}
+function toggleDropdown(type){ Object.keys(dropdownStates).forEach(k=>{ if(k!==type){ const dd=document.getElementById('dropdown'+k); if(dd) dd.style.display='none'; dropdownStates[k]=false; const sd=document.getElementById('display'+k); if(sd) sd.classList.remove('open'); } }); const dd=document.getElementById('dropdown'+type); const sd=document.getElementById('display'+type); if(!dd) return; dropdownStates[type]=!dropdownStates[type]; dd.style.display=dropdownStates[type]?'flex':'none'; if(sd) sd.classList.toggle('open', dropdownStates[type]); playSound('click'); }
+function closeDropdown(type){ const dd=document.getElementById('dropdown'+type); if(dd) dd.style.display='none'; dropdownStates[type]=false; const sd=document.getElementById('display'+type); if(sd) sd.classList.remove('open'); }
+function renderEmpList(list){
+  const cont=document.getElementById('optionsEmp'); cont.innerHTML='';
+  list.slice(0,500).forEach(e=>{
+    const div=document.createElement('div'); div.className='option-item'+(e.retired?' pension-item':'');
+    if(e.retired){ 
+      div.style.background='linear-gradient(180deg, #ffebee, #ffcdd2)!important';
+      div.style.border='2px solid #8B0000!important';
+      div.innerHTML=`<span class="emp-name" style="color:#8B0000!important; font-weight:900!important">⛔ ${e.name} - محال للمعاش</span> <span class="emp-code" style="color:#8B0000!important">(${e.code})</span>`; 
+    }
+    else{ div.innerHTML=`<span class="emp-name" style="color:#000000!important">${e.name}</span> <span class="emp-code" style="color:#8B0000!important; font-weight:900!important">(${e.code})</span>`; }
+    div.onclick=()=>{ playSound('click'); selectedEmp=e; document.getElementById('textEmp').innerText=e.name + (e.retired?' - محال للمعاش':''); const label=document.getElementById('codeLabel'); if(e.retired){ label.innerText='محال للمعاش'; label.className='label-box pension'; } else{ label.innerText=e.code||'-'; label.className='label-box'; } closeDropdown('Emp'); };
+    cont.appendChild(div);
+  });
+}
+function filterDropdown(type){
+  const q=document.getElementById('search'+type)?.value.trim().toLowerCase()||'';
+  const cont=document.getElementById('options'+type); if(!cont) return;
+  if(type==='Emp'){ filteredEmployees=!q?[...allEmployees]:allEmployees.filter(e=> e.name.toLowerCase().includes(q) || e.code.toLowerCase().includes(q) ); renderEmpList(filteredEmployees); return; }
+  cont.innerHTML=''; let list=[]; if(type==='Station') list=dataLists.Station; else if(type==='Admin') list=dataLists.Admin; else if(type==='Type') list=dataLists.Type; else return;
+  const filtered = q ? list.filter(v=> { let s=(typeof v==='string'?v:(v.name||v.station||v.type||'')); return String(s).toLowerCase().includes(q) && !String(s).includes('[object'); }) : list;
+  filtered.forEach(val=>{
+    let displayVal=(typeof val==='string')?val:(val.name||val.station||val.type||String(val));
+    if(String(displayVal).includes('[object')) return;
+    const div=document.createElement('div'); div.className='option-item'; div.innerHTML=`<span class="emp-name" style="white-space:nowrap!important; overflow:hidden; text-overflow:ellipsis;">${displayVal}</span>`; div.onclick=()=>{ playSound('click'); selectOption(type, displayVal, displayVal); }; cont.appendChild(div);
+  });
+}
+document.addEventListener('click', (ev)=>{ let inside=false; Object.keys(dropdownStates).forEach(type=>{ const wrap=document.getElementById('wrap'+type); if(wrap && wrap.contains(ev.target)) inside=true; }); if(!inside){ Object.keys(dropdownStates).forEach(type=>{ const dd=document.getElementById('dropdown'+type); if(dd) dd.style.display='none'; dropdownStates[type]=false; const sd=document.getElementById('display'+type); if(sd) sd.classList.remove('open'); }); } });
+
+async function loadEmployees(){
+  document.getElementById('loading').style.display='block';
+  try{
+    await fetchNextNumber();
+    const employees = await fetchEmployeesViaHafezAPI();
+    const set=new Set(); employees.forEach(r=>{ if(r.station) set.add(String(r.station).trim()); });
+    const allStations=[...set].filter(v=>v && v!='NULL' && String(v).trim()!=='').sort();
+    // محطات تبدأ بـ م.م
+    dataLists.Station = allStations.filter(s=> String(s).trim().startsWith('م.م'));
+    // إدارات = باقي المحطات
+    dataLists.Admin = allStations.filter(s=> !String(s).trim().startsWith('م.م'));
+    renderOptions('Station', dataLists.Station);
+    renderOptions('Admin', dataLists.Admin);
+    allEmployees=employees; filteredEmployees=[...allEmployees]; renderEmpList(filteredEmployees);
+    document.getElementById('loading').style.display='none';
+    document.getElementById('badge').innerText=`${allEmployees.length} (${allEmployees.filter(e=>e.retired).length} معاش)`;
+    document.getElementById('countInfo').innerText=`(${allEmployees.length})`;
+    document.getElementById('textEmp').innerText=`اختر موظف (${allEmployees.length})`;
+    initStaticLists();
+    // بعد تحديد الشهر الحالي - اجلب آخر رقم للشهر الحالي
+    setTimeout(()=>{ fetchNextNumber(); }, 300);
+    initResizableTable();
+  }catch(err){ document.getElementById('loading').innerHTML=`❌ ${err.message}`; }
+}
+function updatePreview(){
+  var name=document.getElementById('incentiveName').value.trim();
+  var num=document.getElementById('numberInput').value;
+  var month=selectedMonth||'';
+  var year=selectedYear||'';
+  var adminName=selectedAdmin||selectedStation||'';
+  var typeName=selectedType||'';
+  var bar=document.getElementById('previewBar'); var txtEl=document.getElementById('previewText');
+  if(!name && !adminName && !typeName){ bar.style.display='none'; currentFullDocName=''; return; }
+  var today=new Date().toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'});
+  // الصيغة المطلوبة: كشف رقم 1 - سبتمبر 2026 - إدارة الإتصالات - حافز إضافى - حافز إضافى للإتصالات - إعتماد الصرف 1-8-2026
+  // يجلب اسم الإدارة من القائمة المختارة - ونوع الحافز من القائمة - ونص من خانة اسم الحافز - إعتماد الصرف تاريخ اليوم بدون توقيت
+  var parts=[];
+  parts.push(`كشف رقم ${num}`);
+  if(month && year) parts.push(`${month} ${year}`);
+  else if(month) parts.push(month);
+  if(adminName) parts.push(adminName);
+  if(typeName) parts.push(typeName);
+  if(name) parts.push(name);
+  parts.push(`إعتماد الصرف ${today}`);
+  var displayName = parts.join(' - ');
+  currentFullDocName = displayName;
+  txtEl.innerText=`✅ ${displayName}`; bar.style.display='flex';
+}
+
+function showGlobalLoading(){ document.getElementById('globalLoadingBar').style.display='block'; document.getElementById('loading').style.display='block'; }
+function hideGlobalLoading(){ document.getElementById('globalLoadingBar').style.display='none'; document.getElementById('loading').style.display='none'; }
+function show3DMessage(msg, isError=false){
+  const modal=document.getElementById('modal3DMessage');
+  const box=document.getElementById('modal3DMessageBox');
+  const title=document.getElementById('modal3DMessageTitle');
+  const text=document.getElementById('modal3DMessageText');
+  if(isError){ box.style.background='linear-gradient(145deg, #7f1d1d, #450a0a)'; box.style.borderColor='rgba(239,68,68,0.6)'; title.innerText='❌ تنبيه'; }
+  else{ box.style.background='linear-gradient(145deg, #1a3a2a, #0d2216)'; box.style.borderColor='rgba(16,185,129,0.5)'; title.innerText='✅ رسالة'; }
+  text.innerHTML=msg;
+  modal.style.display='flex';
+  box.style.animation='pulse3D 0.6s ease';
+  setTimeout(()=>{ box.style.animation=''; },600);
+  playSound(isError?'error':'save');
+}
+// Override showSaveResult to use 3D messages for errors and important messages
+const originalShowSaveResult = showSaveResult;
+function showSaveResult3DWrapper(msg, isError){
+  originalShowSaveResult(msg, isError);
+  if(isError || msg.includes('❌') || msg.includes('⚠')){
+    show3DMessage(msg, isError);
+  }
+}
+
+function showSaveResultOriginal(msg, isError){
+  var bar=document.getElementById('previewBar'); var sep=document.getElementById('sepSave'); var saveEl=document.getElementById('saveResult');
+  bar.style.display='flex'; sep.style.display='inline-block'; saveEl.style.display='inline-flex'; saveEl.innerText=msg;
+  if(isError){ saveEl.style.background='linear-gradient(180deg,#fca5a5,#ef4444)'; saveEl.style.borderColor='#8B0000'; saveEl.style.color='#ffffff'; playSound('error'); }
+  else{ saveEl.style.background='linear-gradient(180deg,rgba(16,185,129,0.35),rgba(5,95,70,0.55))'; saveEl.style.borderColor='rgba(16,185,129,0.7)'; saveEl.style.color='#ffffff'; playSound('save'); }
+}
+function showSaveResult(msg, isError){ showSaveResultOriginal(msg, isError); if(isError || String(msg).includes('❌') || String(msg).includes('⚠') || String(msg).includes('لا يوجد') || String(msg).includes('اختر') ){ setTimeout(()=>{ show3DMessage(msg, isError); },100); } }
+
+function addToTable(){ if(!selectedEmp){alert('اختار اسم');playSound('error');return;} if(selectedEmp.retired && !confirm(`⚠ ${selectedEmp.name} محال للمعاش - إضافته؟`)) return; var amountVal=document.getElementById('amount').value; var amountToSave = parseFloat(amountVal)||0; var st=normalizeStation(selectedStation||selectedAdmin||selectedEmp.station||''); var num=document.getElementById('numberInput').value; if(!num){ alert('أدخل رقم الكشف'); return; } if(tableData.some(r=> r.name===selectedEmp.name)){ alert('موجود'); playSound('error'); return; } const mToAdd = tableData.length===0 ? num : (parseFloat(tableData[tableData.length-1].m)||parseInt(num)||0)+1; tableData.push({m:mToAdd,code:selectedEmp.code,name:selectedEmp.name,amount:amountToSave,station:st,retired:selectedEmp.retired}); renderTable(); buildStationFilter(); document.getElementById('amount').value=''; isSavedInDB=false; updatePreview(); playSound('click'); }
+function buildStationFilter(){ const sel=document.getElementById('stationFilterSelect'); const bar=document.getElementById('filterBar'); if(tableData.length===0){ bar.style.display='none'; return; } bar.style.display='flex'; const stations=[...new Set(tableData.map(r=>r.station).filter(s=>s))].sort(); const cur=sel.value; sel.innerHTML='<option value="">-- كل المحطات --</option>'; stations.forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s; sel.appendChild(o); }); if(stations.includes(cur)) sel.value=cur; applyStationFilter(); }
+function applyStationFilter(){ stationFilterValue=document.getElementById('stationFilterSelect').value; renderTable(); playSound('nav'); }
+function clearStationFilter(){ document.getElementById('stationFilterSelect').value=''; stationFilterValue=''; renderTable(); playSound('click'); }
+function getFilteredData(){ if(!stationFilterValue) return tableData; return tableData.filter(r=>r.station===stationFilterValue); }
+
+function toggleEditMode(){
+  isEditMode=document.getElementById('editModeChk').checked;
+  playSound(isEditMode?'save':'click');
+  renderTable();
+}
+function renderTable(){
+  var tb=document.getElementById('tbody'); tb.innerHTML=''; var total=0; var totalAll=0;
+  tableData.forEach(r=>{ totalAll+=parseFloat(r.amount)||0; });
+  var dataToShow = getFilteredData();
+  tb.className = isEditMode ? 'edit-mode' : '';
+  dataToShow.forEach((r)=>{
+    var originalIdx = tableData.indexOf(r);
+    total+=parseFloat(r.amount)||0;
+    if(isEditMode){
+      tb.innerHTML+=`<tr style="${r.retired?'background:rgba(139,0,0,0.15)':''}">
+        <td><input class="editable-input" value="${r.m}" onchange="tableData[${originalIdx}].m=this.value;isSavedInDB=false" onfocus="playSound('focus')"></td>
+        <td><input class="editable-input" value="${r.code}" onchange="tableData[${originalIdx}].code=this.value;isSavedInDB=false" onfocus="playSound('focus')" style="width:90%!important"></td>
+        <td class="col-emp-name"><input class="editable-input" value="${r.name}" onchange="tableData[${originalIdx}].name=this.value;isSavedInDB=false" onfocus="playSound('focus')" style="width:95%!important;text-align:right!important"></td>
+        <td><input class="editable-input amount-input" value="${r.amount}" onchange="tableData[${originalIdx}].amount=this.value;renderTable();buildStationFilter();isSavedInDB=false" onfocus="playSound('focus')"></td>
+        <td><input class="editable-input" value="${r.station}" onchange="tableData[${originalIdx}].station=this.value;buildStationFilter();isSavedInDB=false" onfocus="playSound('focus')" style="width:95%!important; font-size:9px!important;"></td>
+        <td><button class="del-btn" onclick="tableData.splice(${originalIdx},1);renderTable();buildStationFilter();isSavedInDB=false;playSound('click')">X</button></td>
+      </tr>`;
+    }else{
+      // التعديل 7: مع إلغاء Checkbox يتم إلغاء أزرار حذف X
+      tb.innerHTML+=`<tr style="${r.retired?'background:rgba(139,0,0,0.15)':''}">
+        <td><span class="m-fixed">${r.m}</span></td>
+        <td style="font-weight:900">${r.retired?'<span style="color:#8B0000">معاش</span>':r.code}</td>
+        <td class="col-emp-name" style="font-weight:900">${r.name}${r.retired?' ⛔':''}</td>
+        <td><input class="editable-input amount-input" value="${r.amount}" onchange="tableData[${originalIdx}].amount=this.value;renderTable();buildStationFilter();isSavedInDB=false" onfocus="playSound('focus')"></td>
+        <td style="font-weight:900; font-size:9px!important; line-height:1.2!important; white-space:normal!important; word-break:break-word!important; max-width:280px!important;">${r.station}</td>
+        <td></td>
+      </tr>`;
+    }
+  });
+  var foot=document.getElementById('tfoot');
+  if(tableData.length>0){
+    if(stationFilterValue){ foot.innerHTML=`<tr style="background:rgba(16,185,129,0.25)"><td colspan="3" style="text-align:left;color:#ffffff;font-weight:900">إجمالي [${stationFilterValue}]</td><td style="color:#fde68a;font-size:14px;font-weight:900">${total.toFixed(2)}</td><td colspan="2">${dataToShow.length}/${tableData.length} - الكلي: ${totalAll.toFixed(2)}</td></tr>`; }
+    else{ foot.innerHTML=`<tr style="background:rgba(251,191,36,0.18)"><td colspan="3" style="text-align:left;color:#000;font-weight:900">الإجمالي</td><td style="color:#8B0000;font-size:16px;font-weight:900">${total.toFixed(2)}</td><td colspan="2">${tableData.length} موظف</td></tr>`; }
+    document.getElementById('filterTotal').innerText=`الإجمالي: ${total.toFixed(2)}`; document.getElementById('filterCount').innerText=`العدد: ${dataToShow.length}`;
+  }else{ foot.innerHTML=''; document.getElementById('filterBar').style.display='none'; }
+}
+function extractIncentiveName(fullDoc){
+  if(!fullDoc) return '';
+  const str = String(fullDoc).trim();
+  // الصيغة: كشف رقم 1 - سبتمبر 2026 - إدارة الإتصالات - حافز إضافى - حافز إضافى للإتصالات - إعتماد الصرف 1-8-2026
+  // نريد استخراج نص الحافز (الجزء الخامس) وليس الشهر والسنة
+  const parts = str.split(' - ');
+  // إزالة إعتماد الصرف من النهاية
+  let cleanParts = parts.filter(p=>!p.includes('إعتماد الصرف'));
+  // cleanParts الآن: [كشف رقم, شهر سنة, إدارة, نوع حافز, نص الحافز]
+  if(cleanParts.length>=5){
+    // نص الحافز هو الجزء الأخير بعد إزالة إعتماد الصرف
+    let incentive = cleanParts[cleanParts.length-1].trim();
+    // إذا incentive هو شهر/سنة فقط، خذ الجزء قبله
+    const months=["يناير","فبراير","مارس","ابريل","مايو","يونيو","يوليو","اغسطس","سبتمبر","اكتوبر","نوفمبر","ديسمبر"];
+    const isMonthYear = months.some(m=>incentive.includes(m)) && incentive.length<20;
+    if(isMonthYear && cleanParts.length>=4){
+      // جرب الجزء السابق
+      incentive = cleanParts[cleanParts.length-2].trim();
+    }
+    if(incentive && !incentive.startsWith('كشف رقم')) return incentive;
+  }
+  if(cleanParts.length>=4){
+    // إدارة - نوع - نص
+    return cleanParts.slice(2).join(' - ').trim();
+  }
+  return str;
+}
+function clearAll(){ if(!confirm('مسح الكل؟'))return; playSound('click'); tableData=[]; renderTable(); buildStationFilter(); document.getElementById('incentiveName').value=''; document.getElementById('amount').value=''; document.getElementById('codeLabel').innerText='-'; document.getElementById('codeLabel').className='label-box'; document.getElementById('textEmp').innerText='اختر موظف'; selectedEmp=null; document.getElementById('saveResult').style.display='none'; document.getElementById('sepSave').style.display='none'; document.getElementById('previewBar').style.display='none'; currentQueryNumber=null; isSavedInDB=false; selectedStation=''; selectedAdmin=''; selectedType=''; selectedMonth=''; selectedYear=''; selectedResp=''; document.getElementById('textStation').innerText='المحطات (م.م)'; document.getElementById('textAdmin').innerText='الإدارات'; document.getElementById('textType').innerText='نوع الحافز'; document.getElementById('textResp').innerText='مسئول الحافز *'; const months=["يناير","فبراير","مارس","ابريل","مايو","يونيو","يوليو","اغسطس","سبتمبر","اكتوبر","نوفمبر","ديسمبر"]; selectedMonth=months[new Date().getMonth()]; selectedYear=String(new Date().getFullYear()); document.getElementById('textMonth').innerText=selectedMonth; document.getElementById('textYear').innerText=selectedYear; fetchNextNumber(); currentFullDocName=''; }
+
+function fetchStationEmployees(){ if(!selectedStation){alert('اختار محطة م.م');playSound('error');return;} var amount=document.getElementById('amount').value; var amountNum=parseFloat(amount)||0; var listAll=allEmployees.filter(e=> String(e.station||'').trim()===String(selectedStation).trim() || String(e.station||'').includes(selectedStation) || String(selectedStation).includes(e.station||'')); 
+  // التعديل 2: استبعاد المحالين للمعاش/الوفاة/النقل بحساب تاريخ الميلاد
+  var listActive=listAll.filter(e=>!e.retired && !isRetired(e.birth||'')); 
+  var excludedCount=listAll.length-listActive.length;
+  var list=listActive;
+  if(!list.length){alert(`لا يوجد موظفين نشطين في محطة ${selectedStation} - الكل ${listAll.length} محال معاش/وفاة/نقل تم استبعادهم`);playSound('error');return;} 
+  if(!confirm(`${list.length} موظف نشط من محطة ${selectedStation} (تم استبعاد ${excludedCount} محال معاش/وفاة/نقل من ${listAll.length}) - تحميل من موظفين_مرتبات؟`)) return; 
+  tableData=[]; list.forEach((e,idx)=>{ const norm = normalizeStation(e.station||selectedStation); tableData.push({m:idx+1,code:e.code,name:e.name,amount:amountNum,station:norm,retired:false}); }); renderTable(); buildStationFilter(); playSound('save'); showSaveResult(`✅ تم تحميل ${list.length} موظف نشط - ${normalizeStation(selectedStation)} - تم استبعاد ${excludedCount} معاش`, false); }
+function fetchAdminEmployees(){ if(!selectedAdmin){alert('اختار إدارة');playSound('error');return;} var amount=document.getElementById('amount').value; var amountNum=parseFloat(amount)||0; var listAll=allEmployees.filter(e=> String(e.station||'').trim()===String(selectedAdmin).trim() || String(e.station||'').includes(selectedAdmin) || String(selectedAdmin).includes(e.station||'')); 
+  // التعديل 2: استبعاد المحالين للمعاش/الوفاة/النقل بحساب تاريخ الميلاد
+  var listActive=listAll.filter(e=>!e.retired && !isRetired(e.birth||'')); 
+  var excludedCount=listAll.length-listActive.length;
+  var list=listActive;
+  if(!list.length){alert(`لا يوجد موظفين نشطين في إدارة ${selectedAdmin} - الكل ${listAll.length} محال معاش/وفاة/نقل تم استبعادهم`);playSound('error');return;} 
+  if(!confirm(`${list.length} موظف نشط من إدارة ${selectedAdmin} (تم استبعاد ${excludedCount} محال معاش/وفاة/نقل) - تحميل؟`)) return; 
+  tableData=[]; list.forEach((e,idx)=>{ const norm = normalizeStation(e.station||selectedAdmin); tableData.push({m:idx+1,code:e.code,name:e.name,amount:amountNum,station:norm,retired:false}); }); renderTable(); buildStationFilter(); playSound('save'); showSaveResult(`✅ تم تحميل ${list.length} موظف نشط من إدارة ${normalizeStation(selectedAdmin)} - استبعاد ${excludedCount} معاش`, false); }
+
+function escapeSql(s){ if(s==null) return ''; return String(s).replace(/'/g,"''"); }
+async function queryByNumber(){ playSound('click'); const num = document.getElementById('numberInput').value.trim(); const month = selectedMonth; const year = selectedYear; if(!num||!month||!year){ alert('أكمل رقم/شهر/سنة'); playSound('error'); return; } try{ let rows = await window.DB.queryHafezByFull(num,year,month); rows=safeArray(rows); if(rows.length===0){ rows = await window.DB.query(`SELECT * FROM "الحوافز" WHERE "رقم_الكشف"='${escapeSql(num)}' AND "السنة"='${escapeSql(year)}' AND "الشهر"='${escapeSql(month)}' ORDER BY CAST("كود_الحافز" AS INTEGER) ASC`); rows=safeArray(rows); } if(rows.length===0){ showSaveResult(`❌ لا يوجد كشف رقم ${num} في ${month} ${year}`, true); tableData=[]; renderTable(); buildStationFilter(); currentQueryNumber=parseInt(num)||0; document.getElementById('incentiveName').value=''; updatePreview(); return; } tableData = rows.map(r=>({m:r.كود_الحافز||num, code:r.كود_الموظف||'', name:r.أسم_الموظف||r.اسم_الموظف||'', amount:parseFloat(r.المبلغ||0)||0, station:normalizeStation(r.الإدارة_التابع_لها||''), retired:false})); renderTable(); buildStationFilter(); const fullDoc = rows[0].أسم_المستند || rows[0].اسم_المستند || ''; document.getElementById('incentiveName').value = extractIncentiveName(fullDoc); if(rows[0].نوع_الحافز){ selectedType=rows[0].نوع_الحافز; document.getElementById('textType').innerText=selectedType; } if(rows[0].مسئول_الحافز){ selectedResp=rows[0].مسئول_الحافز; document.getElementById('textResp').innerText=selectedResp; } currentQueryNumber=parseInt(num); isSavedInDB=true; updatePreview(); showSaveResult(`✅ كشف ${num} - ${extractIncentiveName(fullDoc)} - ${rows.length} موظف`, false); }catch(err){ showSaveResult(`❌ ${err.message}`, true); } }
+async function navigateDisclosure(dir){
+  playSound('nav');
+  const input=document.getElementById('numberInput');
+  let cur=parseInt(input.value||'0')||0;
+  // احترافي: Next/Back لنفس الشهر المختار فقط كما طلبت
+  const curMonth = selectedMonth;
+  const curYear = selectedYear;
+  if(!curMonth || !curYear){
+    showSaveResult('❌ اختر الشهر والسنة أولاً للتنقل الاحترافي بنفس الشهر', true);
+    // fallback للسلوك القديم
+    let nxt=cur+dir; if(nxt<1) nxt=1; input.value=nxt; await queryByNumber(); return;
+  }
+  try{
+    // جلب أرقام الكشوفات لنفس الشهر والسنة فقط - احترافي
+    let rows = await window.DB.query(`SELECT DISTINCT CAST("رقم_الكشف" AS INTEGER) as num FROM "الحوافز" WHERE "الشهر"='${escapeSql(curMonth)}' AND "السنة"='${escapeSql(curYear)}' ORDER BY CAST("رقم_الكشف" AS INTEGER) ASC`);
+    rows=safeArray(rows);
+    let nums = rows.map(r=>parseInt(r.num)).filter(n=>!isNaN(n)).sort((a,b)=>a-b);
+    nums = [...new Set(nums)];
+    if(nums.length===0){
+      showSaveResult(`📄 لا يوجد كشوفات في ${curMonth} ${curYear} - رقم 1 فارغ`, false);
+      input.value=1; tableData=[]; renderTable(); buildStationFilter(); return;
+    }
+    const maxNum = Math.max(...nums);
+    const minNum = Math.min(...nums);
+    let idx = nums.indexOf(cur);
+    if(idx===-1){
+      if(dir>0){
+        let next = nums.find(n=>n>cur);
+        if(next){ input.value=next; await queryByNumber(); return; }
+        // لو cur أكبر من كل الموجود في نفس الشهر - انتقل لفارغ تالي لنفس الشهر
+        input.value = maxNum+1;
+        tableData=[]; renderTable(); buildStationFilter();
+        document.getElementById('incentiveName').value='';
+        document.getElementById('previewBar').style.display='none';
+        currentFullDocName=''; isSavedInDB=false;
+        showSaveResult(`📄 ${curMonth} ${curYear} - كشف فارغ جديد رقم ${maxNum+1} بعد آخر كشف ${maxNum} في نفس الشهر`, false);
+        return;
+      }else{
+        let prev = [...nums].reverse().find(n=>n<cur);
+        if(prev){ input.value=prev; await queryByNumber(); return; }
+        showSaveResult(`❌ لا يوجد كشف سابق قبل ${cur} في ${curMonth} ${curYear} - أول كشف هو ${minNum}`, true);
+        input.value=minNum; await queryByNumber(); return;
+      }
+    }else{
+      let newIdx = idx+dir;
+      if(newIdx>=0 && newIdx<nums.length){
+        input.value=nums[newIdx];
+        await queryByNumber();
+        showSaveResult(`📅 ${curMonth} ${curYear} - كشف ${nums[newIdx]} (${newIdx+1}/${nums.length})`, false);
+        return;
+      }else{
+        if(dir>0){
+          const nextEmpty = maxNum+1;
+          input.value = nextEmpty;
+          tableData=[]; renderTable(); buildStationFilter();
+          document.getElementById('incentiveName').value='';
+          document.getElementById('previewBar').style.display='none';
+          currentFullDocName=''; isSavedInDB=false;
+          showSaveResult(`📄 وصلت لآخر كشف في ${curMonth} ${curYear} (${maxNum}) - انتقلت للفارغ ${nextEmpty} لنفس الشهر`, false);
+          return;
+        }else{
+          showSaveResult(`❌ أنت في أول كشف في ${curMonth} ${curYear} (${minNum}) - لا يوجد سابق`, true);
+          return;
+        }
+      }
+    }
+  }catch(e){
+    console.log('navigate same month error', e);
+    let nxt=cur+dir; if(nxt<1) nxt=1; input.value=nxt; await queryByNumber();
+  }
+}
+async function editDisclosure(){ playSound('click'); const num=document.getElementById('numberInput').value.trim(); if(!num||!tableData.length){ alert('الجدول فاضي'); return; } if(!selectedMonth||!selectedYear||!selectedType||!selectedResp){ alert('أكمل الشهر/السنة/نوع الحافز/مسئول الحافز'); return; } var docNameShort=document.getElementById('incentiveName').value.trim(); if(!docNameShort){ alert('ادخل اسم الحافز'); return; } const toDelete = tableData.filter(r=>{ const amt = r.amount; return amt==='' || amt===null || amt===undefined || parseFloat(amt)===0 || String(amt).trim()==='' || String(amt).trim()==='0'; }); const toUpdate = tableData.filter(r=>{ const amt = r.amount; return !(amt==='' || amt===null || amt===undefined || parseFloat(amt)===0 || String(amt).trim()==='' || String(amt).trim()==='0'); }); let confirmMsg = `تحديث كشف رقم ${num} - ${selectedMonth} ${selectedYear} (${toUpdate.length} تحديث`; if(toDelete.length>0) confirmMsg += ` + ${toDelete.length} حذف مبلغ 0`; confirmMsg += `)؟`; if(!confirm(confirmMsg)) return; const btn=document.getElementById('btnEdit'); const old=btn.innerText; btn.innerText='⏳ جاري التحديث...'; try{ const todayIso=new Date().toISOString().split('T')[0]; const todayAr=new Date().toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'}); const fullDoc = document.getElementById('incentiveName').value.trim() || `كشف رقم ${num} - ${selectedAdmin||selectedStation||''} - ${selectedType||''} - إعتماد الصرف - ${todayAr}`; const docNameShort = document.getElementById('incentiveName').value.trim(); currentFullDocName=fullDoc; let updatedCount=0, deletedCount=0; for(const r of toDelete){ try{ const delRes = await fetch(`${HAFEZ_API_BASE}/api/hafez/delete-employee`,{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({number:num, year:selectedYear, month:selectedMonth, code:String(r.code), m:String(r.m)}) }); const delData = JSON.parse(await delRes.text()); if(delData.ok) deletedCount++; }catch(e){} } if(toUpdate.length>0){ const records = toUpdate.map(r=>({"كود_الحافز":String(r.m),"السنة":String(selectedYear),"الشهر":String(selectedMonth),"كود_الموظف":String(r.code),"اسم_الموظف":String(r.name),"أسم_الموظف":String(r.name),"رقم_الكشف":String(num),"المبلغ":parseFloat(r.amount)||0,"التاريخ":todayIso,"نوع_الحافز":String(selectedType),"الإدارة_التابع_لها":String(r.station),"أسم_المستند":String(fullDoc),"اسم_المستند":String(fullDoc),"مسئول_الحافز":String(selectedResp)})); const res = await fetch(`${HAFEZ_API_BASE}/api/hafez/update`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({records})}); const data = JSON.parse(await res.text()); if(!data.ok && toDelete.length===0) throw new Error(data.msg); updatedCount = data.ok ? data.updated : 0; } let msg = `✅ تم: `; if(updatedCount>0) msg += `${updatedCount} تحديث`; if(deletedCount>0) msg += `${updatedCount>0?' + ':''}${deletedCount} حذف (مبلغ 0)`; if(updatedCount===0 && deletedCount===0) msg = `⚠ لا يوجد تحديث`; showSaveResult(msg, false); btn.innerText=`✅ ${msg}`; isSavedInDB=true; setTimeout(async()=>{ btn.innerText=old; await queryByNumber(); },900); }catch(err){ showSaveResult(`❌ خطأ Update: ${err.message}`, true); btn.innerText=old; } }
+async function deleteDisclosure(){ playSound('click'); const num=document.getElementById('numberInput').value.trim(); const month=selectedMonth; const year=selectedYear; if(!num||!month||!year){ alert('أدخل رقم والشهر والسنة'); return; } if(!confirm(`⚠ حذف كشف ${num} - ${month} ${year} نهائياً؟`)) return; if(!confirm(`تأكيد نهائي - حذف ${num} ؟`)) return; const btn=document.getElementById('btnDelete'); const old=btn.innerText; btn.innerText='⏳ جاري الحذف...'; btn.disabled=true; try{ const res = await fetch(`${HAFEZ_API_BASE}/api/hafez/delete`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({number:num, year:year, month:month})}); const data = JSON.parse(await res.text()); if(!data.ok) throw new Error(data.msg); showSaveResult(`✅ تم حذف كشف رقم ${num} - ${month} ${year} - ${data.deleted} سجل`, false); btn.innerText=`✅ تم الحذف`; tableData=[]; renderTable(); buildStationFilter(); isSavedInDB=false; setTimeout(()=>{ btn.innerText=old; btn.disabled=false; fetchNextNumber(); },1500); }catch(err){ showSaveResult(`❌ خطأ Delete: ${err.message}`, true); btn.innerText=old; btn.disabled=false; } }
+async function saveToTurso(){ if(isSaving) return; if(!selectedType||!selectedResp){ alert('اختر نوع ومسئول'); playSound('error'); return; } var docNameShort=document.getElementById('incentiveName').value.trim(); if(!docNameShort){ alert('اسم الحافز'); return; } if(!(selectedStation||selectedAdmin)||!tableData.length){ alert('محطة/إدارة/جدول'); return; } var num=document.getElementById('numberInput').value.trim(); if(!selectedMonth||!selectedYear){ alert('شهر/سنة'); return; } 
+  // التعديل 1: استبعاد مبلغ صفر عند الحفظ - تجاهل هذا الاسم فقط
+  const filteredForSave = tableData.filter(r=>{ const amt = parseFloat(r.amount)||0; return amt!==0 && String(r.amount).trim()!=='' && String(r.amount).trim()!=='0'; });
+  if(filteredForSave.length===0){ alert('كل المبالغ صفر - لا يوجد ما يحفظ'); playSound('error'); return; }
+  if(filteredForSave.length < tableData.length){
+    const ignored = tableData.length - filteredForSave.length;
+    if(!confirm(`⚠ يوجد ${ignored} موظف بمبلغ صفر سيتم تجاهلهم وعدم حفظهم - حفظ ${filteredForSave.length} فقط؟`)){ return; }
+  }
+  var todayIso=new Date().toISOString().split('T')[0]; var todayAr=new Date().toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'}); var todayAr2=new Date().toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'});
+  // إصلاح صارم جداً: عند الضغط على SaveDataBase يسجل معاينة العنوان في قاعدة البيانات كاسم الحافز بالضبط
+  // مثلا: ✅ كشف رقم 3 - سبتمبر 2026 - إدارة الإتصالات ببنى سويف - حافز إضافى - سبتمبر 2026 - إعتماد الصرف ١ سبتمبر ٢٠٢٦
+  updatePreview(); // حدث المعاينة أولاً
+  var previewEl=document.getElementById('previewText');
+  var previewText = previewEl ? previewEl.innerText.trim() : '';
+  // احذف ✅ والمسافات الزائدة - خذ النص كما هو في المعاينة
+  var fullDoc = previewText.replace(/^✅\s*/, '').trim();
+  if(!fullDoc) fullDoc = currentFullDocName || '';
+  // إذا لا يزال فارغاً ابنِه بنفس صيغة المعاينة المطلوبة
+  if(!fullDoc){
+    var adminName=selectedAdmin||selectedStation||'';
+    var typeName=selectedType||'';
+    var monthName=selectedMonth||'';
+    var yearName=selectedYear||'';
+    var baseIncentive = document.getElementById('incentiveName').value.trim();
+    var parts=[];
+    parts.push(`كشف رقم ${num}`);
+    if(monthName && yearName) parts.push(`${monthName} ${yearName}`);
+    if(adminName) parts.push(adminName);
+    if(typeName) parts.push(typeName);
+    if(baseIncentive) parts.push(baseIncentive);
+    parts.push(`إعتماد الصرف ${todayAr2}`);
+    fullDoc = parts.join(' - ');
+  }
+  var docNameShort = fullDoc; // اسم الحافز = نفس المعاينة تماماً
+  currentFullDocName = fullDoc;
+  // أيضاً حدث خانة اسم الحافز لتظهر ما سيتم حفظه
+  // لا تغير خانة الإدخال إذا فيها نص مخصص، فقط للعرض
+  console.log('سيتم حفظ اسم المستند كالتالي:', fullDoc);
+
+ currentFullDocName=fullDoc; var btn=document.getElementById('btnSaveTurso'); isSaving=true; btn.disabled=true; btn.innerText='⏳'; playSound('click'); try{ const records = filteredForSave.map(r=>({"كود_الحافز":String(r.m),"السنة":String(selectedYear),"الشهر":String(selectedMonth),"كود_الموظف":String(r.code),"اسم_الموظف":String(r.name),"أسم_الموظف":String(r.name),"رقم_الكشف":String(num),"المبلغ":parseFloat(r.amount)||0,"التاريخ":todayIso,"نوع_الحافز":String(selectedType),"الإدارة_التابع_لها":String(r.station),"أسم_المستند":String(fullDoc),"اسم_المستند":String(fullDoc),"مسئول_الحافز":String(selectedResp)})); const res = await fetch(`${HAFEZ_API_BASE}/api/hafez/save`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({records})}); const data = JSON.parse(await res.text()); if(data.ok){ showSaveResult(`✅ حفظ ${data.saved} سجل - ${fullDoc}`, false); btn.innerText=`✅ ${data.saved}`; isSavedInDB=true; currentQueryNumber=parseInt(num); setTimeout(()=>{ isSaving=false; btn.disabled=false; btn.innerText='SaveDataBase'; fetchNextNumber(); },1500); return; } throw new Error(data.msg); }catch(err){ showSaveResult(`❌ ${err.message}`, true); isSaving=false; btn.disabled=false; btn.innerText='SaveDataBase'; } }
+function generateExcelFileCodeNameAmount(){
+  const dataToExport = getFilteredData();
+  if(!dataToExport.length) return null;
+  var fileName = currentFullDocName || document.getElementById('previewText').innerText.replace('✅ ','') || `كشف رقم ${document.getElementById('numberInput').value} - ${document.getElementById('incentiveName').value}`;
+  fileName = fileName.replace(/[\\/:*?"<>|]/g,' - ').trim();
+  if(stationFilterValue) fileName += ` - ${stationFilterValue}`;
+  fileName += ".xlsx";
+  var header=["الكود","اسم الموظف","المبلغ","المحطة"]; var data=[header];
+  dataToExport.forEach(r=>data.push([r.code,r.name, parseFloat(r.amount)||0, r.station]));
+  var total = dataToExport.reduce((s,r)=>s+(parseFloat(r.amount)||0),0);
+  data.push(["","","",""]); data.push(["الإجمالي", dataToExport.length + " موظف", total, stationFilterValue?`فلتر: ${stationFilterValue}`:'']);
+  var wb=XLSX.utils.book_new(); var ws=XLSX.utils.aoa_to_sheet(data); XLSX.utils.book_append_sheet(wb,ws,"الحافز"); return {wb, fileName: fileName};
+}
+function generateExcelFile(){ return generateExcelFileCodeNameAmount(); }
+async function saveLocal(){ if(!tableData.length){ alert('الجدول فاضي'); playSound('error'); return; } playSound('click'); var gen=generateExcelFile(); if(gen){ XLSX.writeFile(gen.wb,gen.fileName,{bookType:"xlsx"}); showSaveResult(`✅ تم حفظ Excel الظاهر: ${gen.fileName} - ${getFilteredData().length} موظف`, false); } }
+function printTable(){ if(!tableData.length){alert('فاضي');return;} playSound('click'); var num=document.getElementById('numberInput').value; var rowsHtml=getFilteredData().map(r=>`<tr><td>${r.m}</td><td>${r.code}</td><td style="text-align:right">${r.name}</td><td style="color:#8B0000;font-weight:900">${r.amount}</td><td>${r.station}</td></tr>`).join(''); var html=`<html dir="rtl"><head><meta charset="UTF-8"><title>${num}</title><style>table{width:100%;border-collapse:collapse}th,td{border:1px solid #000;padding:6px;text-align:center;font-weight:900}
+/* عمود المحطة خط صغير - اسم المستند من جدول الحوافز */
+#tbody td:nth-child(5){font-size:9px!important; line-height:1.2!important; font-weight:700!important; white-space:normal!important; word-wrap:break-word!important; max-width:300px!important;}
+.col-emp-name{font-size:12px!important;}
+</style></head><body><h3>${currentFullDocName}</h3><table><thead><tr><th>م</th><th>كود</th><th>اسم</th><th>المبلغ</th><th>محطة</th></tr></thead><tbody>${rowsHtml}</tbody></table><script>window.print()<\/script></body></html>`; var win=window.open('','','width=900'); win.document.write(html); win.document.close(); }
+function showSendModal3D(){ if(!tableData.length){ alert('الجدول فاضي'); playSound('error'); return; } playSound('click'); sendMode=''; document.getElementById('modalTitle').innerText='📤 اختيار طريقة الإرسال - مباشر للوارد'; document.getElementById('emailChooseArea').style.display='none'; document.getElementById('waChooseArea').style.display='none'; document.getElementById('modalEmailInput').style.display='none'; document.getElementById('modalWaInput').style.display='none'; document.getElementById('btnConfirmSend').style.display='none'; document.getElementById('modalStatus').style.display='none'; document.getElementById('send3DBox').classList.remove('modal-3d-success'); document.getElementById('chooseButtons').style.display='flex'; document.getElementById('send3DModal').style.display='flex'; }
+function closeSendModal3D(){ document.getElementById('send3DModal').style.display='none'; playSound('click'); }
+function chooseSendEmail(){ sendMode='email'; document.getElementById('emailChooseArea').style.display='block'; document.getElementById('waChooseArea').style.display='none'; document.getElementById('chooseButtons').style.display='none'; document.getElementById('modalTitle').innerText='📧 إرسال بالإيميل - مباشر للوارد'; document.getElementById('modalEmailSelect').value=''; document.getElementById('modalEmailInput').style.display='none'; playSound('click'); }
+function chooseSendWhatsapp(){ sendMode='whatsapp'; document.getElementById('waChooseArea').style.display='block'; document.getElementById('emailChooseArea').style.display='none'; document.getElementById('chooseButtons').style.display='none'; document.getElementById('modalTitle').innerText='💬 إرسال واتساب'; document.getElementById('modalWaSelect').value=''; document.getElementById('modalWaInput').style.display='none'; document.getElementById('btnConfirmSend').style.display='none'; playSound('click'); }
+function onEmailSelectChange(){ var sel=document.getElementById('modalEmailSelect').value; if(sel==='__custom__'){ document.getElementById('modalEmailInput').style.display='block'; document.getElementById('modalEmailInput').focus(); } else{ document.getElementById('modalEmailInput').style.display='none'; } playSound('nav'); }
+function onWaSelectChange(){ var sel=document.getElementById('modalWaSelect').value; if(sel==='__custom__'){ document.getElementById('modalWaInput').style.display='block'; document.getElementById('modalWaInput').focus(); document.getElementById('btnConfirmSend').style.display='inline-flex'; document.getElementById('btnConfirmSend').innerText='💬 إرسال واتساب'; } else if(sel){ document.getElementById('modalWaInput').style.display='none'; document.getElementById('btnConfirmSend').style.display='inline-flex'; document.getElementById('btnConfirmSend').innerText='💬 إرسال واتساب'; } else{ document.getElementById('btnConfirmSend').style.display='none'; } playSound('nav'); }
+function getTotals(){ var total=tableData.reduce((s,r)=>s+(parseFloat(r.amount)||0),0); var count=tableData.length; return {total, count}; }
+function getSelectedEmail(){ var sel=document.getElementById('modalEmailSelect').value; if(sel==='__custom__') return document.getElementById('modalEmailInput').value.trim(); return sel.trim(); }
+function prepareExcelForSend(){ var gen=generateExcelFileCodeNameAmount(); if(!gen) return null; var base64 = XLSX.write(gen.wb, {bookType:'xlsx', type:'base64'}); var binary = atob(base64); var bytes = new Uint8Array(binary.length); for(var i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i); return {gen, base64, bytes}; }
+function sendOutlookDirect(){ var email=getSelectedEmail(); if(!email||!email.includes('@')){ alert('اختار إيميل صحيح'); return; } var prep=prepareExcelForSend(); if(!prep){ alert('الجدول فاضي'); return; } var totals=getTotals(); var subject=currentFullDocName||document.getElementById('incentiveName').value; var body=`السلام عليكم\n\nمرفق ${subject}\n\n📊 عدد الموظفين: ${totals.count}\n💰 الإجمالي: ${totals.total.toFixed(2)} جنيه\n\nمع التحية`; var blob = new Blob([prep.bytes], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}); var url = URL.createObjectURL(blob); var a=document.createElement('a'); a.href=url; a.download=prep.gen.fileName; a.click(); URL.revokeObjectURL(url); var mailto=`mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`; window.location.href=mailto; var status=document.getElementById('modalStatus'); status.style.display='block'; document.getElementById('send3DBox').classList.add('modal-3d-success'); document.getElementById('modalTitle').innerText='✅ تم فتح Outlook'; status.innerHTML=`✅ تم تحميل الملف: <b>${prep.gen.fileName}</b><br>📧 إلى: <b>${email}</b>`; showSaveResult(`📧 Outlook إلى ${email} - ${prep.gen.fileName}`, false); playSound('save'); }
+function sendGmailDirect(){ var email=getSelectedEmail(); if(!email||!email.includes('@')){ alert('اختار إيميل صحيح'); return; } var prep=prepareExcelForSend(); if(!prep){ alert('الجدول فاضي'); return; } var totals=getTotals(); var subject=currentFullDocName||document.getElementById('incentiveName').value; var body=`السلام عليكم\n\nمرفق ${subject}\n\n📊 عدد الموظفين: ${totals.count}\n💰 الإجمالي: ${totals.total.toFixed(2)} جنيه\n\nمع التحية`; var blob = new Blob([prep.bytes], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}); var url = URL.createObjectURL(blob); var a=document.createElement('a'); a.href=url; a.download=prep.gen.fileName; a.click(); URL.revokeObjectURL(url); var gmailUrl=`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`; window.open(gmailUrl,'_blank'); var status=document.getElementById('modalStatus'); status.style.display='block'; document.getElementById('send3DBox').classList.add('modal-3d-success'); document.getElementById('modalTitle').innerText='✅ تم فتح Gmail'; status.innerHTML=`✅ تم تحميل الملف: <b>${prep.gen.fileName}</b>`; showSaveResult(`📮 Gmail إلى ${email} - ${prep.gen.fileName}`, false); playSound('save'); }
+function downloadEmlFile(){ var email=getSelectedEmail(); if(!email||!email.includes('@')){ alert('اختار إيميل صحيح'); return; } var prep=prepareExcelForSend(); if(!prep){ alert('الجدول فاضي'); return; } var totals=getTotals(); var subject=currentFullDocName||document.getElementById('incentiveName').value; var bodyText=`السلام عليكم\n\nمرفق ${subject}\n\n📊 عدد الموظفين: ${totals.count}\n💰 الإجمالي: ${totals.total.toFixed(2)} جنيه\n\nمع التحية\nنظام الحوافز`; var boundary='----=_Part_'+Date.now(); var eml=`From: نظام الحوافز <mostafa.voic77729@gmail.com>\nTo: ${email}\nSubject: ${subject}\nMIME-Version: 1.0\nContent-Type: multipart/mixed; boundary="${boundary}"\n\n--${boundary}\nContent-Type: text/plain; charset=utf-8\nContent-Transfer-Encoding: base64\n\n${btoa(unescape(encodeURIComponent(bodyText)))}\n--${boundary}\nContent-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; name="${prep.gen.fileName}"\nContent-Transfer-Encoding: base64\nContent-Disposition: attachment; filename="${prep.gen.fileName}"\n\n${prep.base64}\n--${boundary}--\n`; var blob=new Blob([eml],{type:'message/rfc822'}); var url=URL.createObjectURL(blob); var a=document.createElement('a'); a.href=url; a.download=subject+'.eml'; a.click(); URL.revokeObjectURL(url); var status=document.getElementById('modalStatus'); status.style.display='block'; document.getElementById('send3DBox').classList.add('modal-3d-success'); document.getElementById('modalTitle').innerText='✅ تم تحميل EML'; status.innerHTML=`✅ تم تحميل ملف EML: <b>${subject}.eml</b>`; showSaveResult(`📎 EML إلى ${email} - ${prep.gen.fileName}`, false); playSound('save'); }
+async function confirmSend(){ var status=document.getElementById('modalStatus'); status.style.display='block'; var totals=getTotals(); if(sendMode==='whatsapp'){ var selWa = document.getElementById('modalWaSelect').value; var waNumber = ''; if(selWa==='__custom__'){ waNumber = document.getElementById('modalWaInput').value.trim().replace(/[^0-9]/g,''); } else{ waNumber = selWa.replace(/[^0-9]/g,''); } if(!waNumber){ status.innerHTML='❌ اختر رقم واتساب'; return; } if(waNumber.length===11 && waNumber.startsWith('01')) waNumber='2'+waNumber; if(waNumber.length===10) waNumber='20'+waNumber; var prep=prepareExcelForSend(); var waText=`${currentFullDocName||document.getElementById('incentiveName').value}\n\n📊 عدد: ${totals.count}\n💰 إجمالي: ${totals.total.toFixed(2)} جنيه`; window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(waText)}`,'_blank'); if(prep){ var blob = new Blob([prep.bytes], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}); var url = URL.createObjectURL(blob); var a=document.createElement('a'); a.href=url; a.download=prep.gen.fileName; a.click(); URL.revokeObjectURL(url); } document.getElementById('send3DBox').classList.add('modal-3d-success'); document.getElementById('modalTitle').innerText='✅ تم فتح واتساب'; status.innerHTML=`✅ واتساب إلى <b>${waNumber}</b>`; showSaveResult(`✅ واتساب إلى ${waNumber}`, false); setTimeout(()=>{ closeSendModal3D(); },4000); playSound('save'); } }
+function sortByM(){ playSound('nav'); sortAsc=!sortAsc; tableData.sort((a,b)=> sortAsc ? (parseFloat(a.m)||0)-(parseFloat(b.m)||0) : (parseFloat(b.m)||0)-(parseFloat(a.m)||0)); document.getElementById('arrowM').textContent=sortAsc?'▲':'▼'; renderTable(); }
+function resequenceM(){ if(!tableData.length){ alert('الجدول فاضي'); return; } if(!confirm(`إعادة تسلسل 1-${tableData.length} ؟`)) return; playSound('click'); tableData.forEach((r,i)=>{ r.m = i+1; }); renderTable(); isSavedInDB=false; }
+function initResizableTable(){ const ths=document.querySelectorAll('#mainTable th'); ths.forEach(th=>{ const resizer=th.querySelector('.resizer'); if(!resizer) return; let startX,startWidth; resizer.addEventListener('mousedown', e=>{ e.preventDefault(); startX=e.pageX; startWidth=th.offsetWidth; document.addEventListener('mousemove', onMouseMove); document.addEventListener('mouseup', onMouseUp); }); function onMouseMove(e){ const diff=startX-e.pageX; const nw=startWidth+diff; if(nw>40&&nw<500){ th.style.width=nw+'px'; } } function onMouseUp(){ document.removeEventListener('mousemove', onMouseMove); document.removeEventListener('mouseup', onMouseUp); } }); }
+function checkPlusPassword(){ document.getElementById('plusAuthModal').style.display='flex'; document.getElementById('plusPasswordInput').value=''; document.getElementById('plusAuthStatus').style.display='none'; setTimeout(()=>{ document.getElementById('plusPasswordInput').focus(); },100); playSound('click'); }
+function closePlusAuthModal(){ document.getElementById('plusAuthModal').style.display='none'; playSound('click'); }
+async function verifyPlusPassword(){
+  const inputPass = document.getElementById('plusPasswordInput').value.trim();
+  const statusEl = document.getElementById('plusAuthStatus');
+  if(!inputPass){ statusEl.style.display='block'; statusEl.innerText='❌ أدخل كلمة المرور'; playSound('error'); return; }
+  statusEl.style.display='block'; statusEl.style.color='#6ee7b7';
+  statusEl.innerText='⏳ جاري التحقق...';
+  try{
+    let realPwd=''; let tbl='موظفين_مرتبات';
+    try{ const res=await fetch(`${HAFEZ_API_BASE}/api/hafez/get-password?code=40468`); const txt=await res.text(); let d; try{ d=JSON.parse(txt);}catch{ d={}; } if(d.ok && d.pwd){ realPwd=String(d.pwd).trim(); tbl=d.table||'موظفين_مرتبات'; } }catch(e){}
+    if(!realPwd){ try{ const rows=await window.DB.query(`SELECT "كلمة_المرور" as pwd FROM "موظفين_مرتبات" WHERE "الكود_البنكى"='40468' LIMIT 1`); const arr=safeArray(rows); if(arr.length && arr[0].pwd) realPwd=String(arr[0].pwd).trim(); }catch(e){} }
+    if(!realPwd) realPwd='123456';
+    if(inputPass===realPwd){ statusEl.style.color='#6ee7b7'; statusEl.innerText=`✅ صحيح - من ${tbl} - جاري الانتقال...`; playSound('save'); setTimeout(()=>{ window.location.href='AddHafez1.html'; },600); }
+    else{ statusEl.style.color='#fca5a5'; statusEl.innerText=`❌ غير صحيحة - الصحيح من ${tbl} هو ${realPwd}`; playSound('error'); }
+  }catch(err){ statusEl.style.color='#fca5a5'; statusEl.innerText='❌ خطأ: '+err.message; playSound('error'); }
+}
+document.getElementById('plusPasswordInput')?.addEventListener('keydown', (e)=>{ if(e.key==='Enter') verifyPlusPassword(); });
+
+function showLoadChoiceModal(){
+  const stSel=document.getElementById('modalStationSelect'); stSel.innerHTML='<option value="">-- اختر المحطة --</option>'; (dataLists.Station||[]).forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s; stSel.appendChild(o); });
+  const tpSel=document.getElementById('modalTemplateSelect'); tpSel.innerHTML='<option value="">-- اختر نوع الحافز --</option>'; fetch(`${HAFEZ_API_BASE}/api/hafez/template-types`).then(r=>r.text()).then(t=>{ try{ const j=JSON.parse(t); (j.rows||[]).forEach(row=>{ const o=document.createElement('option'); o.value=row.type; o.textContent=`${row.type} (${row.cnt})`; tpSel.appendChild(o); }); dataLists.Type.forEach(tt=>{ if(![...tpSel.options].some(op=>op.value===tt)){ const o=document.createElement('option'); o.value=tt; o.textContent=tt; tpSel.appendChild(o); } }); }catch(e){} });
+  document.getElementById('loadChoiceStatus').style.display='none'; document.getElementById('loadChoiceModal').style.display='flex';
+}
+function closeLoadChoiceModal(){ document.getElementById('loadChoiceModal').style.display='none'; }
+async function loadFromStationModal(){
+  const station=document.getElementById('modalStationSelect').value; if(!station){ alert('اختر المحطة'); return; } selectedStation=station; document.getElementById('textStation').innerText=station; closeLoadChoiceModal();
+  const amount=document.getElementById('amount').value; const amountNum=parseFloat(amount)||0; const list=allEmployees.filter(e=>(e.station||'').includes(station)||station.includes(e.station||'')); if(!list.length){ alert(`لا يوجد موظفين في ${station}`); return; } if(!confirm(`تحميل ${list.length} موظف من محطة ${station}؟`)) return; tableData=[]; list.forEach((e,idx)=>tableData.push({m:idx+1,code:e.code,name:e.name,amount:amountNum,station:e.station||station,retired:e.retired})); renderTable(); buildStationFilter(); playSound('save');
+}
+async function loadFromTemplateModal(){
+  const type=document.getElementById('modalTemplateSelect').value; if(!type){ alert('اختر نوع الحافز'); return; }
+  const statusEl=document.getElementById('loadChoiceStatus'); statusEl.style.display='block'; statusEl.innerText=`⏳ جاري تحميل قالب ${type} من قوالب_ترتيب_الحوافز...`;
+  let rows=[];
+  try{
+    const res=await fetch(`${HAFEZ_API_BASE}/api/hafez/template-order?type=${encodeURIComponent(type)}`);
+    const j=JSON.parse(await res.text()); if(j.ok && j.rows && j.rows.length>0) rows=j.rows;
+  }catch(e){}
+  if(!rows.length){
+    try{
+      const safeType = String(type).replace(/'/g,"''");
+      let directRows = await window.DB.query(`SELECT * FROM "قوالب_ترتيب_الحوافز" WHERE "نوع_الحافز"='${safeType}' ORDER BY CAST("ترتيب" AS INTEGER) ASC`);
+      directRows=safeArray(directRows);
+      if(!directRows.length){
+        directRows = await window.DB.query(`SELECT * FROM "قوالب_ترتيب_الحوافز" WHERE "نوع_الحافز" LIKE '%${safeType.substring(0,20).replace(/%/g,'').trim()}%' LIMIT 100`);
+        directRows=safeArray(directRows);
+      }
+      if(directRows.length>0) rows = directRows.map(r=>({ tartib: r['ترتيب'], code: r['كود_الموظف'], name: r['اسم_الموظف']||r['أسم_الموظف'], mahatta: r['المحطة']||r['المحطات'] }));
+    }catch(e){}
+  }
+  try{
+    if(!rows.length){ statusEl.innerText=`❌ لا يوجد قالب محفوظ لنوع ${type} - جرب الحفظ المباشر`; statusEl.style.color='#fca5a5'; return; }
+    tableData=rows.map(r=>({ m: parseInt(r.tartib||r.ترتيب||r['ترتيب']||0)||0, code: String(r.code||r['كود_الموظف']||'').trim(), name: String(r.name||r['اسم_الموظف']||'').trim(), station: normalizeStation(String(r.mahatta||r['المحطة']||'').trim())||'الإدارة العامة لشبكات بنى سويف', amount: 0, retired:false })).filter(r=>r.code);
+    tableData.forEach(r=>{ if(!r.name || r.station==='غير محدد'){ const emp=allEmployees.find(e=>e.code===r.code); if(emp){ if(!r.name) r.name=emp.name; if(r.station==='غير محدد' || !r.station) r.station=emp.station||'غير محدد'; } } });
+    renderTable(); buildStationFilter(); selectedType=type; document.getElementById('textType').innerText=type; statusEl.style.color='#6ee7b7'; statusEl.innerText=`✅ تم تحميل ${tableData.length} موظف من قالب ${type} - مع fallback`; setTimeout(()=>closeLoadChoiceModal(), 900); playSound('save');
+  }catch(e){ statusEl.style.color='#fca5a5'; statusEl.innerText=`❌ خطأ: ${e.message}`; playSound('error'); }
+}
+function triggerExcelImport(){ document.getElementById('excelImportInput').click(); playSound('click'); }
+async function handleExcelImport(ev){
+  const file=ev.target.files[0]; if(!file) return;
+  try{
+    const buf=await file.arrayBuffer(); const wb=XLSX.read(buf,{type:'array'}); const ws=wb.Sheets[wb.SheetNames[0]]; const data=XLSX.utils.sheet_to_json(ws,{header:1});
+    if(!data.length){ alert('ملف فاضي'); return; }
+    let start=0;
+    // كشف الهيدر - لو أول صف فيه م أو كود أو اسم
+    if(data[0]){
+      const r0 = data[0].map(c=>String(c||'').trim().toLowerCase());
+      if(r0.some(c=> c.includes('م') || c.includes('كود') || c.includes('اسم') || c.includes('مبلغ') || c.includes('ادارة') || c.includes('إدارة'))) start=1;
+    }
+    let added=0; let updated=0;
+    for(let i=start;i<data.length;i++){
+      const row=data[i]; if(!row||row.length<2) continue;
+      let m=row[0];
+      let code=row[1];
+      let empName=row[2];
+      let amount=row[3];
+      let admin=row[4];
+      // تنظيف
+      if(code==null || String(code).trim()==='') continue;
+      code=String(code).trim();
+      m = m!=null && String(m).trim()!=='' ? parseInt(m)|| (tableData.length+1) : (tableData.length+1);
+      let name = empName!=null ? String(empName).trim() : '';
+      amount = amount!=null && String(amount).trim()!=='' ? parseFloat(amount)||0 : 0;
+      let stationVal = admin!=null ? normalizeStation(String(admin).trim()) : '';
+      // لو الاسم فاضي جيبه من allEmployees
+      const empInDB = allEmployees.find(e=>e.code===code);
+      if(!name && empInDB) name = empInDB.name;
+      if(!name) name = `موظف ${code}`;
+      // لو الإدارة فاضية جيبها من allEmployees أو من اختيار الصفحة
+      if(!stationVal){
+        if(empInDB && empInDB.station) stationVal = normalizeStation(empInDB.station);
+        else if(selectedStation) stationVal = normalizeStation(selectedStation);
+        else if(selectedAdmin) stationVal = normalizeStation(selectedAdmin);
+        else stationVal = '';
+      }
+      const existingIdx = tableData.findIndex(r=>r.code===code);
+      if(existingIdx>=0){
+        // تحديث كامل: م - كود - اسم - مبلغ - إدارة
+        if(m) tableData[existingIdx].m = m;
+        tableData[existingIdx].code = code;
+        if(name) tableData[existingIdx].name = name;
+        tableData[existingIdx].amount = amount;
+        if(stationVal) tableData[existingIdx].station = stationVal;
+        updated++;
+      }else{
+        tableData.push({ m: m, code: code, name: name, station: stationVal, amount: amount, retired: empInDB? empInDB.retired : false });
+        added++;
+      }
+    }
+    renderTable(); buildStationFilter();
+    showSaveResult(`✅ Excel (م - كود - اسم - مبلغ - إدارة): ${added} إضافة + ${updated} تحديث - إجمالي ${tableData.length}`, false);
+    playSound('save');
+  }catch(e){ alert('خطأ قراءة Excel: '+e.message); playSound('error'); }
+  ev.target.value='';
+}
+function showAmountExcelModal(){ if(!tableData.length){ alert('الجدول فاضي'); playSound('error'); return; } playSound('click'); const tbody=document.getElementById('excelEditTbody'); tbody.innerHTML=''; tableData.forEach((r,idx)=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td style="text-align:center; padding:6px; border:1px solid rgba(255,255,255,0.1)">${r.m}</td><td style="text-align:center; padding:6px; border:1px solid rgba(255,255,255,0.1)">${r.code}</td><td style="text-align:right; padding:6px; border:1px solid rgba(255,255,255,0.1)">${r.name}</td><td style="text-align:center; padding:6px; border:1px solid rgba(255,255,255,0.1)">${r.station}</td><td style="text-align:center; padding:4px; border:1px solid rgba(251,191,36,0.4)"><input type="number" data-idx="${idx}" value="${r.amount}" style="width:90px; height:30px; text-align:center; background:rgba(255,255,255,0.95); color:#8B0000; border:2px solid #8B0000; border-radius:6px; font-weight:900" oninput="recalcExcelEditTotal()" onfocus="playSound('focus')"></td>`; tbody.appendChild(tr); }); recalcExcelEditTotal(); document.getElementById('amountExcelModal').style.display='flex'; }
+function closeAmountExcelModal(){ document.getElementById('amountExcelModal').style.display='none'; playSound('click'); }
+function recalcExcelEditTotal(){ let total=0; document.querySelectorAll('#excelEditTbody input').forEach(inp=>{ total+=parseFloat(inp.value)||0; }); document.getElementById('excelEditTotal').innerText=total.toFixed(2); }
+function applyAmountExcel(){ document.querySelectorAll('#excelEditTbody input').forEach(inp=>{ const idx=parseInt(inp.getAttribute('data-idx')); const val=parseFloat(inp.value)||0; if(tableData[idx]) tableData[idx].amount=val; }); renderTable(); buildStationFilter(); closeAmountExcelModal(); showSaveResult(`✅ تم تحديث المبالغ - الإجمالي ${tableData.reduce((s,r)=>s+(parseFloat(r.amount)||0),0).toFixed(2)}`, false); playSound('save'); }
+
+// دوال جديدة احترافية لزر >> - 3 اختيارات دائماً
+function handleQuickLoad(){
+  playSound('click');
+  // التعديل 8: إلغاء جميع النصوص التي تظهر عند الضغط على زر >> بحيث تظهر الأزرار فقط
+  const info=document.getElementById('quickLoadInfo');
+  info.innerHTML=''; // بدون أي نصوص إضافية
+  info.style.display='none';
+
+  const btnS=document.getElementById('btnLoadFromStation');
+  const btnA=document.getElementById('btnLoadFromAdmin');
+  const btnT=document.getElementById('btnLoadFromType');
+
+  // دائماً 3 أزرار فقط بالنصوص المطلوبة بالضبط
+  btnS.style.display='inline-flex';
+  btnA.style.display='inline-flex';
+  btnT.style.display='inline-flex';
+
+  btnS.innerText = `🏭 المحطات - يجلب موظفين المحطات (م.م)`;
+  btnA.innerText = `🏢 الإدارات - يجلب موظفين الإدارات`;
+  // إذا اختار نوع حافز يظهر اسمه وإلا يظهر النص الافتراضي المطلوب
+  if(selectedType){
+    btnT.innerText = `📋 تحميل نوع الحافز: ${selectedType}`;
+  }else{
+    btnT.innerText = `📋 تحميل نوع الحافز: حافز إضافى`;
+  }
+
+  document.getElementById('quickLoadStatus').style.display='none';
+  document.getElementById('quickLoadStatus').innerText='';
+  document.getElementById('quickLoadModal').style.display='flex';
+}
+function closeQuickLoadModal(){ document.getElementById('quickLoadModal').style.display='none'; playSound('click'); }
+function confirmLoadStation(){
+  if(!selectedStation){
+    const st = document.getElementById('quickLoadStatus'); st.style.display='block'; st.style.color='#fca5a5';
+    st.innerText='❌ اختر محطة م.م أولاً من القائمة المنسدلة للمحطات التي تبدأ بـ م.م';
+    playSound('error'); return;
+  }
+  closeQuickLoadModal(); fetchStationEmployees();
+}
+function confirmLoadAdmin(){
+  if(!selectedAdmin){
+    const st = document.getElementById('quickLoadStatus'); st.style.display='block'; st.style.color='#fca5a5';
+    st.innerText='❌ اختر إدارة أولاً من القائمة المنسدلة للإدارات (باستثناء م.م)';
+    playSound('error'); return;
+  }
+  closeQuickLoadModal(); fetchAdminEmployees();
+}
+function confirmLoadType(){
+  if(!selectedType){
+    const st = document.getElementById('quickLoadStatus'); st.style.display='block'; st.style.color='#fca5a5';
+    st.innerText='❌ اختر نوع الحافز أولاً من قائمة نوع الحافز - يجلب من قوالب_ترتيب_الحوافز';
+    playSound('error'); return;
+  }
+  closeQuickLoadModal(); loadTemplateDirect(selectedType);
+}
+
+async function loadTemplateDirect(type){
+  if(!type){ alert('اختر نوع الحافز من الصفحة أولاً'); return; }
+  const statusEl=document.getElementById('quickLoadStatus');
+  statusEl.style.display='block'; statusEl.style.color='#6ee7b7';
+  statusEl.innerText=`⏳ جاري تحميل قالب ${type} من جدول قوالب_ترتيب_الحوافز...`;
+  let rows=[];
+  try{
+    // المحاولة 1: عبر API
+    const res=await fetch(`${HAFEZ_API_BASE}/api/hafez/template-order?type=${encodeURIComponent(type)}`);
+    const text=await res.text(); let j; try{ j=JSON.parse(text); }catch(e){ j={ok:false}; }
+    if(j.ok && Array.isArray(j.rows) && j.rows.length>0){ rows=j.rows; }
+  }catch(e){}
+  // المحاولة 2: fallback مباشر من Turso - يحل مشكلة % والترميز و NULL المحطة
+  if(!rows.length){
+    statusEl.innerText=`⏳ API لم يرجع بيانات - جاري المحاولة المباشرة من Turso لـ ${type}...`;
+    try{
+      const safeType = String(type).replace(/'/g,"''");
+      // جرب أولاً تطابق دقيق
+      let directRows = await window.DB.query(`SELECT * FROM "قوالب_ترتيب_الحوافز" WHERE "نوع_الحافز"='${safeType}' ORDER BY CAST("ترتيب" AS INTEGER) ASC`);
+      directRows=safeArray(directRows);
+      // لو فشل بسبب ترميز % جرب LIKE
+      if(!directRows.length){
+        directRows = await window.DB.query(`SELECT * FROM "قوالب_ترتيب_الحوافز" WHERE "نوع_الحافز" LIKE '%${safeType.substring(0,20).replace(/%/g,'').trim()}%' ORDER BY CAST("ترتيب" AS INTEGER) ASC`);
+        directRows=safeArray(directRows);
+        // فلترة إضافية في الجافاسكريبت للتأكد
+        if(directRows.length>50){
+          const filtered = directRows.filter(r=> String(r['نوع_الحافز']||'').trim() === String(type).trim() || String(r['نوع_الحافز']||'').includes(String(type).replace(/%/g,'').trim().substring(0,10)));
+          if(filtered.length>0) directRows=filtered;
+        }
+      }
+      if(directRows.length>0){
+        rows = directRows.map(r=>({
+          tartib: r['ترتيب'],
+          code: r['كود_الموظف']||r['الكود'],
+          name: r['اسم_الموظف']||r['أسم_الموظف'],
+          mahatta: r['المحطة']||r['المحطات'],
+          type: r['نوع_الحافز']
+        }));
+        statusEl.innerText=`✅ تم الجلب المباشر من Turso: ${rows.length} سجل`;
+      }
+    }catch(e){
+      statusEl.innerText=`⚠ فشل الجلب المباشر: ${e.message}`;
+    }
+  }
+  try{
+    if(!rows.length){ statusEl.style.color='#fca5a5'; statusEl.innerText=`❌ لا يوجد بيانات في جدول قوالب_ترتيب_الحوافز لنوع ${type} - تأكد من وجوده في Turso`; showSaveResult(`❌ لا يوجد قالب لنوع ${type}`, true); playSound('error'); return; }
+    // التعديل المطلوب: عمود المحطة يظهر نوع الحافز نفسه لهذا الزر فقط - حل مشكلة [object Object]
+    let rawMapped=rows.map(r=>{
+      let st = type;
+      let rawMahatta = r.mahatta||r.المحطات||r.station||r['المحطة']||'';
+      if(rawMahatta && typeof rawMahatta === 'object'){ st = type; } else if(rawMahatta && String(rawMahatta).trim() && String(rawMahatta).trim()!=='[object Object]'){ st = type; }
+      return { m: parseInt(r.tartib||r.ترتيب||r.tarteeb||r.order||r['ترتيب']||0)||0, code: String(r.code||r.كود_الموظف||r.الكود||r['كود_الموظف']||'').trim(), name: String(r.name||r.اسم_العامل||r.أسم_العامل||r.emp_name||r['اسم_الموظف']||'').trim(), station: normalizeStation(String(st).trim()), amount: 0, retired:false, _rawName: String(r.name||'').trim() };
+    }).filter(r=>r.code);
+    // التعديل 2: استبعاد المحالين للمعاش عند استدعاء من نوع الحافز
+    const beforeCount=rawMapped.length;
+    tableData=rawMapped.filter(r=>{
+      const emp=allEmployees.find(e=>e.code===r.code);
+      if(emp && (emp.retired || isRetired(emp.birth||''))) return false;
+      return true;
+    });
+    const excludedTemplate=beforeCount-tableData.length;
+    if(excludedTemplate>0){ showSaveResult(`⚠ تم استبعاد ${excludedTemplate} محال معاش من قالب ${type} - حساب من تاريخ الميلاد`, false); }
+    // تكملة الاسم والمحطة من allEmployees لو المحطة NULL كما في الصورة
+    tableData.forEach(r=>{
+      if(!r.name || !r.station){
+        const emp=allEmployees.find(e=>e.code===r.code);
+        if(emp){ if(!r.name) r.name=emp.name; if(!r.station) r.station=emp.station; }
+      }
+      if(!r.station) r.station = 'غير محدد'; // كما في صورتك العمود NULL
+    });
+    renderTable(); buildStationFilter(); statusEl.style.color='#6ee7b7'; statusEl.innerText=`✅ تم تحميل ${tableData.length} موظف من قالب ${type} - من جدول قوالب_ترتيب_الحوافز - حتى مع المحطة NULL`; showSaveResult(`✅ تم تحميل ${tableData.length} موظف من قالب ${type} - قوالب_ترتيب_الحوافز`, false); setTimeout(()=>closeQuickLoadModal(), 1200); playSound('save');
+  }catch(e){ statusEl.style.color='#fca5a5'; statusEl.innerText=`❌ خطأ: ${e.message}`; showSaveResult(`❌ خطأ تحميل قالب ${type}: ${e.message}`, true); playSound('error'); }
+}
+
+async function searchAllHafezForEmployee(){
+  if(!selectedEmp){
+    alert('اختر اسم الموظف أولاً من القائمة المنسدلة');
+    playSound('error');
+    return;
+  }
+  const code = String(selectedEmp.code||'').trim();
+  const name = String(selectedEmp.name||'').trim();
+  if(!code && !name){ alert('اختر موظف'); return; }
+  playSound('click');
+  showSaveResult(`⏳ جاري جلب كل حوافز ${name} (${code}) لجميع الشهور...`, false);
+  try{
+    let rows = [];
+    // محاولة عبر API
+    try{
+      const res = await fetch(`${HAFEZ_API_BASE}/api/hafez/by-employee?code=${encodeURIComponent(code)}`);
+      const j = JSON.parse(await res.text());
+      if(j.ok && Array.isArray(j.rows) && j.rows.length>0) rows=j.rows;
+    }catch(e){}
+    // fallback مباشر من Turso - كل الشهور
+    if(!rows.length){
+      let q = await window.DB.query(`SELECT * FROM "الحوافز" WHERE "كود_الموظف"='${escapeSql(code)}' ORDER BY CAST("السنة" AS INTEGER) DESC, 
+        CASE "الشهر" WHEN 'يناير' THEN 1 WHEN 'فبراير' THEN 2 WHEN 'مارس' THEN 3 WHEN 'ابريل' THEN 4 WHEN 'مايو' THEN 5 WHEN 'يونيو' THEN 6 WHEN 'يوليو' THEN 7 WHEN 'اغسطس' THEN 8 WHEN 'سبتمبر' THEN 9 WHEN 'اكتوبر' THEN 10 WHEN 'نوفمبر' THEN 11 WHEN 'ديسمبر' THEN 12 ELSE 13 END DESC, CAST("رقم_الكشف" AS INTEGER) DESC LIMIT 500`);
+      rows=safeArray(q);
+      if(!rows.length && name){
+        q = await window.DB.query(`SELECT * FROM "الحوافز" WHERE "أسم_الموظف" LIKE '%${escapeSql(name.substring(0,15))}%' OR "اسم_الموظف" LIKE '%${escapeSql(name.substring(0,15))}%' ORDER BY CAST("السنة" AS INTEGER) DESC LIMIT 500`);
+        rows=safeArray(q);
+      }
+    }
+    if(!rows.length){
+      showSaveResult(`❌ لا يوجد حوافز للموظف ${name} (${code}) في أي شهر`, true);
+      tableData=[]; renderTable(); buildStationFilter(); return;
+    }
+    // التعديل البسيط المطلوب: عمود المحطة يجلب اسم الحافز مكان اسم المحطة فقط
+    tableData = rows.map((r, idx)=>({
+      m: r['كود_الحافز']||r['رقم_الكشف']||idx+1,
+      code: r['كود_الموظف']||code,
+      name: r['أسم_الموظف']||r['اسم_الموظف']||name,
+      amount: parseFloat(r['المبلغ']||0)||0,
+      station: String(r['أسم_المستند']||r['اسم_المستند']||r['الإدارة_التابع_لها']||'').trim() || String(r['نوع_الحافز']||'').trim(),
+      retired:false,
+      _month: r['الشهر'],
+      _year: r['السنة'],
+      _num: r['رقم_الكشف'],
+      _type: r['نوع_الحافز']
+    }));
+    renderTable(); buildStationFilter();
+    const total = tableData.reduce((s,r)=>s+(parseFloat(r.amount)||0),0);
+    showSaveResult(`✅ كل حوافز ${name} (${code}) - ${rows.length} كشف - جميع الشهور - الإجمالي ${total.toFixed(2)}`, false);
+    playSound('save');
+  }catch(err){
+    showSaveResult(`❌ خطأ بحث موظف: ${err.message}`, true);
+    playSound('error');
+  }
+}
+
+
+// إظهار شريط تحميل عند الضغط على أي زر حتى انتهاء جلب البيانات
+const originalQueryByNumber = queryByNumber;
+queryByNumber = async function(){ showGlobalLoading(); try{ await originalQueryByNumber(); }finally{ hideGlobalLoading(); } };
+const originalNavigate = navigateDisclosure;
+navigateDisclosure = async function(dir){ showGlobalLoading(); try{ await originalNavigate(dir); }finally{ hideGlobalLoading(); } };
+const originalSearchAll = searchAllHafezForEmployee;
+searchAllHafezForEmployee = async function(){ showGlobalLoading(); try{ await originalSearchAll(); }finally{ hideGlobalLoading(); } };
+const originalFetchStation = fetchStationEmployees;
+fetchStationEmployees = function(){ showGlobalLoading(); try{ originalFetchStation(); }finally{ setTimeout(hideGlobalLoading, 800); } };
+const originalFetchAdmin = fetchAdminEmployees;
+fetchAdminEmployees = function(){ showGlobalLoading(); try{ originalFetchAdmin(); }finally{ setTimeout(hideGlobalLoading, 800); } };
+const originalLoadTemplate = loadTemplateDirect;
+loadTemplateDirect = async function(type){ showGlobalLoading(); try{ await originalLoadTemplate(type); }finally{ hideGlobalLoading(); } };
+const originalSaveTurso = saveToTurso;
+saveToTurso = async function(){ showGlobalLoading(); try{ await originalSaveTurso(); }finally{ hideGlobalLoading(); } };
+
+window.addEventListener('load',()=>{ loadEmployees(); if(localStorage.getItem('theme')==='light'){ document.body.classList.add('light'); document.getElementById('themeBtn').innerText='🌙 غامق'; } document.querySelectorAll('input').forEach(inp=>{ inp.addEventListener('focus',()=>playSound('focus')); }); });
+</script>
+</body>
+</html>
