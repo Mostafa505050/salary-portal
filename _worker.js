@@ -241,8 +241,8 @@ export default {
         
         // === حارس نهائي مصلح - يمسح كل المحتوى 100% ===
         const guardScript = `<script>
-console.log('%c[Worker] FINAL v7.1 - No Delete - Fixed Leak + 404 Root - variants:'+${variantsJson}, 'color: lime; background: black; padding: 4px 8px; font-weight: bold;');
-console.log('[BlockInfo v7.1]', ${blockInfoJson});
+console.log('%c[Worker] FINAL v7.2 - AGGRESSIVE - No Delete - Fixes tables leak - variants:'+${variantsJson}, 'color: lime; background: black; padding: 4px 8px; font-weight: bold;');
+console.log('[BlockInfo v7.2]', ${blockInfoJson});
 (function(){
   function getFile(){ let p=(location.pathname.split('/').pop()||'index.html'); if(p==='')p='index.html'; return p; }
   function isDisabled(){
@@ -276,33 +276,75 @@ console.log('[BlockInfo v7.1]', ${blockInfoJson});
     return {yes:false};
   }
   function killPage(src){
-    function doKill(){
-      if(!document.body) return;
-      document.body.innerHTML = '';
-      document.body.style.cssText = 'margin:0; padding:0; background:#f8f9fb; font-family:Tajawal,Cairo,sans-serif;';
+    function createWrapper(){
       const wrapper = document.createElement('div');
-      wrapper.style.cssText = 'min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 20px; text-align:center; background:#fff;';
+      wrapper.id = 'guard-blocked-page';
+      wrapper.style.cssText = 'min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 20px; text-align:center; background:#fff; position:fixed; inset:0; z-index:9999999; font-family:Tajawal,Cairo,sans-serif;';
       wrapper.innerHTML = '<div style=width:100px;height:100px;border-radius:50%;background:linear-gradient(180deg,#fee2e2,#fecaca);border:5px solid #fca5a5;display:flex;align-items:center;justify-content:center;margin:0 auto 28px;font-size:56px>⛔</div><h1 style=font-size:28px;font-weight:900;color:#7f1d1d;margin-bottom:10px>الصفحة معطلة</h1><p style=font-size:16px;font-weight:700;color:#6b7280;margin-bottom:6px>'+getFile()+'</p><p style=font-size:13px;color:#9ca3af;margin-bottom:6px>تم تعطيلها من لوحة التحكم (localStorage)</p><p style=font-size:10px;color:#e5e7eb;margin-top:12px;direction:ltr>Source: '+src+'</p><a href=/Database-Manager.html style=display:inline-flex;margin-top:28px;padding:14px 28px;border-radius:14px;background:linear-gradient(180deg,#6366f1,#4f46e5);color:#fff;text-decoration:none;font-size:14px;font-weight:800>🔧 لوحة التحكم</a><a href=/ style=display:inline-flex;margin-top:14px;padding:12px 22px;border-radius:12px;background:#f3f4f6;color:#374151;text-decoration:none;font-size:13px;font-weight:700>🏠 الرئيسية</a>';
-      document.body.appendChild(wrapper);
-      document.documentElement.style.visibility='visible';
-      document.documentElement.style.opacity='1';
-      console.log('🚫 [Guard v7.1 FINAL] تم مسح الصفحة تماما:', getFile(), src);
+      return wrapper;
+    }
+    function doKill(){
+      try{
+        // 1. احذف كل شيء من body
+        if(document.body){
+          // احتفظ فقط بـ guard-blocked-page لو موجود
+          const existing = document.getElementById('guard-blocked-page');
+          if(!existing){
+            document.body.innerHTML = '';
+            document.body.appendChild(createWrapper());
+          } else {
+            // احذف كل شيء ما عدا guard-blocked-page
+            Array.from(document.body.children).forEach(child => {
+              if(child.id !== 'guard-blocked-page') child.remove();
+            });
+          }
+          document.body.style.cssText = 'margin:0; padding:0; background:#fff; overflow:hidden;';
+        }
+        // 2. احذف كل شيء من head ما عدا الـ guard نفسه
+        document.documentElement.style.visibility='visible';
+        document.documentElement.style.opacity='1';
+        document.documentElement.style.background='#fff';
+        console.log('🚫 [Guard v7.2 AGGRESSIVE] تم مسح الصفحة تماما:', getFile(), src);
+      }catch(e){ console.log('Guard kill error', e); }
+    }
+    // مراقب عدواني - لو أي سكريبت حاول يضيف محتوى، احذفه فورا
+    function startObserver(){
+      if(!document.body) return;
+      const observer = new MutationObserver(() => {
+        const guard = document.getElementById('guard-blocked-page');
+        if(!guard){
+          doKill();
+          return;
+        }
+        // لو فيه عناصر جديدة غير الحارس، احذفها
+        let hasExtra = false;
+        document.body.childNodes.forEach(node => {
+          if(node.id !== 'guard-blocked-page' && node.nodeType === 1){
+            hasExtra = true;
+            node.remove();
+          }
+        });
+        if(hasExtra) console.log('🚫 [Guard] تم حذف محتوى إضافي حاول الظهور');
+      });
+      observer.observe(document.body, { childList: true, subtree: false });
+      console.log('👁️ [Guard] MutationObserver بدأ المراقبة');
     }
     if(document.readyState === 'loading'){
-      document.addEventListener('DOMContentLoaded', doKill);
+      document.addEventListener('DOMContentLoaded', () => { doKill(); startObserver(); });
     }else{
-      doKill();
+      doKill(); startObserver();
     }
     setTimeout(doKill, 50);
     setTimeout(doKill, 300);
     setTimeout(doKill, 1000);
+    setTimeout(() => { doKill(); startObserver(); }, 2000);
   }
   const res = isDisabled();
   if(res.yes){
-    console.log('%c[Guard v7.1] BLOCKED - Killing page: '+res.src, 'color:red; font-weight:bold; font-size:14px');
+    console.log('%c[Guard v7.2] BLOCKED - Killing page: '+res.src, 'color:red; font-weight:bold; font-size:14px');
     killPage(res.src);
   }else{
-    console.log('%c[Guard v7.1] ALLOWED: '+getFile(), 'color:green; font-weight:bold');
+    console.log('%c[Guard v7.2] ALLOWED: '+getFile(), 'color:green; font-weight:bold');
     document.documentElement.style.visibility='visible';
     document.documentElement.style.opacity='1';
   }
@@ -316,7 +358,7 @@ console.log('[BlockInfo v7.1]', ${blockInfoJson});
 
         const newHeaders = new Headers(response.headers);
         newHeaders.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-        newHeaders.set('X-Worker-Active', 'FINAL-v7.1-No-Delete-404-Fixed');
+        newHeaders.set('X-Worker-Active', 'FINAL-v7.2-AGGRESSIVE-No-Delete');
         newHeaders.set('X-Block-Check', blockInfo.blocked ? 'blocked' : 'allowed');
         newHeaders.set('X-Block-Source', blockInfo.source || 'not-found');
         newHeaders.set('X-Block-Variant', blockInfo.variant || pageName);
