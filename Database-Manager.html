@@ -149,7 +149,35 @@ let pageConfig = {};
 
 try{ pageConfig = JSON.parse(localStorage.getItem(LS_KEY) || "{}"); }catch{}
 
-function saveToLocal(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(pageConfig)); }catch{} }
+function saveToLocal(){
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify(pageConfig));
+
+    // === إصلاح شامل - أضف هذه الأسطر الـ 4 ===
+    // 1. احفظ نسخة موحدة باسم pagesStatus (اللي كل الصفحات بتفحصه)
+    localStorage.setItem('pagesStatus', JSON.stringify(pageConfig));
+    localStorage.setItem('pageStatus', JSON.stringify(pageConfig));
+
+    // 2. احفظ كل صفحة بمفتاح منفصل للتوافق
+    for(let file in pageConfig){
+      let cfg = pageConfig[file];
+      let isEnabled = true;
+
+      // حاول تفهم حالة الصفحة مهما كان شكل pageConfig
+      if(cfg === false || cfg === 'معطل' || cfg === 'disabled') isEnabled = false;
+      else if(cfg && typeof cfg === 'object'){
+        if(cfg.enabled === false || cfg.status === 'معطل' || cfg.status === false || cfg.isEnabled === false) isEnabled = false;
+      }
+
+      // احفظ بكل الصيغ اللي الحارس الشامل بيفحصها
+      localStorage.setItem(file + '_status', isEnabled? 'مفعل' : 'معطل');
+      localStorage.setItem(file, isEnabled? 'مفعل' : 'معطل');
+      localStorage.setItem(file.toLowerCase() + '_status', isEnabled? 'مفعل' : 'معطل');
+    }
+    // === نهاية الإصلاح ===
+
+  }catch(e){ console.error('خطأ حفظ:', e); }
+}
 
 async function ensureTable(){
   try{ await fetch(TURSO_API, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({sql: `CREATE TABLE IF NOT EXISTS "${TABLE}" ("اسم_الصفحة" TEXT PRIMARY KEY, "قاعدة_البيانات" TEXT, "مفعلة" INTEGER, "تاريخ_التحديث" TEXT)`})}); }catch(e){}
