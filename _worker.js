@@ -205,8 +205,23 @@ export default {
     let response;
     try { 
       response = await env.ASSETS.fetch(request);
+      // === تعديل وحيد هنا: إصلاح 404 للرئيسية بدون حذف دوال ===
       if (response.status === 404) {
-        if (isHtml) {
+        // إذا الطلب للرئيسية / حاول جلب index.html كـ fallback
+        if (pathname === '/' || pathname === '' || pathname === '/index.html') {
+          try {
+            const indexReq = new Request(new URL('/index.html', request.url).toString(), request);
+            const indexRes = await env.ASSETS.fetch(indexReq);
+            if (indexRes.status !== 404) {
+              response = indexRes; // استخدم index.html لو موجود
+            } else {
+              // لو لا يوجد index.html اعرض بوابة دخول بدل 404
+              return new Response(`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>بوابة المرتبات</title><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#0f172a;color:#e2e8f0;font-family:Tajawal,Cairo;direction:rtl} .card{background:rgba(255,255,255,0.06);backdrop-filter:blur(16px);padding:36px 28px;border-radius:20px;border:1px solid rgba(255,255,255,0.08);text-align:center;max-width:420px} h2{margin:0 0 12px} p{color:#94a3b8;font-size:13px} a{display:block;margin:10px 0;padding:12px;background:#10b981;color:white;border-radius:10px;text-decoration:none;font-weight:700} a.secondary{background:rgba(255,255,255,0.08)}</style></head><body><div class="card"><h2>بوابة المرتبات</h2><p>مرحبا - اختر صفحة</p><a href="/Database-Manager.html">🛠 لوحة التحكم</a><a href="/MyAdmin.html" class="secondary">MyAdmin</a><a href="/AddHafez1.html" class="secondary">AddHafez1</a><a href="/salary.html" class="secondary">salary</a></div></body></html>`, { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache' } });
+            }
+          } catch(e) {}
+        }
+        // باقي صفحات 404 (ليست الرئيسية)
+        if (response.status === 404 && isHtml) {
           return new Response(`<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>404 - غير موجودة</title><style>body{margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#020a05;color:#e2e8f0;font-family:Cairo,Tajawal;direction:rtl} .card{text-align:center;background:rgba(255,255,255,0.05);backdrop-filter:blur(20px);padding:48px 32px;border-radius:20px;border:1px solid rgba(255,255,255,0.08);max-width:500px} h1{font-size:48px;margin:0} h2{margin:12px 0;font-size:20px} p{color:#94a3b8;font-size:13px} a{display:inline-block;margin:6px;padding:10px 18px;background:#10b981;color:white;border-radius:10px;text-decoration:none;font-size:13px} .list{text-align:right;margin-top:16px;background:rgba(0,0,0,0.2);padding:12px;border-radius:12px;font-size:11px;max-height:200px;overflow:auto}</style></head><body><div class="card"><h1>404</h1><h2>الصفحة غير موجودة</h2><p>${pageName} غير موجودة في الموقع</p><p style="font-size:11px;color:#64748b">المسار: ${pathname}</p><a href="/">🏠 الرئيسية</a><a href="/database-manager-FIXED.html" style="background:rgba(255,255,255,0.1)">🛠 لوحة التحكم</a><div class="list"><b>الصفحات المتاحة:</b><br>• index.html<br>• pageAdmin1.html<br>• pageUser1.html<br>• dashboard.html<br>• hafez.html<br>• Hafez-V35-Plus-40468.html<br>• salary.html<br>• employees.html<br>• tables.html<br>• database-manager-FIXED.html</div></div></body></html>`, {
             status: 404,
             headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache', 'X-Worker-404': 'true', 'X-Requested-Path': pathname }
@@ -221,13 +236,13 @@ export default {
     if (isHtml) {
       try {
         let html = await response.text();
-        const blockInfoJson = JSON.stringify(blockInfo).replace(/</g, '\\u003c').slice(0,3000);
+        const blockInfoJson = JSON.stringify(blockInfo).replace(/</g, '\u003c').slice(0,3000);
         const variantsJson = JSON.stringify(normalizePageNameVariants(pageName));
         
         // === حارس نهائي مصلح - يمسح كل المحتوى 100% ===
         const guardScript = `<script>
-console.log('%c[Worker] FINAL v7 - Fixed Leak - variants:'+${variantsJson}, 'color: lime; background: black; padding: 4px 8px; font-weight: bold;');
-console.log('[BlockInfo v7]', ${blockInfoJson});
+console.log('%c[Worker] FINAL v7.1 - No Delete - Fixed Leak + 404 Root - variants:'+${variantsJson}, 'color: lime; background: black; padding: 4px 8px; font-weight: bold;');
+console.log('[BlockInfo v7.1]', ${blockInfoJson});
 (function(){
   function getFile(){ let p=(location.pathname.split('/').pop()||'index.html'); if(p==='')p='index.html'; return p; }
   function isDisabled(){
@@ -250,7 +265,6 @@ console.log('[BlockInfo v7]', ${blockInfoJson});
         }
       }catch(e){}
     }
-    // مفاتيح منفصلة
     const direct = [getFile(), getFile()+'_status', getFile().toLowerCase(), getFile().toLowerCase()+'_status', getFile().replace('.html','').toLowerCase()+'_status'];
     for(let k of direct){
       const v = localStorage.getItem(k);
@@ -272,7 +286,7 @@ console.log('[BlockInfo v7]', ${blockInfoJson});
       document.body.appendChild(wrapper);
       document.documentElement.style.visibility='visible';
       document.documentElement.style.opacity='1';
-      console.log('🚫 [Guard v7 FINAL] تم مسح الصفحة تماما:', getFile(), src);
+      console.log('🚫 [Guard v7.1 FINAL] تم مسح الصفحة تماما:', getFile(), src);
     }
     if(document.readyState === 'loading'){
       document.addEventListener('DOMContentLoaded', doKill);
@@ -285,10 +299,10 @@ console.log('[BlockInfo v7]', ${blockInfoJson});
   }
   const res = isDisabled();
   if(res.yes){
-    console.log('%c[Guard v7] BLOCKED - Killing page: '+res.src, 'color:red; font-weight:bold; font-size:14px');
+    console.log('%c[Guard v7.1] BLOCKED - Killing page: '+res.src, 'color:red; font-weight:bold; font-size:14px');
     killPage(res.src);
   }else{
-    console.log('%c[Guard v7] ALLOWED: '+getFile(), 'color:green; font-weight:bold');
+    console.log('%c[Guard v7.1] ALLOWED: '+getFile(), 'color:green; font-weight:bold');
     document.documentElement.style.visibility='visible';
     document.documentElement.style.opacity='1';
   }
@@ -302,14 +316,14 @@ console.log('[BlockInfo v7]', ${blockInfoJson});
 
         const newHeaders = new Headers(response.headers);
         newHeaders.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-        newHeaders.set('X-Worker-Active', 'FINAL-v7-Fixed-Leak');
+        newHeaders.set('X-Worker-Active', 'FINAL-v7.1-No-Delete-404-Fixed');
         newHeaders.set('X-Block-Check', blockInfo.blocked ? 'blocked' : 'allowed');
         newHeaders.set('X-Block-Source', blockInfo.source || 'not-found');
         newHeaders.set('X-Block-Variant', blockInfo.variant || pageName);
         return new Response(html, { status: response.status, headers: newHeaders });
       } catch(e) {
         const newHeaders = new Headers(response.headers);
-        newHeaders.set('X-Worker-Active', 'FINAL-v7-error');
+        newHeaders.set('X-Worker-Active', 'FINAL-v7.1-error');
         newHeaders.set('X-Error', e.message.slice(0,500));
         return new Response(response.body, { status: response.status, headers: newHeaders });
       }
