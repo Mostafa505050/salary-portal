@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>V28 - إلغاء النص + تكبير إحصاء درجتين + Double Click فواصل رؤوس + اسم البند كامل في الملاحظات</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Tajawal:wght@700;800&display=swap" rel="stylesheet">
+<style>
+*{font-family:'Cairo',sans-serif;box-sizing:border-box}
+input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+input[type=number]{-moz-appearance:textfield}
+:root{
+  --bg:#c9b896;
+  --bg2:#b8a483;
+  --card:#fefcf7;
+  --card-border:#a89a7d;
+  --text:#3a2f1e;
+  --text-light:#6b5d46;
+  --primary:#6b5d52;
+  --primary-dark:#4a3f38;
+  --success:#6a9c6b;
+  --success-dark:#4d7a4e;
+  --warning:#e6c86e;
+  --warning-dark:#c9a84a;
+  --info:#7aa8b5;
+  --info-dark:#5a8693;
+  --table-head:#a8c0a0;
+  --table-head-text:#2d3a2e;
+  --table-row:#fffef9;
+  --table-row-alt:#f5efe0;
+  --table-yellow:#fef7d7;
+  --border:#a89a7d;
+  --shadow:#8a7f6a;
+  --table-font:11px;
+  --head-font:10px;
+}
+body{
+  background:linear-gradient(135deg, var(--bg) 0%, var(--bg2) 100%);
+  margin:0;padding:14px;min-height:100vh;color:var(--text);
+}
+body.dark{
+  --bg:#1a1a1a;--bg2:#252525;--card:#2a2a2a;--card-border:#3a3a3a;--text:#e8e0d8;--text-light:#9a8f87;
+  --table-head:#3a4a3a;--table-row:#2f2f2f;--table-row-alt:#353535;--table-yellow:#4a4520;
+  --border:#444;--shadow:#111;
+  background:radial-gradient(ellipse at top, #2a2a2a 0%, #1a1a1a 100%);
+}
+.card-pro{
+  background:var(--card);
+  border:1.5px solid var(--card-border);
+  border-radius:18px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9);
+  padding:14px;
+  margin-bottom:12px;
+  position:relative;
+}
+.top-frozen{position:sticky !important;top:10px !important;z-index:100 !important;backdrop-filter:blur(16px);background:rgba(254,252,247,0.92) !important}
+body.dark .top-frozen{background:rgba(42,42,42,0.92) !important}
+
+.btn-3d{
+  height:34px;
+  padding:0 12px;
+  border-radius:10px;
+  border:none;
+  font-weight:800;
+  font-size:10px;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  position:relative;
+  top:0;
+  transition:all 0.12s cubic-bezier(0.4,0,0.2,1);
+  user-select:none;
+  white-space:nowrap;
+}
+.btn-3d::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:10px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.25) 0%, transparent 50%);
+  pointer-events:none;
+}
+.btn-3d:hover{transform:translateY(-1px);filter:brightness(1.05)}
+.btn-3d:active{transform:translateY(2px);filter:brightness(0.95)}
+
+.btn-primary-3d{
+  background:linear-gradient(180deg, #8a7a6d 0%, #6b5d52 100%);
+  color:#fff;
+  box-shadow:0 4px 0 var(--primary-dark), 0 6px 12px rgba(107,93,82,0.3);
+  border:1.5px solid var(--primary-dark);
+}
+.btn-primary-3d:active{box-shadow:0 1px 0 var(--primary-dark)}
+.btn-success-3d{
+  background:linear-gradient(180deg, #8ab88c 0%, #6a9c6b 100%);
+  color:#fff;
+  box-shadow:0 4px 0 var(--success-dark), 0 6px 12px rgba(106,156,107,0.3);
+  border:1.5px solid var(--success-dark);
+}
+.btn-success-3d:active{box-shadow:0 1px 0 var(--success-dark)}
+.btn-warning-3d{
+  background:linear-gradient(180deg, #f0d78a 0%, #e6c86e 100%);
+  color:#4a3a1a;
+  box-shadow:0 4px 0 var(--warning-dark), 0 6px 12px rgba(230,200,110,0.3);
+  border:1.5px solid var(--warning-dark);
+}
+.btn-warning-3d:active{box-shadow:0 1px 0 var(--warning-dark)}
+.btn-info-3d{
+  background:linear-gradient(180deg, #9ac0cc 0%, #7aa8b5 100%);
+  color:#fff;
+  box-shadow:0 4px 0 var(--info-dark), 0 6px 12px rgba(122,168,181,0.3);
+  border:1.5px solid var(--info-dark);
+}
+.btn-info-3d:active{box-shadow:0 1px 0 var(--info-dark)}
+.btn-neutral-3d{
+  background:linear-gradient(180deg, #ffffff 0%, #f2efe9 100%);
+  color:var(--text);
+  box-shadow:0 4px 0 var(--border), 0 6px 12px rgba(0,0,0,0.1);
+  border:1.5px solid var(--border);
+}
+.btn-neutral-3d:active{box-shadow:0 1px 0 var(--border)}
+body.dark .btn-neutral-3d{background:linear-gradient(180deg, #3a3a3a 0%, #2f2f2f 100%);color:var(--text)}
+
+.input-pro{
+  width:100%;
+  padding:6px 8px;
+  border-radius:8px;
+  border:1.5px solid var(--card-border);
+  font-weight:700;
+  text-align:center;
+  font-size:10px;
+  background:var(--card);
+  color:var(--text);
+  box-shadow:inset 0 2px 4px rgba(0,0,0,0.05), 0 1px 0 rgba(255,255,255,0.8);
+  transition:all 0.2s;
+}
+.input-pro:focus{outline:none;border-color:var(--primary);box-shadow:inset 0 2px 4px rgba(0,0,0,0.05), 0 0 0 3px rgba(107,93,82,0.12)}
+body.dark .input-pro{background:#333;border-color:#555}
+.input-small-pro{width:80px !important}
+
+.table-wrap{
+  overflow:auto;
+  max-height:60vh;
+  border:1.5px solid var(--card-border);
+  border-radius:14px;
+  background:var(--card);
+  box-shadow:0 8px 24px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.8);
+  position:relative;
+}
+table{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%;table-layout:fixed}
+th{
+  background:linear-gradient(180deg, var(--table-head) 0%, #9ab894 100%);
+  color:var(--table-head-text);
+  padding:6px 4px;
+  border:1px solid var(--border);
+  font-weight:800;
+  font-size:var(--head-font) !important;
+  white-space:normal !important;
+  word-wrap:break-word !important;
+  line-height:1.2 !important;
+  position:sticky;
+  top:0;
+  z-index:20;
+  text-align:center;
+  vertical-align:middle;
+}
+th.yellow{background:linear-gradient(180deg, #fef7d7 0%, #f5e8a8 100%) !important}
+th.gray{background:linear-gradient(180deg, #e8e2d9 0%, #d6cfc4 100%) !important}
+body.dark th{background:linear-gradient(180deg, #4a5a4a 0%, #3a4a3a 100%) !important;color:#e8e0d8}
+th.hidden-col{display:none !important}
+th .resizer{
+  position:absolute;left:0;top:0;width:8px;height:100%;cursor:col-resize;z-index:5;
+  background:transparent;transition:background 0.2s;
+}
+th .resizer:hover{background:rgba(107,93,82,0.25)}
+th .resizer::after{
+  content:'';position:absolute;left:3px;top:20%;width:2px;height:60%;
+  background:rgba(0,0,0,0.15);border-radius:1px;opacity:0;transition:opacity 0.2s;
+}
+th:hover .resizer::after{opacity:1}
+
+th.m-frozen{
+  position:sticky !important;right:0 !important;top:0 !important;z-index:50 !important;
+  background:linear-gradient(180deg, #e8e2d9 0%, #d6cfc4 100%) !important;
+  width:48px !important;min-width:48px !important;max-width:48px !important;
+  box-shadow:-3px 0 12px rgba(0,0,0,0.1), -1px 0 0 var(--border) !important;
+}
+th.name-frozen{
+  position:sticky !important;right:48px !important;top:0 !important;z-index:49 !important;
+  width:165px !important;min-width:165px !important;
+  box-shadow:-3px 0 12px rgba(0,0,0,0.1), -1px 0 0 var(--border) !important;
+}
+td.m-frozen{
+  position:sticky !important;right:0 !important;z-index:30 !important;
+  background:var(--table-row-alt) !important;
+  width:48px !important;min-width:48px !important;max-width:48px !important;
+  box-shadow:-3px 0 12px rgba(0,0,0,0.08), -1px 0 0 var(--border) !important;
+  cursor:grab;
+}
+td.name-frozen{
+  position:sticky !important;right:48px !important;z-index:29 !important;
+  background:var(--table-row) !important;
+  width:165px !important;min-width:165px !important;
+  box-shadow:-3px 0 12px rgba(0,0,0,0.08), -1px 0 0 var(--border) !important;
+}
+td{
+  border:1px solid rgba(168,154,125,0.5);
+  padding:0;
+  background:var(--table-row);
+  text-align:center;
+  height:23px !important;
+  overflow:hidden;
+}
+tr:nth-child(even) td{background:var(--table-row-alt)}
+tr:hover td{background:#f5efe0 !important}
+body.dark tr:hover td{background:#3a3a3a !important}
+tr.row-highlight td{background:#fef7d7 !important;box-shadow:inset 0 0 0 1px #e6c86e}
+td.col-highlight{background:#e8f0f5 !important}
+td.cell-focused{background:#fff3c4 !important;box-shadow:inset 0 0 0 2px #e6c86e !important}
+body.dark td{border-color:rgba(100,100,100,0.3)}
+td input{
+  width:100%;height:100%;border:none;background:transparent;
+  text-align:center;font-weight:700;font-size:var(--table-font) !important;
+  outline:none;padding:2px 3px;line-height:1;color:var(--text);
+}
+td textarea{font-size:var(--table-font) !important;color:var(--text)}
+td.yellow{background:var(--table-yellow) !important}
+td.hidden-col{display:none !important}
+td.notes-cell{white-space:normal !important;max-width:240px;min-width:180px;vertical-align:top}
+td.notes-cell textarea{width:100%;min-height:24px;max-height:38px;border:none;background:transparent;resize:vertical;font-weight:600;text-align:right;padding:3px 5px;outline:none;line-height:1.3}
+
+.badge{
+  padding:3px 8px;border-radius:14px;font-size:8px;font-weight:800;
+  border:1.5px solid var(--card-border);
+  background:var(--card);
+  box-shadow:0 2px 0 var(--border), 0 3px 6px rgba(0,0,0,0.08);
+  color:var(--text);
+}
+.loading-overlay{position:fixed;inset:0;background:rgba(201,184,150,0.92);backdrop-filter:blur(12px);z-index:9999;display:none;align-items:center;justify-content:center;flex-direction:column;color:var(--text)}
+body.dark .loading-overlay{background:rgba(26,26,26,0.92)}
+.progress-container{width:380px;max-width:85%;height:10px;background:#e8e2d9;border-radius:20px;overflow:hidden;border:1.5px solid var(--card-border);margin-top:10px;box-shadow:inset 0 2px 4px rgba(0,0,0,0.08)}
+.progress-bar{height:100%;background:linear-gradient(90deg, #6a9c6b, #8ab88c);width:0%;transition:width 0.4s;border-radius:20px}
+.sort-btn{
+  width:18px;height:16px;border:1.5px solid var(--border);border-radius:4px;
+  background:linear-gradient(180deg, #fff 0%, #f2efe9 100%);
+  font-size:8px;font-weight:900;cursor:pointer;
+  box-shadow:0 2px 0 var(--border);margin-right:2px;display:inline-flex;align-items:center;justify-content:center;
+}
+/* تكبير عناصر الإحصاء الى درجتين فقط */
+.stats-badge{
+  padding:5px 12px;border-radius:14px;border:1.5px solid var(--card-border);
+  font-size:11px !important;
+  font-weight:900 !important;
+  background:var(--card);
+  box-shadow:0 3px 0 var(--border), 0 4px 8px rgba(0,0,0,0.08);
+  display:inline-flex;align-items:center;gap:5px;color:var(--text);
+  transition:all 0.15s;
+}
+.stats-badge:hover{transform:translateY(-1px);box-shadow:0 4px 0 var(--border), 0 6px 12px rgba(0,0,0,0.1)}
+.font-control{
+  display:flex;align-items:center;gap:4px;
+  background:var(--card);border:1.5px solid var(--card-border);border-radius:10px;
+  padding:4px 8px;box-shadow:0 2px 0 var(--border), 0 3px 6px rgba(0,0,0,0.06);
+}
+.font-control button{
+  width:24px;height:20px;border:1.5px solid var(--border);border-radius:5px;
+  background:linear-gradient(180deg, #fff 0%, #f2efe9 100%);
+  font-size:10px;font-weight:900;cursor:pointer;
+  box-shadow:0 2px 0 var(--border);transition:all 0.12s;color:var(--text);
+}
+.font-control button:active{transform:translateY(1px);box-shadow:0 1px 0 var(--border)}
+</style>
+</head>
+<body>
+<div class="card-pro top-frozen" id="topCard">
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+<div style="display:flex;align-items:center;gap:10px">
+<div style="width:42px;height:42px;background:linear-gradient(135deg, #8a7a6d 0%, #6b5d52 100%);border:2px solid var(--primary-dark);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:18px;box-shadow:0 4px 0 var(--primary-dark), 0 6px 12px rgba(107,93,82,0.3)">📊</div>
+<div>
+<h1 style="font-family:'Tajawal';font-size:18px;font-weight:800;color:var(--text);margin:0;line-height:1">المتغيرات الشهرية للمرتبات</h1>
+</div>
+</div>
+<div style="display:flex;gap:4px;align-items:center">
+<button class="btn-3d btn-neutral-3d" onclick="toggleDayNight()" id="dayNightBtn" style="height:28px;width:36px;font-size:12px">🌙</button>
+<span class="badge" id="countBadge">--</span>
+<span class="badge" id="realBadge" style="background:linear-gradient(180deg, #d4f0d5 0%, #a8d9a9 100%)">Turso</span>
+<span class="badge" id="statusBadge">جاهز</span>
+</div>
+</div>
+
+<div style="display:flex;gap:5px;margin-top:12px;align-items:center;flex-wrap:wrap">
+<select id="yearSelect" class="input-pro input-small-pro"><option>2024</option><option selected>2025</option><option>2026</option><option>2027</option></select>
+<select id="monthSelect" class="input-pro input-small-pro"><option>يناير</option><option>فبراير</option><option>مارس</option><option>أبريل</option><option>مايو</option><option>يونيو</option><option>يوليو</option><option>أغسطس</option><option>سبتمبر</option><option>أكتوبر</option><option>نوفمبر</option><option>ديسمبر</option></select>
+<select id="payrollSelect" class="input-pro" style="font-size:10px;text-align:right;min-width:170px;max-width:220px"><option>⏳ جاري التحميل...</option></select>
+<input id="searchInput" class="input-pro" placeholder="🔍 بحث..." oninput="filterRows()" style="font-size:10px;width:85px">
+<button class="btn-3d btn-primary-3d" onclick="loadRealData()">🔄 تحميل</button>
+<button class="btn-3d btn-warning-3d" onclick="exportExcelThreeSheets()">📥 تصدير 3 شيتات</button>
+<button class="btn-3d btn-success-3d" onclick="saveAll()">💾 حفظ البيانات</button>
+<button class="btn-3d btn-info-3d" onclick="saveOrder()">📌 حفظ الترتيب</button>
+<button class="btn-3d btn-neutral-3d" onclick="printLandscape()">🖨️ طباعة</button>
+<span id="saveStatus" style="font-size:10px;font-weight:700;color:var(--success);margin-right:6px"></span>
+</div>
+
+<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;align-items:center">
+<div class="font-control">
+<span style="font-size:9px;font-weight:800">🔤 خط الجدول:</span>
+<button onclick="changeTableFont(-1)" title="تصغير">−</button>
+<span id="fontSizeDisplay" style="font-size:10px;font-weight:800;min-width:32px;text-align:center">11px</span>
+<button onclick="changeTableFont(1)" title="تكبير">+</button>
+<button onclick="resetTableFont()" style="width:auto;padding:0 8px;font-size:8px">↺</button>
+</div>
+<button class="btn-3d btn-neutral-3d" onclick="shrinkColumnsToData()" style="background:linear-gradient(180deg, #e8f0f5 0%, #d0dde6 100%)">📏 تصغير حسب البيانات</button>
+<button class="btn-3d btn-neutral-3d" onclick="resetColumnsWidth()" style="background:linear-gradient(180deg, #fef7e8 0%, #f5e8c8 100%)">↺ إعادة الأعمدة</button>
+<div id="statsBox" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"></div>
+</div>
+</div>
+
+<div class="card-pro" style="padding:8px">
+<div class="table-wrap" id="tableWrap">
+<table id="mainTable">
+<thead><tr>
+<th class="gray m-frozen" style="width:58px">م <button class="sort-btn" id="sortMBtn" onclick="sortByM()" title="ترتيب تصاعدي/تنازلي لعمود م" style="width:14px;height:12px;font-size:7px;margin-right:1px">↕</button><div class="resizer"></div></th>
+<th class="gray hidden-col">السنة</th>
+<th class="gray hidden-col">الشهر</th>
+<th class="gray hidden-col">الكود_البنكى</th>
+<th class="name-frozen">اسم_العامل<div class="resizer"></div></th>
+<th style="min-width:145px">موظف_المرتبات <button class="sort-btn" id="sortPayrollBtn" onclick="sortPayroll()" title="ترتيب">↕</button><div class="resizer"></div></th>
+<th style="display:none">الحاله</th>
+<th>تعديل_الاساسى<div class="resizer"></div></th>
+<th>سبب_الاساسى<div class="resizer"></div></th>
+<th>تعديل_ورادى<div class="resizer"></div></th>
+<th>سبب_ورادى<div class="resizer"></div></th>
+<th class="yellow">عدد_غذاء<div class="resizer"></div></th>
+<th class="yellow">قيمة_اعاشة<div class="resizer"></div></th>
+<th>علاج_طبى ⚙<div class="resizer"></div></th>
+<th>علاج_177 ⚙<div class="resizer"></div></th>
+<th>علاج_أسرى<div class="resizer"></div></th>
+<th>قسط_أسرى ⚙<div class="resizer"></div></th>
+<th>نفقة<div class="resizer"></div></th>
+<th>متجمد_نفقة ⚙<div class="resizer"></div></th>
+<th style="min-width:200px">ملاحظات<div class="resizer"></div></th>
+</tr></thead>
+<tbody id="tbody"><tr><td colspan="15" style="padding:14px;font-size:11px;text-align:center;color:var(--text-light)">✅ V29 - زر صغير بجانب م لإعادة ترتيب + سهم تصاعدي/تنازلي تكبير إحصاء درجتين + Double Click فواصل رؤوس + اسم البند كامل في الملاحظات علاج_177 بدل [177]</td></tr></tbody>
+</table>
+</div>
+</div>
+
+<div id="loadingOverlay" class="loading-overlay">
+<div style="width:44px;height:44px;border:3px solid var(--card-border);border-top-color:var(--primary);border-radius:50%;animation:spin 0.8s linear infinite"></div>
+<div style="font-size:12px;font-weight:800;margin-top:10px" id="loadingTitle">⏳ جاري...</div>
+<div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+<div style="margin-top:5px;font-size:9px;font-weight:600;opacity:0.7" id="progressText">0 / 0</div>
+<div style="margin-top:2px;font-size:8px;opacity:0.5" id="progressDetail"></div>
+</div>
+
+<div id="installModal" style="display:none;position:fixed;inset:0;background:rgba(201,184,150,0.85);backdrop-filter:blur(10px);z-index:9999;align-items:center;justify-content:center">
+<div style="background:var(--card);border:2px solid var(--card-border);border-radius:16px;padding:16px;width:370px;max-width:95%;box-shadow:0 16px 40px rgba(0,0,0,0.15), 0 6px 0 var(--border)">
+<h3 id="modalTitle" style="font-weight:800;font-size:11px">⚙ إعداد القسط</h3>
+<div style="display:grid;gap:7px;margin-top:10px">
+<div><label style="font-size:9px;font-weight:700;color:var(--text-light);display:block;margin-bottom:2px">الإجمالي</label><input id="modalTotal" class="input-pro" type="number" oninput="calcInstallment()"></div>
+<div><label style="font-size:9px;font-weight:700;color:var(--text-light);display:block;margin-bottom:2px">القسط</label><input id="modalInstallment" class="input-pro" type="number" oninput="calcInstallment('installment')"></div>
+<div><label style="font-size:9px;font-weight:700;color:var(--text-light);display:block;margin-bottom:2px">عدد الأشهر</label><input id="modalMonths" class="input-pro" type="number" oninput="calcInstallment('months')"></div>
+<div style="background:var(--bg);padding:8px;border-radius:8px;border:1.5px solid var(--card-border);font-size:10px">
+<div>المتبقي: <b id="modalRemaining" style="color:#c44">--</b></div>
+<div style="margin-top:5px;background:#fef7d7;padding:5px;border-radius:5px;border:1px dashed var(--border);font-size:9px"><b id="shortText">--</b></div>
+</div>
+</div>
+<div style="display:flex;gap:5px;margin-top:12px"><button class="btn-3d btn-success-3d" onclick="applyInstallment()" style="flex:1;height:34px">✅ تطبيق</button><button class="btn-3d btn-neutral-3d" onclick="closeModal()" style="flex:1;height:34px">❌ إلغاء</button></div>
+</div>
+</div>
+
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+<script>
+const WORKER_BASE_URL="https://turso-api.mostafa-voic77729.workers.dev";
+let currentData=[], modalRowIdx=null, modalField=null;
+let payrollCol="", codeCol="", nameCol="", tursoChangeCols=[], statusCol="الحاله";
+let dragSrcIndex=null;
+let payrollSortDir='asc';
+let isDark=false;
+let tableFontSize=11;
+let originalColumnWidths=[];
+
+function setStatus(m){ if(m.includes('ترتيب تصاعدي')||m.includes('ترتيب تنازلي')) return; document.getElementById('saveStatus').textContent=m; document.getElementById('statusBadge').textContent=m; }
+function showLoading(show,title){ document.getElementById('loadingOverlay').style.display=show?'flex':'none'; if(title) document.getElementById('loadingTitle').textContent=title; }
+function updateProgress(current,total,detail){ const pct=Math.round(current/total*100)||0; document.getElementById('progressBar').style.width=pct+'%'; document.getElementById('progressText').textContent=`${current} / ${total} (${pct}%)`; if(detail) document.getElementById('progressDetail').textContent=detail; }
+function toggleDayNight(){
+  isDark=!isDark;
+  document.body.classList.toggle('dark', isDark);
+  document.getElementById('dayNightBtn').textContent=isDark ? '☀️' : '🌙';
+  localStorage.setItem('dayNight', isDark ? 'dark' : 'light');
+}
+if(localStorage.getItem('dayNight')==='dark'){toggleDayNight();}
+
+function changeTableFont(delta){
+  tableFontSize=Math.max(8, Math.min(18, tableFontSize+delta));
+  document.documentElement.style.setProperty('--table-font', tableFontSize+'px');
+  document.documentElement.style.setProperty('--head-font', (tableFontSize-1)+'px');
+  document.getElementById('fontSizeDisplay').textContent=tableFontSize+'px';
+  localStorage.setItem('tableFontSize', tableFontSize);
+  document.querySelectorAll('#mainTable th').forEach(th=>{ th.style.fontSize=(tableFontSize-1)+'px'; });
+}
+function resetTableFont(){
+  tableFontSize=11;
+  document.documentElement.style.setProperty('--table-font', tableFontSize+'px');
+  document.documentElement.style.setProperty('--head-font', (tableFontSize-1)+'px');
+  document.getElementById('fontSizeDisplay').textContent=tableFontSize+'px';
+  localStorage.setItem('tableFontSize', tableFontSize);
+}
+const savedFont=localStorage.getItem('tableFontSize');
+if(savedFont){ tableFontSize=parseInt(savedFont); document.documentElement.style.setProperty('--table-font', tableFontSize+'px'); document.documentElement.style.setProperty('--head-font', (tableFontSize-1)+'px'); }
+
+function shrinkColumnsToData(){
+  if(!currentData.length){alert('لا يوجد بيانات');return;}
+  const table=document.getElementById('mainTable');
+  const headerRow=table.querySelector('thead tr');
+  const headers=Array.from(headerRow.children);
+  const bodyRows=Array.from(table.querySelectorAll('tbody tr'));
+  if(!originalColumnWidths.length){ originalColumnWidths=headers.map(th=>th.style.width || th.offsetWidth+'px'); }
+  headers.forEach((th, colIdx)=>{
+    if(th.classList.contains('hidden-col')) return;
+    if(th.classList.contains('m-frozen') || th.classList.contains('name-frozen')) return;
+    if(th.style.display==='none') return;
+    let maxLen=0;
+    bodyRows.forEach(tr=>{
+      const td=tr.children[colIdx];
+      if(!td) return;
+      const inp=td.querySelector('input, textarea');
+      const val=inp ? (inp.value||'') : (td.textContent||'');
+      const len=String(val).trim().length;
+      if(len>maxLen) maxLen=len;
+    });
+    const newWidth=Math.max(50, Math.min(200, maxLen*8 + 20));
+    th.style.width=newWidth+'px';
+    th.style.minWidth=newWidth+'px';
+    th.style.maxWidth=newWidth+'px';
+  });
+  setStatus(`✅ تصغير حسب البيانات`);
+}
+function resetColumnsWidth(){
+  const headers=Array.from(document.querySelectorAll('#mainTable thead th'));
+  if(originalColumnWidths.length){
+    headers.forEach((th,i)=>{ if(originalColumnWidths[i]){ th.style.width=originalColumnWidths[i]; th.style.minWidth=''; th.style.maxWidth=''; } });
+  } else { headers.forEach(th=>{ th.style.width=''; th.style.minWidth=''; th.style.maxWidth=''; }); }
+  setStatus(`↺ إعادة عرض الأعمدة`);
+}
+
+async function tursoQuery(sql){
+  const tryParse=j=>{if(Array.isArray(j))return j;if(j&&Array.isArray(j.data))return j.data;if(j&&Array.isArray(j.rows))return j.rows;if(j&&Array.isArray(j.result))return j.result;if(j&&j.result&&Array.isArray(j.result.rows))return j.result.rows;if(j&&j.ok&&Array.isArray(j.rows))return j.rows;return null;};
+  const eps=[`${WORKER_BASE_URL}/api/turso`,`${WORKER_BASE_URL}/api/query`,`${WORKER_BASE_URL}/api/turso/query`,`${WORKER_BASE_URL}/api/sql`];
+  let last=null;
+  for(let ep of eps){
+    try{
+      const r=await fetch(ep,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sql,query:sql})});
+      const txt=await r.text();let j=null;try{j=JSON.parse(txt);}catch{last=txt.slice(0,500);continue;}
+      if(!r.ok){last=j?.msg||j?.error||txt.slice(0,500);continue;}
+      const arr=tryParse(j);
+      if(arr!==null) return arr;
+      if(j&&j.ok) return [];
+    }catch(e){last=e.message;}
+  }
+  throw new Error(last||"فشل");
+}
+async function detectRealSchema(){
+  try{
+    const cols=await tursoQuery(`PRAGMA table_info('موظفين_مرتبات')`);
+    const colNames=cols.map(c=>c.name);
+    statusCol=colNames.find(n=>n.trim()==='الحاله') || "الحاله";
+    payrollCol=colNames.find(n=>n.includes('موظف_المرتبات'))||"موظف_المرتبات";
+    codeCol=colNames.find(n=>n.includes('الكود_البنكى'))||colNames[0];
+    nameCol=colNames.find(n=>n.includes('اسم_العامل'))||colNames[1];
+  }catch(e){statusCol="الحاله"; payrollCol="موظف_المرتبات"; codeCol="الكود_البنكى"; nameCol="اسم_العامل";}
+  try{ const changeCols=await tursoQuery(`PRAGMA table_info('Change_Salarey')`); tursoChangeCols=changeCols.map(c=>c.name); }catch(e){tursoChangeCols=[];}
+  try{await tursoQuery(`CREATE TABLE IF NOT EXISTS ترتيب_الموظفين (الكود_البنكى TEXT PRIMARY KEY, موظف_المرتبات TEXT, ترتيب INTEGER, اسم_العامل TEXT)`);}catch(e){}
+}
+async function ensureTable(){ try{await tursoQuery(`CREATE TABLE IF NOT EXISTS Change_Salarey (م INTEGER, السنة TEXT, الشهر TEXT, الكود_البنكى TEXT, اسم_العامل TEXT, موظف_المرتبات TEXT, الحاله TEXT, عدد_ايام_بدل_الغذاء INTEGER, قيمة_بدل_الاعاشة REAL, العلاج_الطبى_الشهرى REAL, إجمالي_العلاج_الطبى REAL, قسط_العلاج_الطبى REAL, متبقي_العلاج_الطبى REAL, عدد_أشهر_العلاج_الطبى INTEGER, علاج_حساب_177 REAL, إجمالي_177 REAL, قسط_177 REAL, متبقي_177 REAL, عدد_أشهر_177 INTEGER, علاج_أسرى REAL, قسط_علاج_أسرى REAL, إجمالي_قسط_أسرى REAL, قسط_شهري_أسرى REAL, متبقي_أسرى REAL, عدد_أشهر_أسرى INTEGER, نفقة REAL, متجمد_نفقة REAL, إجمالي_متجمد_نفقة REAL, قسط_متجمد_نفقة REAL, متبقي_متجمد_نفقة REAL, عدد_أشهر_متجمد_نفقة INTEGER, ملاحظات_اخرى TEXT, UNIQUE(السنة, الشهر, الكود_البنكى))`);}catch(e){} }
+async function loadPayrollList(){
+  try{
+    await ensureTable(); await detectRealSchema();
+    let rows=[]; try{rows=await tursoQuery(`SELECT * FROM \`موظفين_مرتبات\` LIMIT 1000`);}catch(e){rows=await tursoQuery(`SELECT * FROM "موظفين_مرتبات" LIMIT 1000`);}
+    const payrollSet=new Set(); rows.forEach(r=>{const v=r[payrollCol]||r['موظف_المرتبات']; if(v) payrollSet.add(String(v).trim());});
+    const list=[...payrollSet].sort();
+    const sel=document.getElementById('payrollSelect');
+    let options='<option value="">-- اختر --</option>';
+    options+=`<option value="__ALL_ACTIVE__">📋 كل الاستحقاقات (الحاله=نشط)</option>`;
+    options+=list.map(v=>`<option value="${v}">${v}</option>`).join('');
+    sel.innerHTML=options;
+    const now=new Date(); document.getElementById('yearSelect').value=String(now.getFullYear());
+    const months=["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+    document.getElementById('monthSelect').value=months[now.getMonth()];
+    document.getElementById('countBadge').textContent=`👥 ${list.length} مسئول`;
+  }catch(e){setStatus("❌ "+e.message);}
+}
+function updateStats(){
+  const statsBox=document.getElementById('statsBox');
+  if(!currentData.length){statsBox.innerHTML='';return;}
+  const counts={}; currentData.forEach(r=>{const key=r.موظف_المرتبات||'غير محدد'; counts[key]=(counts[key]||0)+1;});
+  let html=`<span class="stats-badge" style="background:linear-gradient(180deg, #d4f0d5 0%, #a8d9a9 100%);font-size:11px">📊 الإجمالي: ${currentData.length}</span>`;
+  for(let k in counts){ html+=`<span class="stats-badge" style="font-size:11px">👤 ${k}: ${counts[k]}</span>`; }
+  statsBox.innerHTML=html;
+}
+let mSortDir='asc';
+function sortByM(){
+  if(!currentData.length) return;
+  const btn=document.getElementById('sortMBtn');
+  if(mSortDir==='asc'){
+    currentData.sort((a,b)=>a.م - b.م);
+    mSortDir='desc';
+    btn.textContent='↓';
+    btn.style.background='#6a9c6b';
+    btn.style.color='#fff';
+    btn.title='ترتيب تنازلي';
+  } else {
+    currentData.sort((a,b)=>b.م - a.م);
+    mSortDir='asc';
+    btn.textContent='↑';
+    btn.style.background='#e6c86e';
+    btn.style.color='#000';
+    btn.title='ترتيب تصاعدي';
+  }
+  renderTable(currentData);
+  updateStats();
+  setStatus(`↕ ترتيب عمود م ${mSortDir==='desc'?'تصاعدي':'تنازلي'}`);
+}
+function sortPayroll(){
+  if(!currentData.length) return;
+  const btn=document.getElementById('sortPayrollBtn');
+  if(payrollSortDir==='asc'){
+    currentData.sort((a,b)=>{ if(a.موظف_المرتبات < b.موظف_المرتبات) return -1; if(a.موظف_المرتبات > b.موظف_المرتبات) return 1; return a.م - b.م; });
+    payrollSortDir='desc'; btn.textContent='↓'; btn.style.background='#6a9c6b'; btn.style.color='#fff';
+  } else {
+    currentData.sort((a,b)=>{ if(a.موظف_المرتبات > b.موظف_المرتبات) return -1; if(a.موظف_المرتبات < b.موظف_المرتبات) return 1; return b.م - a.م; });
+    payrollSortDir='asc'; btn.textContent='↑'; btn.style.background='#e6c86e';
+  }
+  currentData.forEach((r,i)=>{r.م=i+1;}); renderTable(currentData); updateStats();
+}
+async function loadRealData(){
+  const year=document.getElementById('yearSelect').value;
+  const month=document.getElementById('monthSelect').value;
+  const payroll=document.getElementById('payrollSelect').value;
+  if(!payroll){alert("اختر موظف المرتبات");return;}
+  if(!payrollCol) await detectRealSchema();
+  showLoading(true, "⏳ تحميل - الحاله=نشط بالهاء...");
+  try{
+    let empRows=[];
+    if(payroll==='__ALL_ACTIVE__'){ try{empRows=await tursoQuery(`SELECT * FROM \`موظفين_مرتبات\` WHERE الحاله = 'نشط'`);}catch(e){let all=await tursoQuery(`SELECT * FROM \`موظفين_مرتبات\``); empRows=all.filter(r=>String(r[statusCol]||r['الحاله']||'').trim()==='نشط');} }
+    else { try{empRows=await tursoQuery(`SELECT * FROM \`موظفين_مرتبات\` WHERE موظف_المرتبات = '${payroll.replace(/'/g,"''")}' AND الحاله = 'نشط'`);}catch(e){let all=await tursoQuery(`SELECT * FROM \`موظفين_مرتبات\` WHERE موظف_المرتبات = '${payroll.replace(/'/g,"''")}'`); empRows=all.filter(r=>String(r[statusCol]||r['الحاله']||'').trim()==='نشط');} }
+    updateProgress(1,2,`تم ${empRows.length} - الحاله=نشط`);
+    let orderMap={}; try{ const orderRows=await tursoQuery(`SELECT * FROM ترتيب_الموظفين ${payroll!=='__ALL_ACTIVE__'?`WHERE موظف_المرتبات='${payroll.replace(/'/g,"''")}'`:''} ORDER BY ترتيب`); orderRows.forEach(r=>{orderMap[r.الكود_البنكى]=r.ترتيب;}); }catch(e){}
+    let existing=[];try{ if(payroll==='__ALL_ACTIVE__'){existing=await tursoQuery(`SELECT * FROM Change_Salarey WHERE السنة='${year}' AND الشهر='${month}'`);} else {existing=await tursoQuery(`SELECT * FROM Change_Salarey WHERE السنة='${year}' AND الشهر='${month}' AND موظف_المرتبات='${payroll.replace(/'/g,"''")}'`);} }catch(e){existing=[];}
+    const map={};existing.forEach(r=>map[r.الكود_البنكى]=r);
+    let data=empRows.map((emp,i)=>{ const code=emp[codeCol]||Object.values(emp)[0]||""; const ex=map[code]||{}; const savedOrder=orderMap[code]; return{م:savedOrder|| (i+1), السنة:year,الشهر:month,الكود_البنكى:code,اسم_العامل:emp[nameCol]||"",موظف_المرتبات:emp[payrollCol]||payroll,الحاله:"نشط",عدد_ايام_بدل_الغذاء:ex.عدد_ايام_بدل_الغذاء||0,قيمة_بدل_الاعاشة:ex.قيمة_بدل_الاعاشة||0,العلاج_الطبى_الشهرى:ex.العلاج_الطبى_الشهرى||0,إجمالي_العلاج_الطبى:ex.إجمالي_العلاج_الطبى||0,قسط_العلاج_الطبى:ex.قسط_العلاج_الطبى||0,متبقي_العلاج_الطبى:ex.متبقي_العلاج_الطبى||0,عدد_أشهر_العلاج_الطبى:ex.عدد_أشهر_العلاج_الطبى||0,علاج_حساب_177:ex.علاج_حساب_177||0,إجمالي_177:ex.إجمالي_177||0,قسط_177:ex.قسط_177||0,متبقي_177:ex.متبقي_177||0,عدد_أشهر_177:ex.عدد_أشهر_177||0,علاج_أسرى:ex.علاج_أسرى||0,قسط_علاج_أسرى:ex.قسط_علاج_أسرى||0,إجمالي_قسط_أسرى:ex.إجمالي_قسط_أسرى||0,قسط_شهري_أسرى:ex.قسط_شهري_أسرى||0,متبقي_أسرى:ex.متبقي_أسرى||0,عدد_أشهر_أسرى:ex.عدد_أشهر_أسرى||0,نفقة:ex.نفقة||0,متجمد_نفقة:ex.متجمد_نفقة||0,إجمالي_متجمد_نفقة:ex.إجمالي_متجمد_نفقة||0,قسط_متجمد_نفقة:ex.قسط_متجمد_نفقة||0,متبقي_متجمد_نفقة:ex.متبقي_متجمد_نفقة||0,عدد_أشهر_متجمد_نفقة:ex.عدد_أشهر_متجمد_نفقة||0,ملاحظات_اخرى:ex.ملاحظات_اخرى||""}; });
+    data.sort((a,b)=>a.م - b.م); data.forEach((r,i)=>{r.م=i+1;}); currentData=data;
+    updateProgress(2,2,`✅ تم ${data.length} - الحاله=نشط`); await new Promise(res=>setTimeout(res,300));
+    showLoading(false); renderTable(currentData); updateStats();
+  }catch(e){showLoading(false); setStatus("❌ "+e.message);}
+}
+function renderTable(data){
+  const tbody=document.getElementById('tbody');
+  tbody.innerHTML=data.map((row,ri)=>`
+<tr draggable="true" data-idx="${ri}">
+<td class="m-col m-frozen" draggable="true"><input type="number" value="${row.م}" data-field="م" data-idx="${ri}" oninput="onInputM(this)"></td>
+<td class="hidden-col"><input value="${row.السنة}" data-field="السنة" data-idx="${ri}" readonly></td>
+<td class="hidden-col"><input value="${row.الشهر}" data-field="الشهر" data-idx="${ri}" readonly></td>
+<td class="hidden-col"><input value="${row.الكود_البنكى}" data-field="الكود_البنكى" data-idx="${ri}" readonly></td>
+<td class="name-frozen"><input value="${row.اسم_العامل}" data-field="اسم_العامل" data-idx="${ri}" readonly style="font-weight:800"></td>
+<td><input value="${row.موظف_المرتبات}" data-field="موظف_المرتبات" data-idx="${ri}" readonly></td>
+<td style="display:none"><input value="${row.الحاله}" data-field="الحاله" data-idx="${ri}" readonly></td>
+<td><input type="number" value="${row.تعديل_الاساسى||''}" data-field="تعديل_الاساسى" data-idx="${ri}" oninput="onInput(this)"></td>
+<td><input value="${row.سبب_تعديل_الاساسى||''}" data-field="سبب_تعديل_الاساسى" data-idx="${ri}" oninput="onInput(this)"></td>
+<td><input type="number" value="${row.تعديل_بدل_الورادى||''}" data-field="تعديل_بدل_الورادى" data-idx="${ri}" oninput="onInput(this)"></td>
+<td><input value="${row.سبب_تعديل_بدل_الورادى||''}" data-field="سبب_تعديل_بدل_الورادى" data-idx="${ri}" oninput="onInput(this)"></td>
+<td class="yellow"><input type="number" value="${row.عدد_ايام_بدل_الغذاء||''}" data-field="عدد_ايام_بدل_الغذاء" data-idx="${ri}" oninput="onInput(this)"></td>
+<td class="yellow"><input type="number" value="${row.قيمة_بدل_الاعاشة||''}" data-field="قيمة_بدل_الاعاشة" data-idx="${ri}" oninput="onInput(this)"></td>
+<td><div style="display:flex;align-items:center"><input type="number" value="${row.العلاج_الطبى_الشهرى||''}" data-field="العلاج_الطبى_الشهرى" data-idx="${ri}" oninput="onInput(this)" style="flex:1"><button onclick="openModal(${ri},'العلاج_الطبى')" style="width:18px;height:18px;border:1.5px solid var(--border);background:linear-gradient(180deg, #fff 0%, #f2efe9 100%);border-radius:5px;font-size:9px;margin-right:2px;box-shadow:0 2px 0 var(--border)">⚙</button></div></td>
+<td><div style="display:flex;align-items:center"><input type="number" value="${row.علاج_حساب_177||''}" data-field="علاج_حساب_177" data-idx="${ri}" oninput="onInput(this)" style="flex:1"><button onclick="openModal(${ri},'177')" style="width:18px;height:18px;border:1.5px solid var(--border);background:linear-gradient(180deg, #fff 0%, #f2efe9 100%);border-radius:5px;font-size:9px;margin-right:2px;box-shadow:0 2px 0 var(--border)">⚙</button></div></td>
+<td><input type="number" value="${row.علاج_أسرى||''}" data-field="علاج_أسرى" data-idx="${ri}" oninput="onInput(this)"></td>
+<td><div style="display:flex;align-items:center"><input type="number" value="${row.قسط_علاج_أسرى||''}" data-field="قسط_علاج_أسرى" data-idx="${ri}" oninput="onInput(this)" style="flex:1"><button onclick="openModal(${ri},'أسرى')" style="width:18px;height:18px;border:1.5px solid var(--border);background:linear-gradient(180deg, #fff 0%, #f2efe9 100%);border-radius:5px;font-size:9px;margin-right:2px;box-shadow:0 2px 0 var(--border)">⚙</button></div></td>
+<td><input type="number" value="${row.نفقة||''}" data-field="نفقة" data-idx="${ri}" oninput="onInput(this)"></td>
+<td><div style="display:flex;align-items:center"><input type="number" value="${row.متجمد_نفقة||''}" data-field="متجمد_نفقة" data-idx="${ri}" oninput="onInput(this)" style="flex:1"><button onclick="openModal(${ri},'متجمد_نفقة')" style="width:18px;height:18px;border:1.5px solid var(--border);background:linear-gradient(180deg, #fff 0%, #f2efe9 100%);border-radius:5px;font-size:9px;margin-right:2px;box-shadow:0 2px 0 var(--border)">⚙</button></div></td>
+<td class="notes-cell"><textarea data-field="ملاحظات_اخرى" data-idx="${ri}" oninput="onInputTextarea(this)">${row.ملاحظات_اخرى||''}</textarea></td>
+</tr>`).join('');
+  initResizableHeaders(); attachNav(); initDragDrop(); initRowColHighlight();
+  document.querySelectorAll('#mainTable th').forEach(th=>{ th.style.fontSize=(tableFontSize-1)+'px'; });
+}
+function initRowColHighlight(){
+  const table=document.getElementById('mainTable');
+  table.addEventListener('focusin', (e)=>{
+    if(!e.target.matches('input, textarea')) return;
+    clearHighlight();
+    const td=e.target.closest('td'); const tr=e.target.closest('tr'); if(!td || !tr) return;
+    const colIndex=td.cellIndex; tr.classList.add('row-highlight');
+    table.querySelectorAll('tbody tr, thead tr').forEach(r=>{ const cells=r.children; if(cells[colIndex]) cells[colIndex].classList.add('col-highlight'); });
+    td.classList.add('cell-focused');
+  });
+}
+function clearHighlight(){ document.querySelectorAll('.row-highlight').forEach(el=>el.classList.remove('row-highlight')); document.querySelectorAll('.col-highlight').forEach(el=>el.classList.remove('col-highlight')); document.querySelectorAll('.cell-focused').forEach(el=>el.classList.remove('cell-focused')); }
+
+function initResizableHeaders(){
+  document.querySelectorAll('th .resizer').forEach(resizer=>{
+    const th=resizer.parentElement; 
+    if(th.classList.contains('m-frozen') || th.classList.contains('name-frozen')) return;
+    let startX, startWidth;
+    const mouseDown = (e)=>{
+      startX=e.clientX;
+      startWidth=parseInt(document.defaultView.getComputedStyle(th).width,10);
+      document.addEventListener('mousemove', mouseMove);
+      document.addEventListener('mouseup', mouseUp);
+      e.preventDefault();e.stopPropagation();
+    };
+    const mouseMove = (e)=>{
+      const newWidth=startWidth + e.clientX - startX;
+      if(newWidth>=20){th.style.width=newWidth+'px';th.style.minWidth=newWidth+'px';}
+    };
+    const mouseUp = ()=>{document.removeEventListener('mousemove', mouseMove);document.removeEventListener('mouseup', mouseUp);};
+    resizer.addEventListener('mousedown', mouseDown);
+    
+    // Double Click بين فواصل الأعمدة يتغير عرضها بناء على بيانات رؤوس الأعمدة
+    resizer.addEventListener('dblclick', (e)=>{
+      e.preventDefault(); e.stopPropagation();
+      const headerText=th.textContent.replace('↕','').trim();
+      // عرض بناء على رؤوس الأعمدة فقط
+      const canvas=document.createElement('canvas');
+      const ctx=canvas.getContext('2d');
+      const style=getComputedStyle(th);
+      ctx.font=`${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+      const textMetrics=ctx.measureText(headerText);
+      const textWidth=textMetrics.width;
+      const newWidth=Math.max(60, Math.min(220, textWidth + 32)); // 32 padding + sort button
+      th.style.width=newWidth+'px';
+      th.style.minWidth=newWidth+'px';
+      th.style.maxWidth=newWidth+'px';
+      th.style.background='#fef7d7';
+      setTimeout(()=>{th.style.background='';}, 400);
+      document.getElementById('saveStatus').textContent=`📏 ${headerText}: ${Math.round(newWidth)}px حسب الرأس`;
+    });
+  });
+}
+function initDragDrop(){
+  const rows=document.querySelectorAll('#tbody tr');
+  rows.forEach(row=>{
+    row.addEventListener('dragstart', (e)=>{ if(e.target.tagName==='INPUT' && e.target.dataset.field==='م') {e.preventDefault();return;} dragSrcIndex=parseInt(row.dataset.idx); row.style.opacity='0.5'; });
+    row.addEventListener('dragend', ()=>{row.style.opacity='1';});
+    row.addEventListener('dragover', (e)=>{e.preventDefault();});
+    row.addEventListener('drop', (e)=>{ e.preventDefault(); const targetIdx=parseInt(row.dataset.idx); if(dragSrcIndex!==null && dragSrcIndex!==targetIdx){ const dragged=currentData[dragSrcIndex]; currentData.splice(dragSrcIndex,1); currentData.splice(targetIdx,0,dragged); currentData.forEach((r,i)=>{r.م=i+1;}); renderTable(currentData); updateStats(); } });
+  });
+}
+function onInputM(el){const idx=parseInt(el.dataset.idx);const val=parseInt(el.value)||0;currentData[idx].م=val;}
+function onInput(el){currentData[parseInt(el.dataset.idx)][el.dataset.field]=el.type==='number'?(parseFloat(el.value)||0):el.value;}
+function onInputTextarea(el){currentData[parseInt(el.dataset.idx)][el.dataset.field]=el.value;}
+
+function attachNav(){
+  document.querySelectorAll('#tbody input, #tbody textarea').forEach(inp=>{
+    inp.addEventListener('keydown',e=>{
+      if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)){
+        e.preventDefault();
+        const td=inp.closest('td');
+        const tr=inp.closest('tr');
+        if(!td || !tr) return;
+        const colIndex=td.cellIndex;
+        const rowIndex=parseInt(tr.dataset.idx);
+        let target=null;
+        
+        if(e.key==='ArrowUp'){
+          const prevIdx=rowIndex-1;
+          if(prevIdx>=0){
+            const prevRow=document.querySelector(`tr[data-idx="${prevIdx}"]`);
+            if(prevRow){ target=prevRow.children[colIndex]?.querySelector('input, textarea'); }
+          }
+        } else if(e.key==='ArrowDown'){
+          const nextIdx=rowIndex+1;
+          if(nextIdx<currentData.length){
+            const nextRow=document.querySelector(`tr[data-idx="${nextIdx}"]`);
+            if(nextRow){ target=nextRow.children[colIndex]?.querySelector('input, textarea'); }
+          }
+        } else if(e.key==='ArrowLeft'){
+          let nextCol=colIndex+1;
+          while(nextCol < tr.children.length){
+            const nextTd=tr.children[nextCol];
+            if(nextTd && !nextTd.classList.contains('hidden-col') && nextTd.style.display!=='none'){
+              target=nextTd.querySelector('input, textarea');
+              if(target) break;
+            }
+            nextCol++;
+          }
+          if(!target && rowIndex+1 < currentData.length){
+            const nextRow=document.querySelector(`tr[data-idx="${rowIndex+1}"]`);
+            if(nextRow){
+              for(let i=0;i<nextRow.children.length;i++){
+                const td=nextRow.children[i];
+                if(!td.classList.contains('hidden-col') && td.style.display!=='none'){
+                  target=td.querySelector('input, textarea');
+                  if(target) break;
+                }
+              }
+            }
+          }
+        } else if(e.key==='ArrowRight'){
+          let prevCol=colIndex-1;
+          while(prevCol>=0){
+            const prevTd=tr.children[prevCol];
+            if(prevTd && !prevTd.classList.contains('hidden-col') && prevTd.style.display!=='none'){
+              target=prevTd.querySelector('input, textarea');
+              if(target) break;
+            }
+            prevCol--;
+          }
+          if(!target && rowIndex>0){
+            const prevRow=document.querySelector(`tr[data-idx="${rowIndex-1}"]`);
+            if(prevRow){
+              for(let i=prevRow.children.length-1;i>=0;i--){
+                const td=prevRow.children[i];
+                if(!td.classList.contains('hidden-col') && td.style.display!=='none'){
+                  target=td.querySelector('input, textarea');
+                  if(target) break;
+                }
+              }
+            }
+          }
+        }
+        
+        if(target){
+          target.focus();
+          target.select();
+          target.closest('tr')?.scrollIntoView({behavior:'smooth', block:'nearest'});
+        }
+      } else if(e.key==='Enter'){
+        e.preventDefault();
+        const td=inp.closest('td');
+        const tr=inp.closest('tr');
+        const colIndex=td.cellIndex;
+        const rowIndex=parseInt(tr.dataset.idx);
+        const nextIdx=rowIndex+1;
+        if(nextIdx<currentData.length){
+          const nextRow=document.querySelector(`tr[data-idx="${nextIdx}"]`);
+          if(nextRow){
+            const target=nextRow.children[colIndex]?.querySelector('input, textarea');
+            if(target){target.focus();target.select(); target.closest('tr')?.scrollIntoView({behavior:'smooth', block:'nearest'});}
+          }
+        }
+      }
+    });
+  });
+}
+
+function getNextMonths(curM, curY, count){
+  const months=["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+  let idx=months.indexOf(curM); let y=parseInt(curY); let res=[]; let endMonth="", endYear="";
+  for(let k=1;k<count;k++){idx++; if(idx>=12){idx=0;y++;} res.push(`${months[idx]} ${y}`); endMonth=months[idx]; endYear=y;}
+  return {list:res, endMonth, endYear};
+}
+function openModal(ri,type){
+  modalRowIdx=ri;modalField=type;const r=currentData[ri];let t=0,i=0,m=0;
+  if(type==='العلاج_الطبى'){t=r.إجمالي_العلاج_الطبى;i=r.قسط_العلاج_الطبى;m=r.عدد_أشهر_العلاج_الطبى;}
+  else if(type==='177'){t=r.إجمالي_177;i=r.قسط_177;m=r.عدد_أشهر_177;}
+  else if(type==='أسرى'){t=r.إجمالي_قسط_أسرى;i=r.قسط_شهري_أسرى;m=r.عدد_أشهر_أسرى;}
+  else if(type==='متجمد_نفقة'){t=r.إجمالي_متجمد_نفقة;i=r.قسط_متجمد_نفقة;m=r.عدد_أشهر_متجمد_نفقة;}
+  document.getElementById('modalTitle').textContent=`⚙ ${type} - ${r.اسم_العامل}`;
+  document.getElementById('modalTotal').value=t||'';document.getElementById('modalInstallment').value=i||'';document.getElementById('modalMonths').value=m||'';
+  calcInstallment();document.getElementById('installModal').style.display='flex';
+}
+function closeModal(){document.getElementById('installModal').style.display='none';}
+function calcInstallment(ch){
+  let total=parseFloat(document.getElementById('modalTotal').value)||0;
+  let inst=parseFloat(document.getElementById('modalInstallment').value)||0;
+  let months=parseFloat(document.getElementById('modalMonths').value)||0;
+  if(ch==='months'&&total&&months){inst=Math.ceil(total/months);document.getElementById('modalInstallment').value=inst;}
+  else if(ch==='installment'&&total&&inst){months=Math.ceil(total/inst);document.getElementById('modalMonths').value=months;}
+  else if(total&&months&&!inst){inst=Math.ceil(total/months);document.getElementById('modalInstallment').value=inst;}
+  else if(total&&inst&&!months){months=Math.ceil(total/inst);document.getElementById('modalMonths').value=months;}
+  inst=parseFloat(document.getElementById('modalInstallment').value)||0;
+  months=parseFloat(document.getElementById('modalMonths').value)||0;
+  const curM=document.getElementById('monthSelect').value;
+  const curY=document.getElementById('yearSelect').value;
+  const next=getNextMonths(curM,curY,months);
+  const remaining=Math.max(0, total-inst);
+  document.getElementById('modalRemaining').textContent=remaining+'ج';
+  // اسم البند كامل في الملاحظات
+  const fullNameMap={'العلاج_الطبى':'العلاج_الطبى','177':'علاج_177','أسرى':'قسط_أسرى','متجمد_نفقة':'متجمد_نفقة'};
+  const displayName=fullNameMap[modalField]||modalField;
+  const shortText=total?`${displayName} - إجمالي ${total}ج /${months} شهر المتبقي ${remaining}ج ابتداء من ${curM} ${curY} الى ${next.endMonth} ${next.endYear}`:'--';
+  document.getElementById('shortText').textContent=shortText;
+}
+function removeOldNoteForField(existingNotes, field){
+  if(!existingNotes) return "";
+  const fullNameMap={'العلاج_الطبى':['العلاج_الطبى','[العلاج_الطبى]'],'177':['علاج_177','[177]','[علاج_177]'],'أسرى':['قسط_أسرى','علاج_أسرى','[أسرى]'],'متجمد_نفقة':['متجمد_نفقة','[متجمد_نفقة]']};
+  const tags=fullNameMap[field]||[field];
+  let parts=existingNotes.split('|').map(s=>s.trim()).filter(Boolean);
+  parts=parts.filter(p=>!tags.some(tag=>p.includes(tag)));
+  return parts.join(' | ');
+}
+function applyInstallment(){
+  if(modalRowIdx===null)return;
+  const total=parseFloat(document.getElementById('modalTotal').value)||0;
+  const inst=parseFloat(document.getElementById('modalInstallment').value)||0;
+  const months=parseFloat(document.getElementById('modalMonths').value)||0;
+  const remaining=Math.max(0, total-inst);
+  const row=currentData[modalRowIdx];
+  const monthName=document.getElementById('monthSelect').value;
+  const yearName=document.getElementById('yearSelect').value;
+  const next=getNextMonths(monthName,yearName,months);
+  // اسم البند كامل - إجباري
+  const fullNameMap={'العلاج_الطبى':'العلاج_الطبى','177':'علاج_177','أسرى':'قسط_أسرى','متجمد_نفقة':'متجمد_نفقة'};
+  const displayName=fullNameMap[modalField]||modalField;
+  const shortNote=`${displayName} - إجمالي ${total}ج /${months} شهر المتبقي ${remaining}ج ابتداء من ${monthName} ${yearName} الى ${next.endMonth} ${next.endYear}`;
+  if(modalField==='العلاج_الطبى'){row.إجمالي_العلاج_الطبى=total;row.قسط_العلاج_الطبى=inst;row.عدد_أشهر_العلاج_الطبى=months;row.متبقي_العلاج_الطبى=remaining;row.العلاج_الطبى_الشهرى=inst;}
+  else if(modalField==='177'){row.إجمالي_177=total;row.قسط_177=inst;row.عدد_أشهر_177=months;row.متبقي_177=remaining;row.علاج_حساب_177=inst;}
+  else if(modalField==='أسرى'){row.إجمالي_قسط_أسرى=total;row.قسط_شهري_أسرى=inst;row.عدد_أشهر_أسرى=months;row.متبقي_أسرى=remaining;row.قسط_علاج_أسرى=inst;}
+  else if(modalField==='متجمد_نفقة'){row.إجمالي_متجمد_نفقة=total;row.قسط_متجمد_نفقة=inst;row.عدد_أشهر_متجمد_نفقة=months;row.متبقي_متجمد_نفقة=remaining;row.متجمد_نفقة=inst;}
+  const cleanedOld=removeOldNoteForField(row.ملاحظات_اخرى, modalField);
+  row.ملاحظات_اخرى=cleanedOld ? cleanedOld + " | " + shortNote : shortNote;
+  closeModal(); renderTable(currentData); updateStats();
+}
+async function saveOrder(){
+  if(!currentData.length){alert("لا يوجد");return;}
+  showLoading(true,"📌 حفظ الترتيب...");
+  let ok=0;
+  for(let i=0;i<currentData.length;i++){
+    const r=currentData[i];
+    const sql=`INSERT OR REPLACE INTO ترتيب_الموظفين (الكود_البنكى, موظف_المرتبات, ترتيب, اسم_العامل) VALUES ('${r.الكود_البنكى}', '${String(r.موظف_المرتبات).replace(/'/g,"''")}', ${i+1}, '${String(r.اسم_العامل).replace(/'/g,"''")}')`;
+    try{await tursoQuery(sql); ok++; updateProgress(i+1, currentData.length, `حفظ ترتيب ${r.اسم_العامل} - ${i+1}`);}catch(e){}
+  }
+  showLoading(false); setStatus(`✅ حفظ ترتيب ${ok}`);
+}
+async function saveAll(){
+  if(!currentData.length){alert("لا يوجد");return;}
+  if(!tursoChangeCols.length){ try{ const cols=await tursoQuery(`PRAGMA table_info('Change_Salarey')`); tursoChangeCols=cols.map(c=>c.name); }catch(e){} }
+  let ok=0; showLoading(true,"💾 حفظ البيانات - الحاله=نشط...");
+  for(let idx=0; idx<currentData.length; idx++){
+    const r=currentData[idx]; if(!r.الكود_البنكى) continue;
+    const dataMap={"م": r.م,"السنة": r.السنة,"الشهر": r.الشهر,"الكود_البنكى": r.الكود_البنكى,"اسم_العامل": r.اسم_العامل,"موظف_المرتبات": r.موظف_المرتبات,"الحاله": "نشط","عدد_ايام_بدل_الغذاء": r.عدد_ايام_بدل_الغذاء||0,"قيمة_بدل_الاعاشة": r.قيمة_بدل_الاعاشة||0,"العلاج_الطبى_الشهرى": r.العلاج_الطبى_الشهرى||0,"إجمالي_العلاج_الطبى": r.إجمالي_العلاج_الطبى||0,"قسط_العلاج_الطبى": r.قسط_العلاج_الطبى||0,"متبقي_العلاج_الطبى": r.متبقي_العلاج_الطبى||0,"عدد_أشهر_العلاج_الطبى": r.عدد_أشهر_العلاج_الطبى||0,"علاج_حساب_177": r.علاج_حساب_177||0,"إجمالي_177": r.إجمالي_177||0,"قسط_177": r.قسط_177||0,"متبقي_177": r.متبقي_177||0,"عدد_أشهر_177": r.عدد_أشهر_177||0,"علاج_أسرى": r.علاج_أسرى||0,"قسط_علاج_أسرى": r.قسط_علاج_أسرى||0,"إجمالي_قسط_أسرى": r.إجمالي_قسط_أسرى||0,"قسط_شهري_أسرى": r.قسط_شهري_أسرى||0,"متبقي_أسرى": r.متبقي_أسرى||0,"عدد_أشهر_أسرى": r.عدد_أشهر_أسرى||0,"نفقة": r.نفقة||0,"متجمد_نفقة": r.متجمد_نفقة||0,"إجمالي_متجمد_نفقة": r.إجمالي_متجمد_نفقة||0,"قسط_متجمد_نفقة": r.قسط_متجمد_نفقة||0,"متبقي_متجمد_نفقة": r.متبقي_متجمد_نفقة||0,"عدد_أشهر_متجمد_نفقة": r.عدد_أشهر_متجمد_نفقة||0,"ملاحظات_اخرى": r.ملاحظات_اخرى||""};
+    const filteredCols=[]; const filteredVals=[];
+    for(let col of tursoChangeCols){ if(col==='id') continue; if(dataMap.hasOwnProperty(col)){ filteredCols.push(`"${col.replace(/"/g,'""')}"`); const val=dataMap[col]; if(typeof val==='number') filteredVals.push(val); else filteredVals.push(`'${String(val).replace(/'/g,"''")}'`); } }
+    if(filteredCols.length){ const sql=`INSERT OR REPLACE INTO Change_Salarey (${filteredCols.join(', ')}) VALUES (${filteredVals.join(', ')})`; try{await tursoQuery(sql); ok++;}catch(e){} }
+    updateProgress(idx+1, currentData.length, `${r.اسم_العامل} - م${r.م}`);
+  }
+  showLoading(false); setStatus(`✅ تم حفظ ${ok} - الحاله=نشط`);
+}
+function exportExcelThreeSheets(){
+  if(!currentData.length){alert("لا يوجد");return;}
+  const sorted=[...currentData].sort((a,b)=>{ if(a.موظف_المرتبات < b.موظف_المرتبات) return -1; if(a.موظف_المرتبات > b.موظف_المرتبات) return 1; return a.م - b.م; });
+  const sheet1Data=sorted.map(r=>({"م": r.م,"كود الموظف": r.الكود_البنكى,"اسم العامل": r.اسم_العامل,"عدد_غذاء": r.عدد_ايام_بدل_الغذاء||0,"قيمة_اعاشة": r.قيمة_بدل_الاعاشة||0,"علاج_طبى ⚙": r.العلاج_الطبى_الشهرى||0}));
+
+  // الشيت الثاني - فلترة: عندما يكون جميع الصفوف قيمتها صفر او فارغة لا يضع اسم الموظف بالكامل فى الشيت الثانى فقط بإستثناء 3 أعمدة عدد_غذاء وقيمة_اعاشة وعلاج_طبى
+  // يعني: نستبعد الصفوف التي كل قيم التعديلات فيها صفر/فارغة، ونحتفظ فقط بالصفوف التي فيها تعديل فعلي
+  const filteredForSheet2 = sorted.filter(r=>{
+    const hasBasicAdjust = (r.تعديل_الاساسى && r.تعديل_الاساسى!=0) || (r.سبب_تعديل_الاساسى && String(r.سبب_تعديل_الاساسى).trim()!=='');
+    const hasWardi = (r.تعديل_بدل_الورادى && r.تعديل_بدل_الورادى!=0) || (r.سبب_تعديل_بدل_الورادى && String(r.سبب_تعديل_بدل_الورادى).trim()!=='');
+    const has177 = r.علاج_حساب_177 && r.علاج_حساب_177!=0;
+    const hasFamily = r.علاج_أسرى && r.علاج_أسرى!=0;
+    const hasFamilyInstall = r.قسط_علاج_أسرى && r.قسط_علاج_أسرى!=0;
+    const hasNafaka = r.نفقة && r.نفقة!=0;
+    const hasMotajamed = r.متجمد_نفقة && r.متجمد_نفقة!=0;
+    const hasNotes = r.ملاحظات_اخرى && String(r.ملاحظات_اخرى).trim()!=='';
+    // استثناء 3 أعمدة: عدد_غذاء, قيمة_اعاشة, علاج_طبى لا تدخل في الفحص لأنها خاصة بالشيت الأول
+    return hasBasicAdjust || hasWardi || has177 || hasFamily || hasFamilyInstall || hasNafaka || hasMotajamed || hasNotes;
+  });
+
+  const sheet2Data=filteredForSheet2.map(r=>({"م": r.م,"كود الموظف": r.الكود_البنكى,"اسم العامل": r.اسم_العامل,"موظف_المرتبات": r.موظف_المرتبات,"تعديل_الاساسى": r.تعديل_الاساسى||0,"سبب_الاساسى": r.سبب_تعديل_الاساسى||"","تعديل_ورادى": r.تعديل_بدل_الورادى||0,"سبب_ورادى": r.سبب_تعديل_بدل_الورادى||"","علاج_177 ⚙": r.علاج_حساب_177||0,"علاج_أسرى": r.علاج_أسرى||0,"قسط_أسرى ⚙": r.قسط_علاج_أسرى||0,"نفقة": r.نفقة||0,"متجمد_نفقة ⚙": r.متجمد_نفقة||0,"ملاحظات": r.ملاحظات_اخرى||""}));
+  const sheet3Data=sorted.map(r=>({"م": r.م,"كود الموظف": r.الكود_البنكى,"اسم الموظف": r.اسم_العامل,"موظف الاستحقاقات": r.موظف_المرتبات,"تعديل_الاساسى": r.تعديل_الاساسى||0,"سبب_الاساسى": r.سبب_تعديل_الاساسى||"","تعديل_ورادى": r.تعديل_بدل_الورادى||0,"سبب_ورادى": r.سبب_تعديل_بدل_الورادى||"","عدد_غذاء": r.عدد_ايام_بدل_الغذاء||0,"قيمة_اعاشة": r.قيمة_بدل_الاعاشة||0,"علاج_طبى ⚙": r.العلاج_الطبى_الشهرى||0,"علاج_177 ⚙": r.علاج_حساب_177||0,"علاج_أسرى": r.علاج_أسرى||0,"قسط_أسرى ⚙": r.قسط_علاج_أسرى||0,"نفقة": r.نفقة||0,"متجمد_نفقة ⚙": r.متجمد_نفقة||0,"ملاحظات": r.ملاحظات_اخرى||""}));
+  const wb=XLSX.utils.book_new();
+  function createStyledSheet(data){
+    const ws=XLSX.utils.json_to_sheet(data); ws['!dir']='rtl'; if(!ws['!sheetView']) ws['!sheetView']=[]; ws['!sheetView'].push({rightToLeft:true});
+    const range=XLSX.utils.decode_range(ws['!ref']);
+    for(let C=range.s.c; C<=range.e.c; C++){ for(let R=range.s.r; R<=range.e.r; R++){ const addr=XLSX.utils.encode_cell({r:R,c:C}); if(!ws[addr]) continue; if(!ws[addr].s) ws[addr].s={}; const headerName = R===0 ? Object.keys(data[0]||{})[C] : ""; if(R===0){ let bg="A8C0A0"; if(headerName.includes("غذاء") || headerName.includes("اعاشة")) bg="FEF7D7"; else if(headerName==="م") bg="E8E2D9"; ws[addr].s={fill:{patternType:"solid",fgColor:{rgb:bg}},font:{bold:true,sz:11,color:{rgb:"2D3A2E"}},alignment:{horizontal:"center",vertical:"center",wrapText:true},border:{top:{style:"thin",color:{rgb:"C8BEB2"}},bottom:{style:"thin",color:{rgb:"C8BEB2"}},left:{style:"thin",color:{rgb:"C8BEB2"}},right:{style:"thin",color:{rgb:"C8BEB2"}}}}; } else { let bg="FFFEF9"; if(headerName.includes("غذاء") || headerName.includes("اعاشة")) bg="FEF7D7"; if(R%2===0 && bg==="FFFEF9") bg="F5EFE0"; ws[addr].s={fill:{patternType:"solid",fgColor:{rgb:bg}},font:{bold:true,sz:10},alignment:{horizontal:"center",vertical:"center",wrapText:true},border:{top:{style:"thin",color:{rgb:"C8BEB2"}},bottom:{style:"thin",color:{rgb:"C8BEB2"}},left:{style:"thin",color:{rgb:"C8BEB2"}},right:{style:"thin",color:{rgb:"C8BEB2"}}}}; } } } ws['!freeze']={xSplit:2, ySplit:1}; return ws;
+  }
+  const ws1=createStyledSheet(sheet1Data); const ws2=createStyledSheet(sheet2Data); const ws3=createStyledSheet(sheet3Data);
+  ws1['!cols']=[{wch:6},{wch:14},{wch:24},{wch:10},{wch:12},{wch:12}]; ws2['!cols']=[{wch:6},{wch:14},{wch:24},{wch:16},{wch:12},{wch:16},{wch:12},{wch:16},{wch:12},{wch:12},{wch:12},{wch:10},{wch:12},{wch:30}]; ws3['!cols']=[{wch:6},{wch:14},{wch:24},{wch:16},{wch:12},{wch:16},{wch:12},{wch:16},{wch:10},{wch:12},{wch:12},{wch:12},{wch:12},{wch:12},{wch:10},{wch:12},{wch:30}];
+  XLSX.utils.book_append_sheet(wb, ws1, "الغذاء والعلاج الطبي"); XLSX.utils.book_append_sheet(wb, ws2, "بدون غذاء وعلاج طبي"); XLSX.utils.book_append_sheet(wb, ws3, "جميع الأعمدة الظاهرة");
+  wb.Workbook={Views:[{RTL:true}]}; const fileName=`المتغيرات_الشهرية_${document.getElementById('payrollSelect').value||'الكل'}_${document.getElementById('monthSelect').value}_${document.getElementById('yearSelect').value}_احترافي.xlsx`; XLSX.writeFile(wb, fileName); 
+  const excluded = sorted.length - filteredForSheet2.length;
+  setStatus(`✅ تصدير 3 شيتات | شيت2: ${filteredForSheet2.length} موظف (استبعد ${excluded} صفر) | شيت1: ${sheet1Data.length} | شيت3: ${sheet3Data.length}`);
+}
+function printLandscape(){
+  const win=window.open('','_blank'); const tableClone=document.getElementById('mainTable').cloneNode(true);
+  tableClone.querySelectorAll('.hidden-col').forEach(el=>el.remove()); tableClone.querySelectorAll('td').forEach(td=>{ const inp=td.querySelector('input, textarea'); if(inp){td.textContent=inp.value||''; td.style.padding='4px'; td.style.fontWeight='700'; td.style.fontSize='9px'; td.style.height='20px';} });
+  tableClone.querySelectorAll('th .resizer').forEach(r=>r.remove());
+  win.document.write(`<html dir="rtl"><head><meta charset="utf-8"><style>@page{size:A4 landscape;margin:8mm}body{font-family:Cairo;background:#c9b896}table{border-collapse:collapse;width:100%}th{background:#a8c0a0;border:1.5px solid #a89a7d;padding:6px;font-weight:800;font-size:9px}th.yellow{background:#fef7d7}td{border:1px solid #a89a7d;padding:4px;text-align:center;font-weight:700;font-size:9px;background:#fffef9;height:20px}td.yellow{background:#fef7d7}h2{text-align:center;font-family:Tajawal}</style></head><body><h2>المتغيرات الشهرية - ${document.getElementById('payrollSelect').value} - ${document.getElementById('monthSelect').value} ${document.getElementById('yearSelect').value}</h2>${tableClone.outerHTML}<script>window.onload=()=>setTimeout(()=>window.print(),400);<\/script></body></html>`); win.document.close();
+}
+function filterRows(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  if(!q){renderTable(currentData);updateStats();return;}
+  const filtered=currentData.filter(r=>String(r.اسم_العامل).toLowerCase().includes(q)||String(r.الكود_البنكى).includes(q)||String(r.موظف_المرتبات).toLowerCase().includes(q));
+  renderTable(filtered);
+}
+window.onload=()=>{loadPayrollList(); document.getElementById('fontSizeDisplay').textContent=tableFontSize+'px';};
+document.getElementById('payrollSelect').addEventListener('change',()=>{if(document.getElementById('payrollSelect').value)loadRealData();});
+</script>
+</body>
+</html>
