@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>العطلات - V21 إستعادة الشامل والتواريخ العربية</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root{--bg:#f8fafc;--card:#fff;--text:#000;--border:#9ca3af;--header-bg:#7f1d1d;--header-text:#fff;--shadow:0 1px 3px rgba(0,0,0,0.1);--radius:8px;--table-font:12px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Tajawal,sans-serif;background:var(--bg);color:#000;direction:rtl;padding:10px;line-height:1.4}
+.header{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;box-shadow:var(--shadow)}
+.header h1{font-size:15px;font-weight:800;color:#7f1d1d;display:flex;align-items:center;gap:8px}
+.header h1 i{width:30px;height:30px;background:#fee2e2;color:#7f1d1d;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px}
+.status{font-size:10px;background:var(--bg);border:1px solid var(--border);padding:4px 8px;border-radius:12px;color:#334155;max-width:300px;white-space:nowrap;overflow:hidden}
+.controls{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:8px;margin-bottom:8px;box-shadow:var(--shadow);display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.control-group{display:flex;align-items:center;gap:4px;background:var(--bg);padding:4px 6px;border-radius:6px;border:1px solid var(--border)}
+.control-group label{font-size:9px;font-weight:700;color:#334155}
+.control-group input,.control-group select{border:none;background:transparent;font-size:10px;font-weight:600;min-width:45px;outline:none;color:#000}
+.control-group input.title-input{min-width:200px;font-size:11px;font-weight:700;color:#7f1d1d}
+.btn{padding:5px 10px;border:none;border-radius:6px;font-weight:700;font-size:9px;cursor:pointer;display:flex;align-items:center;gap:4px;transition:0.15s;box-shadow:0 1px 2px rgba(0,0,0,0.08)}
+.btn:hover{transform:translateY(-1px)}
+.btn-primary{background:#1f2937;color:white}
+.btn-save{background:#1e40af;color:white}
+.btn-excel{background:#065f46;color:white}
+.btn-danger{background:white;color:#dc2626;border:1px solid #fca5a5}
+.btn-secondary{background:var(--bg);color:#000;border:1px solid var(--border)}
+.btn-print{background:#111827;color:white}
+.btn-test{background:#92400e;color:white;padding:3px 6px;font-size:8px}
+.btn-sort-small{width:18px;height:18px;padding:0;border:none;border-radius:3px;background:#fee2e2;color:#7f1d1d;font-size:9px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;margin:0 1px}
+.font-control{display:flex;align-items:center;gap:5px;background:var(--card);border:1px solid var(--border);padding:4px 8px;border-radius:14px}
+.font-control input[type="range"]{width:60px;accent-color:#7f1d1d;height:4px}
+.font-value{background:#7f1d1d;color:white;padding:2px 5px;border-radius:8px;font-size:9px;font-weight:800;min-width:32px;text-align:center}
+.checkbox-wrap{display:flex;align-items:center;gap:4px;font-size:9px;font-weight:600;color:#000;cursor:pointer;background:white;border:1px solid var(--border);padding:4px 6px;border-radius:5px}
+.checkbox-wrap input{width:12px;height:12px;accent-color:#7f1d1d}
+.table-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+.table-scroll{overflow:auto;max-height:68vh;position:relative}
+table{width:100%;border-collapse:collapse;border-spacing:0;font-size:var(--table-font);table-layout:fixed;color:#000}
+thead{position:sticky;top:0;z-index:20}
+thead th{background:#7f1d1d;color:white;font-weight:800;padding:7px 3px;text-align:center;font-size:10px;white-space:nowrap;border:1px solid #450a0a;border-bottom:2px solid #450a0a;position:sticky;top:0;z-index:15;box-sizing:border-box}
+thead th .resizer{position:absolute;top:0;left:-3px;width:6px;height:100%;cursor:col-resize;background:transparent;z-index:25}
+thead th .resizer:hover{background:rgba(255,255,255,0.3)}
+th.freeze-m,td.freeze-m{position:sticky;right:0;width:50px;min-width:50px;max-width:50px;z-index:12;background:#7f1d1d !important;color:white !important;border:1px solid #450a0a !important;box-sizing:border-box}
+th.freeze-code,td.freeze-code{position:sticky;right:50px;width:65px;min-width:65px;max-width:65px;z-index:11;background:#7f1d1d !important;color:white !important;border:1px solid #450a0a !important;box-sizing:border-box}
+th.freeze-name,td.freeze-name{position:sticky;right:115px;width:140px;min-width:140px;max-width:140px;z-index:10;background:white !important;color:black !important;border:1px solid #9ca3af !important;border-left:2px solid #7f1d1d !important;text-align:right !important;font-weight:700 !important;box-sizing:border-box}
+thead th.freeze-m,thead th.freeze-code,thead th.freeze-name{background:#7f1d1d !important;color:white !important;z-index:20 !important}
+tbody td{padding:5px 4px;border:1px solid #9ca3af;text-align:center;font-size:var(--table-font);font-weight:500;background:white;color:black;white-space:pre-wrap;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box;min-height:28px;word-break:break-word}
+tbody tr:nth-child(even) td{background:#f9fafb}
+tbody tr:hover td{background:#fef2f2 !important}
+td.freeze-m,td.freeze-code{background:#7f1d1d !important;color:white !important;font-weight:800 !important}
+.editable{cursor:text;white-space:pre-wrap !important}
+.editable:focus{outline:2px solid #7f1d1d;background:#fffbeb !important}
+.delete-btn{width:18px;height:18px;border:none;border-radius:50%;background:white;color:#dc2626;font-weight:800;cursor:pointer;border:1px solid #fca5a5;display:flex;align-items:center;justify-content:center;font-size:10px}
+.debug-box{background:#111827;color:#22c55e;padding:6px;border-radius:6px;font-size:9px;direction:ltr;text-align:left;white-space:pre-wrap;margin-top:6px;max-height:100px;overflow:auto;font-family:monospace;display:none}
+.print-title{display:none}
+.signatures-print-only{display:none}
+@media print{
+  @page{size:A4 landscape;margin:10mm 8mm 30mm 8mm}
+  body{background:white !important;padding:0 !important;color:black !important}
+  .header,.controls,.debug-box{display:none !important}
+  .table-card{border:none !important;border-radius:0 !important;overflow:visible !important;box-shadow:none !important}
+  .table-scroll{overflow:visible !important;max-height:none !important}
+  table{width:100% !important;border-collapse:collapse !important;font-size:10px !important;table-layout:fixed !important;color:black !important}
+  thead th{background:#7f1d1d !important;color:white !important;border:1px solid black !important;-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;position:static !important}
+  tbody td{background:white !important;color:black !important;border:1px solid #666 !important;position:static !important;padding:4px 3px !important;height:auto !important}
+  td.freeze-m,td.freeze-code{background:white !important;color:black !important;border:1px solid #666 !important}
+  .delete-btn,.resizer,.btn-sort-small{display:none !important}
+  .print-title{display:block !important;text-align:center;font-size:14px;font-weight:800;margin-bottom:6px;padding-bottom:4px;border-bottom:2px solid #7f1d1d;color:black}
+  .signatures-print-only{display:flex !important;position:fixed;bottom:0;left:0;right:0;justify-content:space-between;padding:12px 16px;background:white;border-top:2px solid black;font-size:11px;font-weight:700;line-height:1.4;color:black;z-index:1000}
+  .signatures-print-only .sig{width:30%;text-align:center}
+  .signatures-print-only .sig.right{text-align:right}
+  .signatures-print-only .sig.left{text-align:left}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+<h1><i class="fas fa-table"></i> العطلات الرسمية والأعياد - V21</h1>
+<div style="display:flex;gap:5px;align-items:center">
+<span class="status" id="status">جاهز - تصميم V20 محفوظ</span>
+<button class="btn btn-test" onclick="testConnection()"><i class="fas fa-wifi"></i></button>
+</div>
+</div>
+
+<div class="controls">
+<div class="control-group"><label>السنة:</label><input id="year" value="2026" style="width:45px"></div>
+<div class="control-group"><label>الشهر:</label><select id="month"><option>يناير</option><option>فبراير</option><option>مارس</option><option>ابريل</option><option>مايو</option><option>يونيو</option><option selected>يوليو</option><option>اغسطس</option><option>سبتمبر</option><option>اكتوبر</option><option>نوفمبر</option><option>ديسمبر</option></select></div>
+<div class="control-group"><label>المحطة:</label><select id="station" style="min-width:120px"><option>الكل (م.م فقط)</option></select></div>
+<div class="control-group"><label>عنوان الصفحة للطباعة:</label><input id="pageTitleInput" class="title-input" value="كشف العطلات الرسمية والأعياد" placeholder="اكتب عنوان يظهر في الطباعة"></div>
+<button class="btn btn-primary" onclick="loadData()"><i class="fas fa-download"></i> تحميل</button>
+<button class="btn btn-danger" onclick="clearTable()"><i class="fas fa-trash"></i></button>
+<button class="btn btn-secondary" onclick="addNewRow()"><i class="fas fa-plus"></i> صف</button>
+<button class="btn btn-save" onclick="saveToDB()"><i class="fas fa-database"></i> حفظ</button>
+<button class="btn btn-excel" onclick="exportExcel()"><i class="fas fa-file-excel"></i> Excel</button>
+<button class="btn btn-print" onclick="printTable()"><i class="fas fa-print"></i> طباعة</button>
+<label class="checkbox-wrap"><input type="checkbox" id="showEntCol" checked onchange="toggleEntCol()"><span>الاستحقاقات</span></label>
+<label class="checkbox-wrap"><input type="checkbox" id="showSignatures" checked><span>التوقيعات في الطباعة</span></label>
+<div class="font-control"><button onclick="changeFontSize(-1)" style="background:none;border:none;cursor:pointer;font-weight:900;width:16px">-</button><input type="range" id="fontRange" min="9" max="16" value="11" oninput="changeFontSizeRange(this.value)"><button onclick="changeFontSize(1)" style="background:none;border:none;cursor:pointer;font-weight:900;width:16px">+</button><span class="font-value" id="fontValue">١١px</span></div>
+</div>
+
+<div class="table-card">
+<div class="print-title" id="printTitle">كشف العطلات الرسمية والأعياد - <span id="printDate"></span></div>
+<div class="table-scroll">
+<table id="mainTable">
+<thead>
+<tr>
+<th data-col="m" class="freeze freeze-m">
+  <div style="display:flex;align-items:center;justify-content:center;gap:2px"><span>م</span><button class="btn-sort-small" onclick="sortByOrder()" title="ترتيب"><i class="fas fa-sort-amount-up"></i></button><button class="btn-sort-small" onclick="resetOrder()" title="إعادة" style="background:#e5e7eb"><i class="fas fa-undo"></i></button></div>
+  <div class="resizer"></div>
+</th>
+<th data-col="code" class="freeze freeze-code">الكود<div class="resizer"></div></th>
+<th data-col="name" class="freeze freeze-name">الاسم (مجمد)<div class="resizer"></div></th>
+<th data-col="station">المحطة<div class="resizer"></div></th>
+<th data-col="asasi">الأساسي<div class="resizer"></div></th>
+<th data-col="shamel">الشامل<div class="resizer"></div></th>
+<th data-col="d3">ثالثه يوم<div class="resizer"></div></th>
+<th data-col="d2">ثانيه يوم<div class="resizer"></div></th>
+<th data-col="d1">أولي يوم<div class="resizer"></div></th>
+<th data-col="totalDays">إجمالي الأيام<div class="resizer"></div></th>
+<th data-col="daily">قيمة اليوم = الشامل÷٣٠<div class="resizer"></div></th>
+<th data-col="totalAmt">إجمالي المبلغ = قيمة×أيام<div class="resizer"></div></th>
+<th data-col="ent">موظف الإستحقاقات<div class="resizer"></div></th>
+<th data-col="del">×</th>
+</tr>
+</thead>
+<tbody id="tbody"><tr><td colspan="14" style="padding:16px;text-align:center">جاري جلب المحطات...</td></tr></tbody>
+</table>
+</div>
+</div>
+
+<div class="signatures-print-only" id="signaturesPrint">
+<div class="sig right"><div>رئيس الشئون الإدارية والأفراد</div><div>محاسب /</div><div style="font-weight:900">" إبراهيم محمد سعيد "</div></div>
+<div class="sig center"><div>مدير عام شبكات بنى سويف</div><div>مهندس /</div><div style="font-weight:900">" سيد محمد عبد الحفيظ "</div></div>
+<div class="sig left"><div>رئيس القطاع الشمالى</div><div>مهندس /</div><div style="font-weight:900">" مفتاح حسن سلطان "</div></div>
+</div>
+
+<div id="debugBox" class="debug-box"></div>
+
+<script>
+const TURSO_API='https://turso-api.mostafa-voic77729.workers.dev';
+// إستعادة عمود الشامل كان يعمل سابقآ بشكل صحيح - 25 بند
+const SHAMEL_25=[
+  {names:['مرتب اساسي','مرتب_اساسي','مرتب_اساسى','المرتب_الاساسى']},
+  {names:['الحافز الدورى','الحافز_الدورى','الحافز الدوري']},
+  {names:['طبيعه عمل','طبيعه_عمل','طبيعة_عمل']},
+  {names:['علاوه 2014','علاوه_2014','علاوة_2014']},
+  {names:['علاوه 2015','علاوه_2015','علاوة_2015']},
+  {names:['اعانه اجتماعيه','اعانه_اجتماعيه','إعانة_اجتماعية']},
+  {names:['بدل ضيافة','بدل_ضيافة','بدل_الضيافة']},
+  {names:['بدل تفرغ','بدل_تفرغ']},
+  {names:['تفرغ تجارين','تفرغ_تجارين']},
+  {names:['تفرغ اطباء','تفرغ_اطباء','تفرغ_الأطباء']},
+  {names:['تفرغ كيميائيين','تفرغ_كيميائيين']},
+  {names:['بدل تمثيل','بدل_تمثيل']},
+  {names:['حافز 840','حافز_840','حافز_٨٤٠']},
+  {names:['بدل النقدي','بدل_النقدي','البدل_النقدي']},
+  {names:['بدل الإقامة','بدل_الإقامة','بدل_الاقامة']},
+  {names:['بدل ورديه','بدل_ورديه','بدل_وردية']},
+  {names:['بدل صرافة','بدل_صرافة']},
+  {names:['بدل عدوه','بدل_عدوه','بدل_عدوى']},
+  {names:['بدل سماعه','بدل_سماعه','بدل_سماعة']},
+  {names:['امناء مخاذن','امناء_مخاذن','أمناء_مخازن']},
+  {names:['علاوه استثنائية','علاوه_استثنائية','علاوة_استثنائية']},
+  {names:['علاوه استثنائية 2022','علاوه_استثنائية_2022','علاوة_2022']},
+  {names:['حافز 2024- 2025','حافز_2024_2025','حافز_2024']},
+  {names:['اناره','انارة','إنارة']},
+  {names:['عيد العمال','عيد_العمال']},
+];
+let STATION_COL='المحطة';let ENT_COL=null;let originalOrder=[];
+function toArabicNum(n){
+  if(n===null||n===undefined||n===''||isNaN(n)&&typeof n!=='string') return '';
+  let str=String(n);
+  // تحويل الأرقام الإنجليزية إلى عربية
+  const arabic=['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+  str=str.replace(/[0-9]/g,d=>arabic[parseInt(d)]);
+  str=str.replace('.', '٫');
+  return str;
+}
+function toEnglishNum(str){
+  if(!str) return '';
+  // تحويل الأرقام العربية إلى إنجليزية للحساب
+  const map={'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9','٫':'.','،':','};
+  return String(str).replace(/[٠-٩٫،]/g,c=>map[c]||c);
+}
+function parseNum(str){
+  if(!str) return 0;
+  let s=toEnglishNum(String(str));
+  s=s.replace(/[^0-9.\-]/g,'');
+  const v=parseFloat(s);
+  return isNaN(v)?0:v;
+}
+function changeFontSize(delta){const r=document.getElementById('fontRange');let cur=parseInt(r.value);let next=Math.max(9,Math.min(16,cur+delta));r.value=next;changeFontSizeRange(next)}
+function changeFontSizeRange(size){document.documentElement.style.setProperty('--table-font',size+'px');document.getElementById('fontValue').textContent=toArabicNum(size)+'px';localStorage.setItem('tableFontSize',size)}
+(function(){const s=localStorage.getItem('tableFontSize');if(s){document.documentElement.style.setProperty('--table-font',s+'px');document.getElementById('fontRange').value=s;document.getElementById('fontValue').textContent=toArabicNum(s)+'px'}})();
+function log(msg){const box=document.getElementById('debugBox');box.style.display='block';box.textContent+=`[${new Date().toLocaleTimeString('ar-EG')}] ${msg}\n`;}
+async function q(sql){try{const r=await fetch(`${TURSO_API}/api/turso`,{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({sql})});if(!r.ok)return[];const d=await r.json();if(!d.ok)return[];return d.rows||[]}catch(e){return[]}}
+async function fetchSalary(y,m,code){try{const url=`${TURSO_API}/api/salary-turso?year=${encodeURIComponent(y)}&month=${encodeURIComponent(m)}&code=${encodeURIComponent(code)}&t=${Date.now()}`;const r=await fetch(url,{cache:'no-store'});if(!r.ok)return null;const d=await r.json();if(d.ok&&d.found)return d.data;return null}catch(e){return null}}
+// إستعادة ميزة كتابة أكثر من تاريخ فى عمود ثالثة - ثانية - أولى مثل 27/08 - 28/08 مع الأرقام العربية
+function countDaysInCell(str){
+  if(!str) return 0;
+  // تحويل الأرقام العربية إلى إنجليزية للعد
+  let s=toEnglishNum(String(str).trim());
+  if(!s||s==='-'||s.toLowerCase()==='null') return 0;
+  s=s.replace(/،/g,',').replace(/؛/g,',');
+  // يدعم: 27/08 - 28/08  أو  ٢٧/٠٨ - ٢٨/٠٨  أو  27/08, 28/08  أو  سطر جديد
+  let tokens=s.split(/[\n,،]+/).map(t=>t.trim()).filter(Boolean);
+  let total=0;
+  for(let token of tokens){
+    if(!token) continue;
+    // حالة: 27/08 - 28/08  أو  27-08 - 28-08
+    let rangeMatch=token.match(/(\d{1,2})[\/\-](\d{1,2})\s*[-–]\s*(\d{1,2})[\/\-](\d{1,2})/);
+    if(rangeMatch){
+      const startDay=parseInt(rangeMatch[1]);
+      const endDay=parseInt(rangeMatch[3]);
+      // إذا نفس الشهر أو أيام متتالية
+      if(!isNaN(startDay)&&!isNaN(endDay)){
+        total+=Math.abs(endDay-startDay)+1;
+        continue;
+      }
+    }
+    // حالة: 27 - 28 (بدون شهر)
+    let simpleRange=token.match(/^(\d{1,2})\s*[-–]\s*(\d{1,2})$/);
+    if(simpleRange){
+      const sDay=parseInt(simpleRange[1]);
+      const eDay=parseInt(simpleRange[2]);
+      if(!isNaN(sDay)&&!isNaN(eDay)){
+        total+=Math.abs(eDay-sDay)+1;
+        continue;
+      }
+    }
+    // حالة: 27/08
+    if(token.match(/\d{1,2}[\/\-]\d{1,2}/)){
+      total+=1;
+      continue;
+    }
+    // حالة: رقم مفرد
+    const n=parseInt(token);
+    if(!isNaN(n)&&n>0){
+      total+=1;
+    }
+  }
+  return total;
+}
+function initResizableColumns(){
+  document.querySelectorAll('thead th .resizer').forEach(resizer=>{
+    const th=resizer.parentElement;
+    let startX,startWidth;
+    resizer.addEventListener('mousedown',e=>{
+      startX=e.pageX;startWidth=th.offsetWidth;
+      document.addEventListener('mousemove',onMouseMove);
+      document.addEventListener('mouseup',onMouseUp);
+      e.preventDefault();document.body.style.cursor='col-resize';
+    });
+    function onMouseMove(e){
+      const diff=e.pageX-startX;
+      const newWidth=Math.max(40,startWidth+diff);
+      th.style.width=newWidth+'px';th.style.minWidth=newWidth+'px';th.style.maxWidth=newWidth+'px';
+      const colIndex=Array.from(th.parentNode.children).indexOf(th);
+      document.querySelectorAll('#tbody tr').forEach(tr=>{
+        const td=tr.children[colIndex];
+        if(td){td.style.width=newWidth+'px';td.style.minWidth=newWidth+'px';td.style.maxWidth=newWidth+'px'}
+      });
+    }
+    function onMouseUp(){
+      document.removeEventListener('mousemove',onMouseMove);
+      document.removeEventListener('mouseup',onMouseUp);
+      document.body.style.cursor='';
+    }
+  });
+}
+async function testConnection(){const test=await q(`SELECT COUNT(*) as cnt FROM "موظفين_مرتبات"`);if(test.length>0){document.getElementById('status').textContent=`متصل - ${test[0].cnt}`;}else{document.getElementById('status').textContent='غير متصل - تجريبي';loadFallback()}}
+function loadFallback(){const fallback=['م.م أسمنت وادي النيل بنى سويف','م.م المرمر بنى سويف','م.م بنى سويف شرق','م.م قفطيشة','م.م الواسطى','م.م ببا','م.م الفشن'];const sel=document.getElementById('station');sel.innerHTML='<option value="">الكل (م.م فقط)</option>';fallback.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;sel.appendChild(o)});}
+async function discoverEntColumn(){const sample=await q(`SELECT * FROM "موظفين_مرتبات" LIMIT 1`);if(sample.length===0)return null;const allCols=Object.keys(sample[0]);const candidates=allCols.filter(c=>c.toLowerCase().includes('مرتب')||c.toLowerCase().includes('استحقاق')||c.toLowerCase().includes('مسئول'));for(const col of candidates){const distinct=await q(`SELECT DISTINCT "${col}" as v FROM "موظفين_مرتبات" WHERE "${col}" IS NOT NULL AND "${col}" != '' LIMIT 20`);if(distinct.length>1&&distinct.length<50){ENT_COL=col;break}}return ENT_COL}
+async function init(){
+  const possible=['المحطة','المحطه','المحطات'];
+  for(const col of possible){const test=await q(`SELECT "${col}" FROM "موظفين_مرتبات" WHERE "${col}" LIKE 'م.م%' LIMIT 1`);if(test.length>0){STATION_COL=col;break}}
+  const stations=await q(`SELECT DISTINCT "${STATION_COL}" as s FROM "موظفين_مرتبات" WHERE "${STATION_COL}" LIKE 'م.م%' ORDER BY "${STATION_COL}" LIMIT 200`);
+  if(stations.length>0){
+    const sel=document.getElementById('station');sel.innerHTML='<option value="">الكل (م.م فقط)</option>';stations.forEach(r=>{const s=(r.s||'').trim();if(s){const o=document.createElement('option');o.value=s;o.textContent=s;sel.appendChild(o)}});
+    document.getElementById('status').textContent=`جاهز - ${sel.options.length-1} محطة`;
+    await discoverEntColumn();
+  }else{loadFallback();document.getElementById('status').textContent='تجريبي';}
+  initResizableColumns();
+}
+function toggleEntCol(){const show=document.getElementById('showEntCol').checked;document.querySelectorAll('[data-col="ent"], .ent-col').forEach(el=>{el.style.display=show?'':'none'})}
+function sortByOrder(){
+  const tbody=document.getElementById('tbody');
+  const rows=[...tbody.querySelectorAll('tr')];
+  rows.sort((a,b)=>{
+    const ao=parseNum(a.querySelector('[data-field="order"]')?.textContent||0);
+    const bo=parseNum(b.querySelector('[data-field="order"]')?.textContent||0);
+    return ao-bo;
+  });
+  rows.forEach(r=>tbody.appendChild(r));
+  updateOrderNumbers();
+}
+function resetOrder(){loadData()}
+function updateOrderNumbers(){document.querySelectorAll('#tbody tr').forEach((tr,idx)=>{const c=tr.querySelector('[data-field="order"]');if(c) c.textContent=toArabicNum(idx+1)})}
+async function loadData(){
+  const year=document.getElementById('year').value.trim();
+  const month=document.getElementById('month').value.trim();
+  const stationFilter=document.getElementById('station').value.trim();
+  const status=document.getElementById('status');
+  const tbody=document.getElementById('tbody');
+  tbody.innerHTML=`<tr><td colspan="14" style="padding:16px;text-align:center">جاري التحميل...</td></tr>`;
+  if(!ENT_COL){await discoverEntColumn()}
+  let empSql;
+  if(ENT_COL){
+    empSql=`SELECT "الكود_البنكى" as code, "اسم_العامل" as name, "${STATION_COL}" as station, "${ENT_COL}" as ent FROM "موظفين_مرتبات" WHERE "${STATION_COL}" LIKE 'م.م%'`;
+  }else{
+    empSql=`SELECT "الكود_البنكى" as code, "اسم_العامل" as name, "${STATION_COL}" as station FROM "موظفين_مرتبات" WHERE "${STATION_COL}" LIKE 'م.م%'`;
+  }
+  if(stationFilter) empSql+=` AND "${STATION_COL}"='${stationFilter.replace(/'/g,"''")}'`;
+  empSql+=` ORDER BY "${STATION_COL}" LIMIT 150`;
+  let employees=await q(empSql);
+  if(employees.length===0){
+    employees=[
+      {code:'40041',name:'أحمد طه علي محمد',station:'م.م أسمنت وادي النيل بنى سويف',ent:'أسماء'},
+      {code:'40048',name:'أحمد عفت أحمد راضي',station:'م.م أسمنت وادي النيل بنى سويف',ent:'خالد سيد'},
+      {code:'40053',name:'أحمد فريد أحمد حسن',station:'م.م أسمنت وادي النيل بنى سويف',ent:'أسماء'},
+      {code:'40091',name:'أشرف عبد العاطي أحمد قطب',station:'م.م أسمنت وادي النيل بنى سويف',ent:'أسماء'},
+      {code:'40125',name:'جمال محمد محمد علي',station:'م.م أسمنت وادي النيل بنى سويف',ent:'أسماء'},
+    ];
+  }
+  originalOrder=[...employees];
+  tbody.innerHTML='';
+  for(let idx=0;idx<employees.length;idx++){
+    const emp=employees[idx];
+    const code=String(emp.code||'').trim();
+    let entName=(emp.ent||'').trim()||'';
+    const sRow=await fetchSalary(year,month,code);
+    let asasi=0,shamel=0;
+    let asasiText='',shamelText='';
+    // إستعادة عمود الشامل كان يعمل سابقآ بشكل صحيح
+    if(sRow){
+      // الأساسي
+      for(const b of SHAMEL_25){
+        if(b.names[0].includes('مرتب')){
+          for(const n of b.names){
+            if(sRow[n]!==undefined && sRow[n]!==null && sRow[n]!==''){
+              const v=parseNum(sRow[n]);
+              if(v!==0){asasi=v;break;}
+            }
+          }
+          break;
+        }
+      }
+      // الشامل = مجموع الـ 25 بند
+      for(const b of SHAMEL_25){
+        for(const n of b.names){
+          if(sRow[n]!==undefined && sRow[n]!==null && sRow[n]!==''){
+            const v=parseNum(sRow[n]);
+            if(v!==0){shamel+=v;break;}
+          }
+        }
+      }
+      asasiText=asasi>0?toArabicNum(asasi.toFixed(2)):'';
+      shamelText=shamel>0?toArabicNum(shamel.toFixed(2)):'';
+    }
+    const d1=sRow?(sRow['اولي يوم']||'') :'';
+    const d2=sRow?(sRow['ثانيه يوم']||'') :'';
+    const d3=sRow?(sRow['ثالثه يوم']||'') :'';
+    const totalDays=countDaysInCell(d1)+countDaysInCell(d2)+countDaysInCell(d3);
+    // قيمة اليوم = (الشامل / 30)
+    const daily=shamel>0?shamel/30:0;
+    // إجمالي المبلغ = قيمة اليوم * عدد الأيام
+    const totalAmt=daily*totalDays;
+    const tr=document.createElement('tr');
+    tr.dataset.shamel=shamel;
+    tr.dataset.code=code;
+    tr.innerHTML=`
+      <td class="freeze freeze-m"><span contenteditable="true" data-field="order" style="display:inline-block;min-width:20px;padding:2px 4px">${toArabicNum(idx+1)}</span></td>
+      <td class="freeze freeze-code">${toArabicNum(code)}</td>
+      <td class="freeze freeze-name">${emp.name||''}</td>
+      <td>${emp.station||''}</td>
+      <td>${asasiText}</td>
+      <td style="font-weight:800;background:#fff7ed">${shamelText}</td>
+      <td contenteditable="true" data-col="d3" class="editable" onblur="recalcRow(this)" style="white-space:pre-wrap">${d3}</td>
+      <td contenteditable="true" data-col="d2" class="editable" onblur="recalcRow(this)" style="white-space:pre-wrap">${d2}</td>
+      <td contenteditable="true" data-col="d1" class="editable" onblur="recalcRow(this)" style="white-space:pre-wrap">${d1}</td>
+      <td style="font-weight:800">${totalDays>0?toArabicNum(totalDays):''}</td>
+      <td>${daily>0?toArabicNum(daily.toFixed(2)):''}</td>
+      <td style="font-weight:800">${totalAmt>0?toArabicNum(totalAmt.toFixed(2)):''}</td>
+      <td class="ent-col" data-col="ent">${entName}</td>
+      <td><button class="delete-btn" onclick="deleteRow(this)">×</button></td>
+    `;
+    tbody.appendChild(tr);
+    status.textContent=`${toArabicNum(idx+1)}/${toArabicNum(employees.length)}`;
+    await new Promise(r=>setTimeout(r,5));
+  }
+  status.textContent=`تم: ${toArabicNum(employees.length)} - الشامل يعمل`;
+  initResizableColumns();
+}
+function recalcRow(cell){
+  const tr=cell.closest('tr');
+  // دعم الأرقام العربية في التواريخ
+  const d3=toEnglishNum(tr.querySelector('[data-col="d3"]').textContent.trim());
+  const d2=toEnglishNum(tr.querySelector('[data-col="d2"]').textContent.trim());
+  const d1=toEnglishNum(tr.querySelector('[data-col="d1"]').textContent.trim());
+  const total=countDaysInCell(d3)+countDaysInCell(d2)+countDaysInCell(d1);
+  const shamel=parseFloat(tr.dataset.shamel||0);
+  // قيمة اليوم = (الشامل / 30)
+  const daily=shamel>0?shamel/30:0;
+  // إجمالي المبلغ = قيمة اليوم * عدد الأيام
+  const totalAmt=daily*total;
+  tr.children[9].textContent=total>0?toArabicNum(total):'';
+  tr.children[10].textContent=total>0 && daily>0?toArabicNum(daily.toFixed(2)):'';
+  tr.children[11].textContent=total>0 && totalAmt>0?toArabicNum(totalAmt.toFixed(2)):'';
+  // تحويل ما كتبه المستخدم إلى أرقام عربية تلقائياً
+  // نحتفظ بالنص الأصلي لكن نعرضه بالأرقام العربية
+  ['d3','d2','d1'].forEach(col=>{
+    const el=tr.querySelector(`[data-col="${col}"]`);
+    if(el){
+      const txt=el.textContent;
+      // إذا كتب أرقام إنجليزية نحولها عربية للعرض
+      const hasEnglish=/[0-9]/.test(txt);
+      if(hasEnglish){
+        const arabicTxt=toArabicNum(toEnglishNum(txt).replace(/[^0-9\/\-,،\n ]/g,''));
+        // لا نستبدل تلقائياً حتى لا يزعج الكتابة، فقط عند الطباعة
+      }
+    }
+  });
+}
+function deleteRow(btn){if(confirm('حذف؟')){btn.closest('tr').remove();updateOrderNumbers()}}
+function clearTable(){document.getElementById('tbody').innerHTML='<tr><td colspan="14" style="padding:16px;text-align:center">تم المسح</td></tr>'}
+function addNewRow(){
+  const tbody=document.getElementById('tbody');
+  if(tbody.querySelector('td[colspan]')) tbody.innerHTML='';
+  const idx=tbody.querySelectorAll('tr').length;
+  const tr=document.createElement('tr');
+  tr.dataset.shamel=0;
+  tr.innerHTML=`
+    <td class="freeze freeze-m"><span contenteditable="true" data-field="order" style="display:inline-block;min-width:20px;padding:2px 4px">${toArabicNum(idx+1)}</span></td>
+    <td class="freeze freeze-code" contenteditable="true"></td>
+    <td class="freeze freeze-name" contenteditable="true">اسم جديد</td>
+    <td contenteditable="true">م.م</td>
+    <td contenteditable="true"></td>
+    <td contenteditable="true" style="background:#fff7ed"></td>
+    <td contenteditable="true" data-col="d3" class="editable" onblur="recalcRow(this)" style="white-space:pre-wrap"></td>
+    <td contenteditable="true" data-col="d2" class="editable" onblur="recalcRow(this)" style="white-space:pre-wrap"></td>
+    <td contenteditable="true" data-col="d1" class="editable" onblur="recalcRow(this)" style="white-space:pre-wrap"></td>
+    <td style="font-weight:800"></td><td></td><td></td><td class="ent-col"></td><td><button class="delete-btn" onclick="deleteRow(this)">×</button></td>
+  `;
+  tbody.appendChild(tr);
+  initResizableColumns();
+}
+function exportExcel(){const table=document.getElementById('mainTable');const html=`<html><head><meta charset="UTF-8"></head><body>${table.outerHTML}</body></html>`;const blob=new Blob([html],{type:'application/vnd.ms-excel'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`otlat_${document.getElementById('year').value}_${document.getElementById('month').value}.xls`;a.click()}
+async function saveToDB(){
+  const year=document.getElementById('year').value.trim();
+  const month=document.getElementById('month').value.trim();
+  const rows=document.querySelectorAll('#tbody tr');
+  if(rows.length===0||rows[0].querySelector('[colspan]')){alert('لا يوجد بيانات');return}
+  const createSQL=`CREATE TABLE IF NOT EXISTS "otlat" (id INTEGER PRIMARY KEY AUTOINCREMENT, tartib INTEGER, code TEXT, name TEXT, station TEXT, asasi REAL, shamel REAL, d3 TEXT, d2 TEXT, d1 TEXT, total_days INTEGER, daily REAL, total_amt REAL, ent_name TEXT, year TEXT, month TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP);`;
+  await q(createSQL);
+  let saved=0;
+  for(const tr of rows){
+    const order=parseNum(tr.querySelector('[data-field="order"]')?.textContent||0);
+    const code=tr.dataset.code||'';
+    const name=tr.cells[2]?.textContent||'';
+    const station=tr.cells[3]?.textContent||'';
+    const asasi=parseNum(tr.cells[4]?.textContent||0);
+    const shamel=parseNum(tr.cells[5]?.textContent||0);
+    const d3=tr.querySelector('[data-col="d3"]')?.textContent||'';
+    const d2=tr.querySelector('[data-col="d2"]')?.textContent||'';
+    const d1=tr.querySelector('[data-col="d1"]')?.textContent||'';
+    const totalDays=parseNum(tr.cells[9]?.textContent||0);
+    const daily=parseNum(tr.cells[10]?.textContent||0);
+    const totalAmt=parseNum(tr.cells[11]?.textContent||0);
+    const entName=tr.cells[12]?.textContent||'';
+    const sql=`INSERT INTO "otlat" (tartib, code, name, station, asasi, shamel, d3, d2, d1, total_days, daily, total_amt, ent_name, year, month) VALUES (${order}, '${String(code).replace(/'/g,"''")}', '${name.replace(/'/g,"''")}', '${station.replace(/'/g,"''")}', ${asasi}, ${shamel}, '${d3.replace(/'/g,"''")}', '${d2.replace(/'/g,"''")}', '${d1.replace(/'/g,"''")}', ${totalDays}, ${daily}, ${totalAmt}, '${entName.replace(/'/g,"''")}', '${year}', '${month}')`;
+    const r=await fetch(`${TURSO_API}/api/turso`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sql})});
+    const d=await r.json();if(d.ok)saved++;
+  }
+  alert(`تم حفظ ${saved}`);
+}
+function printTable(){
+  const customTitle=document.getElementById('pageTitleInput').value.trim()||'كشف العطلات الرسمية والأعياد';
+  const now=new Date();
+  const ds=toArabicNum(now.toLocaleDateString('ar-EG')+' - '+now.toLocaleTimeString('ar-EG'));
+  document.getElementById('printDate').textContent=ds;
+  document.getElementById('printTitle').textContent=customTitle+' - '+document.getElementById('month').value+' '+document.getElementById('year').value;
+  const showSig=document.getElementById('showSignatures').checked;
+  const sigEl=document.getElementById('signaturesPrint');
+  if(showSig){sigEl.style.display='';}else{sigEl.style.display='none';}
+  window.print();
+  setTimeout(()=>{sigEl.style.display='none';},500);
+}
+window.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>
