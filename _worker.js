@@ -1,12 +1,8 @@
-// _worker.js - تعديل بإضافة دوال فقط بدون حذف أو تعديل أي دالة موجودة
-// جميع الدوال القديمة محفوظة كما هي - تمت إضافة دوال جديدة فقط في الأسفل
-
+// _worker.js - إصلاح كامل: حظر دقيق للصفحة فقط + قائمة بيضاء متعددة بدون تكرار
 const HARDCODED_TURSO_URL = "https://company-alldata-mostafadarwish-mostafa505050.aws-eu-west-1.turso.io";
 const HARDCODED_TURSO_TOKEN = "PASTE_YOUR_TURSO_TOKEN_HERE";
-
 const FALLBACK_BLOCKED = ['addhafez1.html', 'tables.html'];
 
-// ========== الدوال القديمة - محفوظة بدون أي تعديل ==========
 function getTursoConfig(env){
   let url = (env.TURSO_URL || env.TURSO_URLL || HARDCODED_TURSO_URL || '').trim();
   let token = (env.TURSO_TOKEN || env.TURSO_TOKENL || HARDCODED_TURSO_TOKEN || '').trim();
@@ -32,15 +28,13 @@ async function tursoQuery(env, sql, params=[]){
   }catch(e){ return {error:e.message}; }
 }
 
+// إصلاح: مطابقة تامة فقط - لا يحظر الصفحات المتشابهة
 function isBlocked(pageName, blockedList){
-  // إصلاح: مطابقة تامة فقط - لا يحظر الصفحات المتشابهة
-  // مثال: إذا حظرت salaryold.html فقط salaryold.html ستحظر، وليس salary.html
   const low = pageName.toLowerCase().trim();
   const lowNoExt = low.replace('.html','').trim();
   for(const b of blockedList){
     const blFull = String(b).toLowerCase().trim();
     const blNoExt = blFull.replace('.html','').trim();
-    // مطابقة تامة فقط: نفس الاسم بالكامل مع أو بدون .html
     if(blFull===low || blNoExt===lowNoExt){
       return true;
     }
@@ -48,7 +42,6 @@ function isBlocked(pageName, blockedList){
   return false;
 }
 
-// دالة جديدة محسنة للتحقق الدقيق من الصفحات
 function isBlockedExact(pageName, blockedList){
   const low = pageName.toLowerCase().trim();
   for(const b of blockedList){
@@ -66,20 +59,13 @@ function blockedDeviceHTML(ip, device, reason){
   return `<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>محظور</title><style>body{min-height:100vh;background:linear-gradient(135deg,#fee2e2,#fecaca);display:flex;align-items:center;justify-content:center;font-family:Cairo,sans-serif} .box{background:#fff;padding:30px;border-radius:20px;text-align:center;box-shadow:0 16px 40px rgba(0,0,0,0.15)} h1{color:#dc2626}</style></head><body><div class="box"><div style="font-size:60px">🚫</div><h1>تم حظر جهازك</h1><p>IP: ${ip}<br>الجهاز: ${device}<br>السبب: ${reason||'محظور'}<br>01092259655</p><a href="https://wa.me/201092259655" style="display:inline-block;padding:10px 20px;background:#25D366;color:#fff;border-radius:10px;text-decoration:none;margin-top:12px">واتساب</a></div></body></html>`;
 }
 
-// ========== دوال جديدة مضافة فقط - لم يتم تعديل أي دالة قديمة ==========
-
-// دالة جديدة 1: إدخال حظر بطريقة مضمونة 100% - تعتمد على DEFAULT للـ created_at
+// ========== دوال إصلاح الحظر ==========
 async function insertBlockedDeviceFixed(env, device_model, ip, reason){
-  // الحل الجذري: لا نرسل created_at إطلاقاً - نترك قاعدة البيانات تستخدم DEFAULT datetime('now','localtime')
-  // هذا يضمن عدم وجود خطأ في datetime("now") بعلامات مزدوجة
   const sql = "INSERT INTO blocked_devices (device_model, ip, reason) VALUES (?, ?, ?)";
   const params = [device_model, ip, reason];
-  const result = await tursoQuery(env, sql, params);
-  console.log('insertBlockedDeviceFixed result:', result);
-  return result;
+  return await tursoQuery(env, sql, params);
 }
 
-// دالة جديدة 2: جلب الأجهزة المحظورة بطريقة مضمونة
 async function getBlockedDevicesFixed(env){
   const result = await tursoQuery(env, "SELECT * FROM blocked_devices ORDER BY id DESC LIMIT 100", []);
   if(result.error) return {blocked:[], error:result.error};
@@ -95,50 +81,31 @@ async function getBlockedDevicesFixed(env){
   return {blocked, error:null};
 }
 
-// دالة جديدة 3: حذف حظر بطريقة مضمونة
 async function deleteBlockedDeviceFixed(env, id){
-  const result = await tursoQuery(env, "DELETE FROM blocked_devices WHERE id=?", [id]);
-  return result;
+  return await tursoQuery(env, "DELETE FROM blocked_devices WHERE id=?", [id]);
 }
 
-// دالة جديدة 4: الحصول على IP الحقيقي بطريقة مضمونة
 function getRealIPFixed(request){
-  const ip = request.headers.get('CF-Connecting-IP') || request.headers.get('X-Forwarded-For')?.split(',')[0]?.trim() || request.headers.get('X-Real-IP') || 'unknown';
-  return ip;
+  return request.headers.get('CF-Connecting-IP') || request.headers.get('X-Forwarded-For')?.split(',')[0]?.trim() || request.headers.get('X-Real-IP') || 'unknown';
 }
 
-// دالة جديدة 5: تسجيل حقيقي مضمون لـ real_page_logs
-async function insertRealPageLogFixed(env, page, site, device_model, ip, user_agent){
-  const sql = "INSERT INTO real_page_logs (page, site, device_model, ip, user_agent) VALUES (?, ?, ?, ?, ?)";
-  const params = [page, site, device_model, ip, user_agent];
-  const result = await tursoQuery(env, sql, params);
-  return result;
-}
-
-// دالة جديدة 6: معالجة طلب حظر جهاز جديد - endpoint جديد
 async function handleBlockDeviceRequestFixed(request, env){
   try{
     const body = await request.json();
     const ip = body.ip || '';
     const device_model = body.device_model || body.device || 'Unknown';
     const reason = body.reason || 'محظور من لوحة المراقبة';
-    
     if(!ip || !ip.includes('.')){
       return new Response(JSON.stringify({success:false, error:'IP غير صالح: '+ip}), {status:400, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
     }
-    
     const result = await insertBlockedDeviceFixed(env, device_model, ip, reason);
-    if(result.error){
-      return new Response(JSON.stringify({success:false, error:result.error, raw:result.raw}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
-    }
-    
-    return new Response(JSON.stringify({success:true, affected:result.result?.affected_row_count, lastId:result.result?.last_insert_rowid, raw:result.raw}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+    if(result.error) return new Response(JSON.stringify({success:false, error:result.error}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+    return new Response(JSON.stringify({success:true}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
   }catch(e){
     return new Response(JSON.stringify({success:false, error:e.message}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
   }
 }
 
-// دالة جديدة 7: معالجة طلب فك حظر
 async function handleUnblockDeviceRequestFixed(request, env){
   try{
     const body = await request.json();
@@ -146,19 +113,164 @@ async function handleUnblockDeviceRequestFixed(request, env){
     if(!id) return new Response(JSON.stringify({success:false, error:'id مطلوب'}), {status:400, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
     const result = await deleteBlockedDeviceFixed(env, id);
     if(result.error) return new Response(JSON.stringify({success:false, error:result.error}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
-    return new Response(JSON.stringify({success:true, affected:result.result?.affected_row_count}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+    return new Response(JSON.stringify({success:true}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
   }catch(e){
     return new Response(JSON.stringify({success:false, error:e.message}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
   }
 }
 
-// ========== Worker الرئيسي - الدوال القديمة محفوظة + استدعاء الدوال الجديدة ==========
+// ========== ميزة IP واحد + قائمة بيضاء متعددة ==========
+async function ensureWhitelistTableFixed(env){
+  const sql = `CREATE TABLE IF NOT EXISTS ip_whitelist_config (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    allowed_ip TEXT NOT NULL,
+    mode TEXT NOT NULL DEFAULT 'all',
+    created_at TEXT DEFAULT (datetime('now','localtime')),
+    updated_at TEXT DEFAULT (datetime('now','localtime'))
+  )`;
+  await tursoQuery(env, sql, []);
+}
+
+async function ensureAllowedIPsTableFixed(env){
+  const sql1 = `CREATE TABLE IF NOT EXISTS allowed_ips (
+    ip TEXT PRIMARY KEY,
+    reason TEXT DEFAULT 'مسموح',
+    added_at TEXT DEFAULT (datetime('now','localtime'))
+  )`;
+  await tursoQuery(env, sql1, []);
+  await ensureWhitelistTableFixed(env);
+}
+
+async function addAllowedIPFixed(env, ip, reason){
+  await ensureAllowedIPsTableFixed(env);
+  return await tursoQuery(env, "INSERT OR REPLACE INTO allowed_ips (ip, reason) VALUES (?, ?)", [ip, reason||'مسموح']);
+}
+
+async function removeAllowedIPFixed(env, ip){
+  await ensureAllowedIPsTableFixed(env);
+  return await tursoQuery(env, "DELETE FROM allowed_ips WHERE ip=?", [ip]);
+}
+
+async function getAllowedIPsFixed(env){
+  await ensureAllowedIPsTableFixed(env);
+  const q = await tursoQuery(env, "SELECT * FROM allowed_ips ORDER BY added_at DESC", []);
+  if(q.error) return {allowed:[], error:q.error};
+  let allowed=[];
+  if(q.result?.rows){
+    const cols=q.result.cols.map(c=>c.name);
+    allowed=q.result.rows.map(row=>{
+      const obj={};
+      row.forEach((cell,i)=>{ obj[cols[i]]=cell.value??cell.text??''; });
+      return obj;
+    });
+  }
+  return {allowed, error:null};
+}
+
+async function enableWhitelistModeFixed(env){
+  await ensureAllowedIPsTableFixed(env);
+  await tursoQuery(env, "DELETE FROM ip_whitelist_config", []);
+  return await tursoQuery(env, "INSERT INTO ip_whitelist_config (allowed_ip, mode) VALUES ('multiple', 'whitelist')", []);
+}
+
+async function disableWhitelistModeFixed(env){
+  await ensureAllowedIPsTableFixed(env);
+  await tursoQuery(env, "DELETE FROM ip_whitelist_config", []);
+  return await tursoQuery(env, "INSERT INTO ip_whitelist_config (allowed_ip, mode) VALUES ('0.0.0.0', 'all')", []);
+}
+
+async function getWhitelistModeFixedBackend(env){
+  await ensureWhitelistTableFixed(env);
+  const q = await tursoQuery(env, "SELECT * FROM ip_whitelist_config ORDER BY id DESC LIMIT 1", []);
+  if(q.error || !q.result?.rows || q.result.rows.length===0){
+    return {mode:'all', allowed_ip:null};
+  }
+  const cols=q.result.cols.map(c=>c.name);
+  const row=q.result.rows[0];
+  const obj={}; row.forEach((cell,i)=>{ obj[cols[i]]=cell.value??cell.text??''; });
+  return {mode: obj.mode||'all', allowed_ip: obj.allowed_ip, created_at: obj.created_at, raw: obj};
+}
+
+async function isIPAllowedInWhitelistFixed(env, currentIP){
+  const modeData = await getWhitelistModeFixedBackend(env);
+  if(modeData.mode!=='whitelist') return true;
+  const allowedData = await getAllowedIPsFixed(env);
+  return allowedData.allowed.some(a=>a.ip===currentIP);
+}
+
+function whitelistBlockedPageFixed(currentIP, allowedList){
+  const listHTML = allowedList.map(a=>`<span style="background:#dcfce7;color:#065f46;padding:2px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace">${a.ip}</span>`).join(' ');
+  return `<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>مغلق - قائمة بيضاء</title><style>body{min-height:100vh;background:linear-gradient(135deg,#fef3c7,#fde68a);display:flex;align-items:center;justify-content:center;font-family:Cairo,sans-serif} .box{background:#fff;padding:30px;border-radius:20px;text-align:center;box-shadow:0 16px 40px rgba(0,0,0,0.15);max-width:600px;width:92%} h1{color:#d97706} .ip{font-family:monospace;background:#fee2e2;color:#dc2626;padding:4px 10px;border-radius:8px;font-weight:800}</style></head><body><div class="box"><div style="font-size:60px">🔐</div><h1>الموقع في وضع القائمة البيضاء</h1><p>متاح فقط لعناوين محددة</p><div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:12px;margin:12px 0;text-align:right;font-size:12px"><b>IP الخاص بك:</b> <span class="ip">${currentIP}</span><br><br><b>المسموح:</b><br>${listHTML||'لا يوجد'}<br><br>تواصل: 01092259655</div><a href="https://wa.me/201092259655" style="display:inline-block;padding:10px 20px;background:#25D366;color:#fff;border-radius:10px;text-decoration:none;font-weight:800">💬 واتساب</a></div></body></html>`;
+}
+
+async function handleAddAllowedIPFixed(request, env){
+  try{
+    const body = await request.json();
+    const ip = body.ip?.trim();
+    const reason = body.reason?.trim() || 'مسموح';
+    if(!ip || !ip.includes('.')) return new Response(JSON.stringify({success:false, error:'IP غير صالح'}), {status:400, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+    const result = await addAllowedIPFixed(env, ip, reason);
+    if(result.error) return new Response(JSON.stringify({success:false, error:result.error}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+    return new Response(JSON.stringify({success:true, ip:ip}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+  }catch(e){ return new Response(JSON.stringify({success:false, error:e.message}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}}); }
+}
+
+async function handleRemoveAllowedIPFixed(request, env){
+  try{
+    const body = await request.json();
+    const ip = body.ip?.trim();
+    if(!ip) return new Response(JSON.stringify({success:false, error:'IP مطلوب'}), {status:400, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+    const result = await removeAllowedIPFixed(env, ip);
+    if(result.error) return new Response(JSON.stringify({success:false, error:result.error}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+    return new Response(JSON.stringify({success:true}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+  }catch(e){ return new Response(JSON.stringify({success:false, error:e.message}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}}); }
+}
+
+async function handleGetAllowedIPsFixed(request, env){
+  try{
+    const allowedData = await getAllowedIPsFixed(env);
+    const modeData = await getWhitelistModeFixedBackend(env);
+    return new Response(JSON.stringify({allowed:allowedData.allowed, mode:modeData.mode, allowed_ip:modeData.allowed_ip, error:allowedData.error}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*','Cache-Control':'no-cache'}});
+  }catch(e){ return new Response(JSON.stringify({allowed:[], error:e.message}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}}); }
+}
+
+async function handleEnableWhitelistFixed(request, env){
+  try{
+    const result = await enableWhitelistModeFixed(env);
+    if(result.error) return new Response(JSON.stringify({success:false, error:result.error}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+    return new Response(JSON.stringify({success:true, mode:'whitelist'}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+  }catch(e){ return new Response(JSON.stringify({success:false, error:e.message}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}}); }
+}
+
+async function handleDisableWhitelistFixed(request, env){
+  try{
+    const result = await disableWhitelistModeFixed(env);
+    if(result.error) return new Response(JSON.stringify({success:false, error:result.error}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+    return new Response(JSON.stringify({success:true, mode:'all'}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+  }catch(e){ return new Response(JSON.stringify({success:false, error:e.message}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}}); }
+}
+
+// ========== Worker الرئيسي ==========
 export default {
   async fetch(request, env, ctx){
     const url = new URL(request.url);
     const path = url.pathname;
 
-    // === endpoints جديدة مضافة فقط - تستخدم الدوال الجديدة ===
+    if(path==='/api/allowed-ips'){
+      return await handleGetAllowedIPsFixed(request, env);
+    }
+    if(path==='/api/add-allowed-ip'){
+      return await handleAddAllowedIPFixed(request, env);
+    }
+    if(path==='/api/remove-allowed-ip'){
+      return await handleRemoveAllowedIPFixed(request, env);
+    }
+    if(path==='/api/enable-whitelist'){
+      return await handleEnableWhitelistFixed(request, env);
+    }
+    if(path==='/api/disable-whitelist'){
+      return await handleDisableWhitelistFixed(request, env);
+    }
     if(path==='/api/block-device-fixed'){
       return await handleBlockDeviceRequestFixed(request, env);
     }
@@ -169,13 +281,10 @@ export default {
       const ip = getRealIPFixed(request);
       return new Response(JSON.stringify({ip, country:request.cf?.country||'unknown'}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
     }
-
-    // === الدوال القديمة محفوظة كما هي بدون أي تعديل ===
     if(path==='/api/get-ip'){
       const ip = request.headers.get('CF-Connecting-IP') || request.headers.get('X-Forwarded-For')?.split(',')[0]?.trim() || 'unknown';
       return new Response(JSON.stringify({ip, country:request.cf?.country||'unknown', city:request.cf?.city||''}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*','Cache-Control':'no-cache'}});
     }
-
     if(path==='/api/turso'){
       try{
         const body = await request.json();
@@ -190,14 +299,11 @@ export default {
             return obj;
           });
         }
-        const affected = q.result?.affected_row_count;
-        const lastId = q.result?.last_insert_rowid;
-        return new Response(JSON.stringify({rows, affected_row_count:affected, last_insert_rowid:lastId, raw:q.raw}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+        return new Response(JSON.stringify({rows, affected_row_count:q.result?.affected_row_count, last_insert_rowid:q.result?.last_insert_rowid, raw:q.raw}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
       }catch(e){
         return new Response(JSON.stringify({error:e.message, rows:[]}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
       }
     }
-
     if(path==='/api/blocked-list'){
       const q = await tursoQuery(env, 'SELECT "اسم_الصفحة" FROM "صفحات_الموقع" WHERE "مفعلة"=0');
       let pages=[];
@@ -207,9 +313,8 @@ export default {
         if(idx>=0) pages=q.result.rows.map(r=> String(r[idx].value??r[idx].text??'').toLowerCase().trim()).filter(Boolean);
       }
       if(pages.length===0) pages=FALLBACK_BLOCKED;
-      return new Response(JSON.stringify({blocked:pages, count:pages.length, time:new Date().toISOString()}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*','Cache-Control':'no-cache'}});
+      return new Response(JSON.stringify({blocked:pages, count:pages.length}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*','Cache-Control':'no-cache'}});
     }
-
     if(path==='/api/blocked-devices'){
       const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
       const q = await tursoQuery(env, 'SELECT * FROM blocked_devices ORDER BY created_at DESC LIMIT 100');
@@ -223,7 +328,22 @@ export default {
         });
       }
       const isBlocked = blocked.some(b=>b.ip===ip);
-      return new Response(JSON.stringify({blocked, isBlocked, currentIp:ip, count:blocked.length, error:q.error||null}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*','Cache-Control':'no-cache'}});
+      return new Response(JSON.stringify({blocked, isBlocked, currentIp:ip, count:blocked.length}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*','Cache-Control':'no-cache'}});
+    }
+
+    // فحص القائمة البيضاء - فقط المسموحين
+    if(!['/api/','/js/','.js','.css','.json','.png','.jpg','.svg','.ico','Real-Monitoring','whitelist','allowed-ips','add-allowed-ip','remove-allowed-ip','block-device','unblock-device','get-ip','blocked-devices','blocked-list','turso'].some(s=>path.toLowerCase().includes(s.toLowerCase()))){
+      const currentIP = request.headers.get('CF-Connecting-IP') || request.headers.get('X-Forwarded-For')?.split(',')[0]?.trim() || '';
+      if(currentIP){
+        const modeData = await getWhitelistModeFixedBackend(env);
+        if(modeData.mode==='whitelist'){
+          const allowed = await isIPAllowedInWhitelistFixed(env, currentIP);
+          if(!allowed){
+            const allowedData = await getAllowedIPsFixed(env);
+            return new Response(whitelistBlockedPageFixed(currentIP, allowedData.allowed), {status:403, headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-cache'}});
+          }
+        }
+      }
     }
 
     // فحص حظر الأجهزة
@@ -240,7 +360,7 @@ export default {
       }
     }
 
-    // فحص حظر الصفحات
+    // فحص حظر الصفحات - مطابقة تامة فقط
     if(!['database-manager','turso-api','hafez-api','auth-api','favicon','.js','.css','.json','.png','.jpg','.svg','.ico','/api/'].some(s=>path.toLowerCase().includes(s.toLowerCase()))){
       let pageName = path.split('/').pop() || 'index.html';
       if(path==='/' || path==='') pageName='index.html';
