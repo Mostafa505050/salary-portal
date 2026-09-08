@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>لوحة المراقبة - اسم الجهاز الحقيقي</title>
+<title>لوحة المراقبة - مع أزرار التنقل</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -14,9 +14,21 @@
 [data-theme="dark"]{--bg:#0f172a;--bg2:#1e293b;--card:#1e293b;--card2:#334155;--text:#f1f5f9;--text2:#94a3b8;--border:#334155}
 *{font-family:'Cairo',sans-serif;box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);padding:14px;min-height:100vh;transition:0.4s}
-.header-3d{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;border-radius:var(--radius);padding:18px;margin:0 auto 14px;max-width:1350px;box-shadow:var(--shadow-3d);position:relative;border-bottom:4px solid var(--primary3)}
-.theme-toggle{position:absolute;top:14px;left:14px;background:rgba(255,255,255,0.2);backdrop-filter:blur(8px);border:2px solid rgba(255,255,255,0.3);border-radius:50px;padding:7px 12px;cursor:pointer;font-weight:800;color:#fff;box-shadow:0 4px 0 rgba(0,0,0,0.2);transition:0.12s}
-.theme-toggle:active{transform:translateY(4px)}
+.header-3d{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;border-radius:var(--radius);padding:14px 18px;margin:0 auto 14px;max-width:1350px;box-shadow:var(--shadow-3d);border-bottom:4px solid var(--primary3)}
+.header-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.header-left{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.header-right{display:flex;align-items:center;gap:10px}
+.theme-toggle{background:rgba(255,255,255,0.25);backdrop-filter:blur(8px);border:2px solid rgba(255,255,255,0.35);border-radius:50px;padding:7px 14px;cursor:pointer;font-weight:800;color:#fff;box-shadow:0 4px 0 rgba(0,0,0,0.2), 0 6px 10px rgba(0,0,0,0.15);transition:0.12s;display:inline-flex;align-items:center;gap:6px}
+.theme-toggle:active{transform:translateY(4px);box-shadow:0 0 0 rgba(0,0,0,0.2)}
+.info-badge{background:rgba(255,255,255,0.22);backdrop-filter:blur(5px);padding:6px 12px;border-radius:20px;font-size:11px;font-weight:800;border:1px solid rgba(255,255,255,0.3);display:inline-flex;align-items:center;gap:6px}
+.info-badge b{background:#fff;color:#dc2626;padding:2px 8px;border-radius:12px;font-family:monospace}
+.info-badge.device b{color:#065f46;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;vertical-align:middle}
+.nav-bar{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.nav-btn{padding:8px 16px;border-radius:10px;border:none;font-weight:800;font-size:12px;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,0.2), 0 6px 10px rgba(0,0,0,0.12);border:2px solid rgba(0,0,0,0.08);border-bottom-width:4px;transition:0.12s;display:inline-flex;align-items:center;gap:6px;background:#fff;color:var(--primary2)}
+.nav-btn:active{transform:translateY(4px);box-shadow:0 0 0 rgba(0,0,0,0.2)}
+.nav-btn:hover{transform:translateY(-1px);filter:brightness(1.05)}
+.nav-btn.home{background:linear-gradient(135deg,#f0f9ff,#e0f2fe);color:var(--primary3);border-bottom-color:var(--primary3)}
+.nav-btn.back{background:linear-gradient(135deg,#fef3c7,#fde68a);color:#92400e;border-bottom-color:#d97706}
 .card-3d{max-width:1350px;margin:0 auto 14px;background:var(--card);border-radius:var(--radius);padding:16px;border:1px solid var(--border);border-bottom:4px solid var(--border);box-shadow:0 10px 15px -3px rgba(0,0,0,0.1)}
 .btn-3d{padding:9px 16px;border-radius:var(--radius-sm);border:none;font-weight:800;font-size:12px;cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,0.2);border:2px solid rgba(0,0,0,0.08);border-bottom-width:4px;transition:0.12s;display:inline-flex;align-items:center;gap:6px}
 .btn-3d:active{transform:translateY(5px);box-shadow:0 0 0 rgba(0,0,0,0.2)}
@@ -36,28 +48,35 @@ tr:hover td{background:var(--card2)}
 .page-tag{background:var(--card2);border:1px solid var(--border);border-bottom-width:3px;border-radius:20px;padding:2px 8px;margin:2px;display:inline-block;font-size:10px;font-weight:700}
 .device-real{background:linear-gradient(135deg,#fef3c7,#fde68a);border:2px solid #fcd34d;border-bottom-width:4px;border-radius:10px;padding:6px 10px;font-weight:800;font-size:11px;color:#92400e;display:inline-block;max-width:280px;word-break:break-word;box-shadow:0 3px 0 #fcd34d}
 [data-theme="dark"] .device-real{background:#78350f;color:#fef3c7;border-color:#92400e}
-.explain{background:var(--bg2);border:1px dashed var(--border);border-radius:10px;padding:10px;margin-bottom:10px;font-size:11px;line-height:1.7}
 </style>
 </head>
 <body>
 
 <div class="header-3d">
-  <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙 ليلي</button>
-  <h1>📱 لوحة المراقبة </h1>
-  <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-    <span style="background:rgba(255,255,255,0.2);padding:6px 12px;border-radius:20px;font-size:12px;font-weight:800">
-      IP: <span id="myIp" style="background:#fff;color:#dc2626;padding:2px 8px;border-radius:12px;font-family:monospace">جاري...</span>
-    </span>
-    <span style="background:rgba(255,255,255,0.2);padding:6px 12px;border-radius:20px;font-size:11px;font-weight:800;max-width:420px">
-      جهازك الحقيقي: <span id="myDevice" style="background:#fff;color:#065f46;padding:2px 8px;border-radius:12px">جاري كشف الموديل...</span>
-    </span>
-    <button class="btn-3d btn-secondary-3d" style="background:rgba(255,255,255,0.9);color:#0284c7" onclick="location.reload()">🔄 تحديث</button>
+  <!-- الصف العلوي: زر ليلي/نهاري + IP + جهازك + تحديث بجانب بعض -->
+  <div class="header-top">
+    <div class="header-left">
+      <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙 ليلي</button>
+      <span class="info-badge">IP: <b id="myIp">جاري...</b></span>
+      <span class="info-badge device">جهازك الحقيقي: <b id="myDevice">جاري كشف الموديل...</b></span>
+      <button class="btn-3d btn-secondary-3d" style="background:rgba(255,255,255,0.95);color:#0284c7;padding:6px 12px;font-size:11px" onclick="location.reload()">🔄 تحديث</button>
+    </div>
+    <div class="header-right">
+      <h1 style="font-size:20px;font-weight:900">📱 لوحة المراقبة</h1>
+    </div>
+  </div>
+
+  <!-- أزرار التنقل Back و Home -->
+  <div class="nav-bar">
+    <button class="nav-btn back" onclick="goBack()">⬅️ Back - عودة للصفحة السابقة</button>
+    <button class="nav-btn home" onclick="goHome()">🏠 Home - الرئيسية Index</button>
+    <span style="font-size:11px;opacity:0.85;margin-right:8px">💡 Back يعود للصفحة السابقة - Home يذهب لـ index.html</span>
   </div>
 </div>
 
 <div class="card-3d">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-    <h3 style="margin:0">🔐 IPs المسموحة</h3>
+    <h3 style="margin:0;font-size:14px;font-weight:800">🔐 IPs المسموحة</h3>
     <span id="allowedCount" style="background:var(--primary);color:#fff;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:800">0</span>
   </div>
   
@@ -79,7 +98,7 @@ tr:hover td{background:var(--card2)}
 
 <div class="card-3d">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-    <h3 style="margin:0">📱 الأجهزة التي دخلت </h3>
+    <h3 style="margin:0;font-size:14px;font-weight:800">📱 الأجهزة التي دخلت - اسم الجهاز الحقيقي</h3>
     <span id="realCount" style="background:var(--primary);color:#fff;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:800">0</span>
   </div>
   <div class="table-wrap">
@@ -92,7 +111,7 @@ tr:hover td{background:var(--card2)}
 
 <div class="card-3d">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-    <h3 style="margin:0">🚫 المحظورة</h3>
+    <h3 style="margin:0;font-size:14px;font-weight:800">🚫 المحظورة</h3>
     <span id="blockedCount" style="background:var(--danger);color:#fff;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:800">0</span>
   </div>
   <div class="table-wrap" style="max-height:280px">
@@ -121,6 +140,17 @@ function toggleTheme(){
   localStorage.setItem('monitoring-theme',nxt);
   document.getElementById('themeBtn').innerHTML=nxt==='dark'?'☀️ نهاري':'🌙 ليلي';
 }
+function goBack(){
+  if(document.referrer && document.referrer!==location.href){
+    history.back();
+  } else {
+    // إذا لا يوجد صفحة سابقة، اذهب للوحة التحكم
+    location.href='/Database-Manager';
+  }
+}
+function goHome(){
+  location.href='/index.html';
+}
 initTheme();
 
 async function getIp(){
@@ -142,10 +172,11 @@ async function getMyDeviceReal(){
     if(typeof getRealDeviceNameDebug==='function'){
       const name=await getRealDeviceNameDebug();
       document.getElementById('myDevice').innerText=name;
+      document.getElementById('myDevice').title=name;
       return name;
     }
   }catch{}
-  document.getElementById('myDevice').innerText=navigator.userAgent.slice(0,80);
+  document.getElementById('myDevice').innerText=navigator.userAgent.slice(0,60);
 }
 
 async function addIP(){
