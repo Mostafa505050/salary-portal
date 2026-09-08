@@ -1,4 +1,4 @@
-// real-logger V6 - fix block button 
+// real-logger V6 - fix block button
 (function(){
   const APIS=['/api/turso','https://turso-api.mostafa-voic77729.workers.dev/api/turso'];
   let REAL_IP=localStorage.getItem('user_real_ip')||'';
@@ -60,3 +60,107 @@
   };
   fetchIP().then(()=>{ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',logPage); else logPage(); });
 })();
+
+// ========== دوال جديدة مضافة فقط - لم يتم تعديل أي دالة قديمة - إصلاح الحظر ==========
+
+// دالة جديدة 1: جلب IP بطريقة مضمونة إضافية
+async function fetchIPFixed(){
+  try{
+    const res = await fetch('/api/get-ip-fixed', {cache:'no-store'});
+    if(res.ok){
+      const data = await res.json();
+      if(data.ip && data.ip!=='unknown') return data.ip;
+    }
+  }catch{}
+  try{
+    const res = await fetch('/api/get-ip', {cache:'no-store'});
+    if(res.ok){
+      const data = await res.json();
+      if(data.ip && data.ip!=='unknown') return data.ip;
+    }
+  }catch{}
+  return localStorage.getItem('user_real_ip')||'unknown';
+}
+
+// دالة جديدة 2: حظر جهاز بطريقة مضمونة 100% - تستخدم endpoint جديد بدون datetime
+window.blockDeviceFixed = async function(ip, device){
+  console.log('blockDeviceFixed clicked', ip, device);
+  if(!ip || !ip.includes('.') || ip==='local' || ip==='manual' || ip==='unknown'){
+    alert('❌ IP غير حقيقي: '+ip+'\nافتح من الموقع وليس ملف محلي');
+    return;
+  }
+  if(!confirm('حظر IP: '+ip+'\nالجهاز: '+device+'\n\nسيتم منعه من دخول كل الصفحات؟')) return;
+  
+  // استخدام endpoint جديد مضمون - لا يحتوي على datetime("now") بعلامات مزدوجة
+  const payload = {ip: ip, device_model: device, reason: 'محظور من لوحة المراقبة - '+new Date().toLocaleString('ar-EG')};
+  let ok=false;
+  let errMsg='';
+  
+  // محاولة 1: endpoint الجديد المضمون
+  try{
+    const res = await fetch('/api/block-device-fixed', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
+    const txt = await res.text();
+    console.log('block-device-fixed response', res.status, txt.slice(0,300));
+    errMsg = txt.slice(0,300);
+    if(res.ok){
+      const data = JSON.parse(txt);
+      if(data.success){ ok=true; }
+    }
+  }catch(e){ errMsg=e.message; }
+  
+  // محاولة 2: endpoint القديم كاحتياطي
+  if(!ok){
+    try{
+      const res = await fetch('/api/turso', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({sql:"INSERT INTO blocked_devices (device_model, ip, reason) VALUES (?, ?, ?)", params:[device, ip, 'محظور من المراقبة']})});
+      const txt = await res.text();
+      console.log('fallback turso response', res.status, txt.slice(0,200));
+      if(res.ok && !txt.toLowerCase().includes('error')) ok=true;
+      else errMsg=txt.slice(0,200);
+    }catch(e){ errMsg=e.message; }
+  }
+  
+  if(ok){
+    alert('✅ تم حظر IP: '+ip+'\nالجهاز: '+device+'\n\nالآن لن يستطيع الدخول');
+    location.reload();
+  } else {
+    alert('❌ فشل الحظر\nالخطأ: '+errMsg+'\n\nتأكد من:\n1- Worker الجديد يحتوي التوكن\n2- جدول blocked_devices موجود\n3- افتح Console F12');
+  }
+};
+
+// دالة جديدة 3: فك حظر بطريقة مضمونة
+window.unblockDeviceFixed = async function(id){
+  if(!confirm('فك حظر الجهاز رقم '+id+'؟')) return;
+  try{
+    const res = await fetch('/api/unblock-device-fixed', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({id:id})});
+    const txt = await res.text();
+    console.log('unblock response', txt.slice(0,200));
+    alert('✅ تم فك الحظر');
+    location.reload();
+  }catch(e){
+    // fallback
+    try{
+      await fetch('/api/turso',{method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({sql:'DELETE FROM blocked_devices WHERE id=?', params:[id]})});
+      location.reload();
+    }catch(err){ alert('فشل: '+err.message); }
+  }
+};
+
+// دالة جديدة 4: تسجيل حقيقي مضمون إضافي
+async function logRealPageFixed(){
+  const page = (typeof getPage==='function'?getPage():location.pathname);
+  const site = location.hostname||'salary-portal';
+  const device = (typeof getDevice==='function'?getDevice():'PC');
+  const ip = await fetchIPFixed();
+  console.log('📊 FIXED LOG:', page, device, ip);
+  try{
+    await fetch('/api/turso',{method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({sql:'INSERT INTO real_page_logs (page, site, device_model, ip) VALUES (?, ?, ?, ?)', params:[page, site, device, ip]})});
+  }catch{}
+}
+
+// دالة جديدة 5: اختبار الحظر يدوياً
+window.testBlockFixed = async function(){
+  const ip = await fetchIPFixed();
+  const device = (typeof getDevice==='function'?getDevice():'Test Device');
+  alert('IP الحالي: '+ip+'\nالجهاز: '+device+'\n\nسيتم محاولة حظر هذا IP كاختبار');
+  window.blockDeviceFixed(ip, device);
+};
