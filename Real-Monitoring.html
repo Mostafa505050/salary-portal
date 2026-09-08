@@ -3,157 +3,167 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>لوحة المراقبة الفاخرة - بدون تكرار IP</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<title>لوحة المراقبة الفاخرة</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#f8fafc;--bg2:#f0f9ff;--card:#ffffff;--card2:#f8fafc;--text:#0f172a;--text2:#475569;--border:#e2e8f0;
+  --bg:#f8fafc;--bg2:#f0f9ff;--card:#ffffff;--card2:#f8fafc;--text:#0f172a;--text2:#64748b;--border:#e2e8f0;
   --primary:#0ea5e9;--primary2:#0284c7;--primary3:#0369a1;
-  --success:#10b981;--success2:#059669;--danger:#ef4444;--danger2:#dc2626;--warning:#f59e0b;
+  --success:#10b981;--success2:#059669;--danger:#ef4444;--danger2:#dc2626;
   --shadow:0 4px 6px -1px rgba(0,0,0,0.1);--shadow-lg:0 10px 15px -3px rgba(0,0,0,0.1);
-  --shadow-3d:0 8px 0 var(--primary3), 0 15px 20px rgba(0,0,0,0.2);
+  --shadow-3d:0 7px 0 var(--primary3), 0 12px 18px rgba(0,0,0,0.2);
   --radius:16px;--radius-sm:10px;
 }
 [data-theme="dark"]{
   --bg:#0f172a;--bg2:#1e293b;--card:#1e293b;--card2:#334155;--text:#f1f5f9;--text2:#94a3b8;--border:#334155;
 }
 *{font-family:'Cairo',sans-serif;box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);padding:16px;transition:all 0.4s ease;min-height:100vh}
+body{background:var(--bg);color:var(--text);padding:14px;transition:0.4s;min-height:100vh}
 .header-3d{
   background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;border-radius:var(--radius);
-  padding:20px;margin:0 auto 16px;max-width:1300px;box-shadow:var(--shadow-3d);
+  padding:18px;margin:0 auto 14px;max-width:1300px;box-shadow:var(--shadow-3d);
   position:relative;overflow:hidden;border-bottom:4px solid var(--primary3);
 }
-.header-3d::before{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:linear-gradient(to bottom, rgba(255,255,255,0.15), transparent);pointer-events:none}
-.header-3d h1{font-size:22px;font-weight:900;margin-bottom:6px;text-shadow:0 2px 4px rgba(0,0,0,0.2)}
+.header-3d h1{font-size:20px;font-weight:900}
 .theme-toggle{
-  position:absolute;top:16px;left:16px;background:rgba(255,255,255,0.2);backdrop-filter:blur(10px);
-  border:2px solid rgba(255,255,255,0.3);border-radius:50px;padding:8px 14px;cursor:pointer;
-  font-weight:800;color:#fff;display:flex;align-items:center;gap:6px;
-  box-shadow:0 4px 0 rgba(0,0,0,0.2), 0 6px 10px rgba(0,0,0,0.2);transition:all 0.15s ease;
+  position:absolute;top:14px;left:14px;background:rgba(255,255,255,0.2);backdrop-filter:blur(8px);
+  border:2px solid rgba(255,255,255,0.3);border-radius:50px;padding:7px 12px;cursor:pointer;
+  font-weight:800;color:#fff;box-shadow:0 4px 0 rgba(0,0,0,0.2);transition:0.12s;
 }
 .theme-toggle:active{transform:translateY(4px);box-shadow:0 0 0 rgba(0,0,0,0.2)}
 .card-3d{
-  max-width:1300px;margin:0 auto 16px;background:var(--card);border-radius:var(--radius);
-  padding:18px;border:1px solid var(--border);border-bottom:4px solid var(--border);
-  box-shadow:var(--shadow-lg);transition:all 0.3s ease;
+  max-width:1300px;margin:0 auto 14px;background:var(--card);border-radius:var(--radius);
+  padding:16px;border:1px solid var(--border);border-bottom:4px solid var(--border);
+  box-shadow:var(--shadow-lg);
 }
-.card-3d:hover{transform:translateY(-2px);box-shadow:0 12px 20px -3px rgba(0,0,0,0.15)}
-.card-3d h3{font-size:15px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px;color:var(--text);padding-bottom:10px;border-bottom:2px dashed var(--border)}
+.card-3d h3{font-size:14px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px}
 .btn-3d{
-  padding:10px 18px;border-radius:var(--radius-sm);border:none;font-weight:800;font-size:12px;cursor:pointer;
-  position:relative;transition:all 0.12s ease;box-shadow:0 5px 0 rgba(0,0,0,0.2), 0 8px 15px rgba(0,0,0,0.15);
-  display:inline-flex;align-items:center;gap:6px;text-shadow:0 1px 0 rgba(0,0,0,0.2);
-  border:2px solid rgba(0,0,0,0.1);border-bottom-width:4px;
+  padding:9px 16px;border-radius:var(--radius-sm);border:none;font-weight:800;font-size:12px;cursor:pointer;
+  box-shadow:0 5px 0 rgba(0,0,0,0.2), 0 8px 12px rgba(0,0,0,0.12);
+  border:2px solid rgba(0,0,0,0.08);border-bottom-width:4px;transition:0.12s;
+  display:inline-flex;align-items:center;gap:6px;
 }
 .btn-3d:active{transform:translateY(5px);box-shadow:0 0 0 rgba(0,0,0,0.2)}
 .btn-3d:hover{transform:translateY(-1px);filter:brightness(1.05)}
 .btn-primary-3d{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;border-bottom-color:var(--primary3)}
 .btn-success-3d{background:linear-gradient(135deg,#10b981,#059669);color:#fff;border-bottom-color:#047857}
 .btn-danger-3d{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;border-bottom-color:#b91c1c}
-.btn-warning-3d{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border-bottom-color:#b45309}
 .btn-secondary-3d{background:var(--card2);color:var(--text);border-bottom-color:var(--border)}
 .input-3d{
-  padding:10px 14px;border-radius:var(--radius-sm);border:2px solid var(--border);border-bottom-width:4px;
-  background:var(--card);color:var(--text);font-weight:700;font-family:monospace;transition:all 0.2s ease;
+  padding:9px 12px;border-radius:var(--radius-sm);border:2px solid var(--border);border-bottom-width:4px;
+  background:var(--card);color:var(--text);font-weight:700;font-family:monospace;
 }
-.table-wrap{overflow-x:auto;border-radius:var(--radius-sm);border:2px solid var(--border);border-bottom-width:4px;background:var(--card);max-height:500px;box-shadow:inset 0 2px 8px rgba(0,0,0,0.05)}
+.checkbox-label-3d{
+  display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-weight:800;font-size:12px;
+  background:var(--card2);padding:8px 12px;border-radius:var(--radius-sm);
+  border:2px solid var(--border);border-bottom-width:4px;
+  box-shadow:0 3px 0 var(--border);
+}
+.checkbox-label-3d input{width:18px;height:18px}
+.table-wrap{overflow-x:auto;border-radius:var(--radius-sm);border:2px solid var(--border);border-bottom-width:4px;background:var(--card);max-height:480px}
 table{width:100%;border-collapse:collapse;font-size:11px}
-th{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;padding:12px 8px;position:sticky;top:0;font-weight:800;text-shadow:0 1px 2px rgba(0,0,0,0.2);border-bottom:3px solid var(--primary3)}
-td{padding:12px 8px;border-bottom:1px solid var(--border);text-align:center}
+th{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;padding:11px 8px;position:sticky;top:0;font-weight:800;border-bottom:3px solid var(--primary3)}
+td{padding:11px 8px;border-bottom:1px solid var(--border);text-align:center}
 tr:hover td{background:var(--card2)}
-.ip-badge{font-weight:800;color:#dc2626;background:#fee2e2;padding:4px 10px;border-radius:20px;font-family:monospace;border:2px solid #fecaca;border-bottom-width:4px;display:inline-block;box-shadow:0 2px 0 #fecaca}
+.ip-badge{font-weight:800;color:#dc2626;background:#fee2e2;padding:4px 10px;border-radius:20px;font-family:monospace;border:2px solid #fecaca;border-bottom-width:4px;display:inline-block}
 [data-theme="dark"] .ip-badge{background:#7f1d1d;color:#fecaca;border-color:#991b1b}
-.page-tag{background:var(--card2);border:1px solid var(--border);border-bottom-width:3px;border-radius:20px;padding:3px 8px;margin:2px;display:inline-block;font-size:10px;font-weight:700;box-shadow:0 2px 0 var(--border)}
-.status-3d{background:var(--card2);border-radius:var(--radius-sm);padding:12px;border:2px solid var(--border);border-bottom-width:4px;font-size:12px}
-.grid-2{display:grid;grid-template-columns:1fr;gap:16px;max-width:1300px;margin:0 auto 16px}
+.page-tag{background:var(--card2);border:1px solid var(--border);border-bottom-width:3px;border-radius:20px;padding:2px 8px;margin:2px;display:inline-block;font-size:10px;font-weight:700}
+.inline-controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:var(--card2);padding:12px;border-radius:var(--radius-sm);border:2px solid var(--border);border-bottom-width:4px}
 </style>
 </head>
 <body>
 
 <div class="header-3d">
-  <button class="theme-toggle" onclick="toggleThemeFixed()" id="themeBtn">🌙 ليلي</button>
-  <h1>📊 لوحة المراقبة المطورة - بدون تكرار IP - حظر دقيق</h1>
-  <p>✅ إصلاح: حظر الصفحة المحددة فقط بدون تشابه - تجميع زيارات نفس IP في صف واحد</p>
-  <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-    <span style="background:rgba(255,255,255,0.2);backdrop-filter:blur(5px);padding:6px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.3);font-weight:800">
+  <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙 ليلي</button>
+  <h1>📊 لوحة المراقبة الفاخرة</h1>
+  <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+    <span style="background:rgba(255,255,255,0.2);backdrop-filter:blur(5px);padding:6px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.3);font-weight:800;font-size:12px">
       IP الخاص بك: <span id="myIp" style="font-family:monospace;background:#fff;color:#dc2626;padding:2px 8px;border-radius:12px;margin-right:6px">جاري...</span>
     </span>
     <button class="btn-3d btn-secondary-3d" style="background:rgba(255,255,255,0.9);color:#0284c7" onclick="location.reload()">🔄 تحديث</button>
-    <span id="clock" style="background:rgba(0,0,0,0.2);padding:6px 12px;border-radius:20px;font-family:monospace;font-size:11px"></span>
+    <span id="clock" style="background:rgba(0,0,0,0.2);padding:5px 10px;border-radius:20px;font-family:monospace;font-size:11px"></span>
   </div>
 </div>
 
-<!-- قائمة الـ IPs المسموحة فقط - بدون وضع IP واحد -->
-<div class="grid-2">
-  <div class="card-3d">
-    <h3>✅ قائمة الـ IPs المسموحة - إضافة أي IP للسماح - بدون تكرار</h3>
-    <div id="multiIPContainer">⏳ جاري تحميل...</div>
-  </div>
-</div>
-
-<!-- الأجهزة التي دخلت - مجمعة بدون تكرار -->
+<!-- قائمة المسموحين - عناصر بجانب زر الإضافة -->
 <div class="card-3d">
-  <h3>📱 الأجهزة التي دخلت - مجمعة بدون تكرار - كل الصفحات في عمود واحد <span id="realCount" style="background:var(--primary);color:#fff;padding:2px 8px;border-radius:12px;font-size:10px">0</span></h3>
-  <div style="background:var(--bg2);padding:8px;border-radius:8px;margin-bottom:10px;font-size:11px;border:1px dashed var(--border)">
-    💡 <b>التحسين الجديد:</b> نفس الـ IP يظهر مرة واحدة فقط - عمود الصفحات يعرض كل الصفحات التي دخلها بجانب بعض - آخر وقت دخول فقط
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+    <h3 style="margin:0;border:none;padding:0">🔐 التحكم في الوصول - IPs المسموحة</h3>
+    <span id="allowedCount" style="background:var(--primary);color:#fff;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:800">0 IP</span>
+  </div>
+  
+  <div class="inline-controls">
+    <input type="text" id="newAllowedIP" class="input-3d" placeholder="45.102.74.114" style="width:160px">
+    <input type="text" id="newAllowedReason" class="input-3d" placeholder="السبب: مكتب الإدارة" style="width:160px">
+    <button class="btn-3d btn-success-3d" onclick="addIP()">➕ إضافة IP للسماح</button>
+    <label class="checkbox-label-3d">
+      <input type="checkbox" id="whitelistMode" onchange="toggleWhitelist(this.checked)">
+      تفعيل وضع القائمة البيضاء (فقط المسموحين)
+    </label>
+    <button class="btn-3d btn-secondary-3d" onclick="loadAllowed()">🔄 تحديث</button>
+    <button class="btn-3d btn-secondary-3d" onclick="allowAll()">✅ السماح للجميع</button>
+  </div>
+
+  <div id="allowedList" style="margin-top:12px;background:var(--card);border-radius:var(--radius-sm);border:2px solid var(--border);border-bottom-width:4px;max-height:220px;overflow-y:auto;padding:8px">
+    ⏳ جاري التحميل...
+  </div>
+  <div id="whitelistStatus" style="margin-top:8px;padding:8px;border-radius:8px;font-size:11px;font-weight:700;background:var(--card2);border:1px solid var(--border)"></div>
+</div>
+
+<!-- الأجهزة مجمعة بدون تكرار -->
+<div class="card-3d">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <h3 style="margin:0;border:none;padding:0">📱 الأجهزة التي دخلت - مجمعة</h3>
+    <span id="realCount" style="background:var(--primary);color:#fff;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:800">0</span>
   </div>
   <div class="table-wrap">
     <table>
-      <thead><tr><th>🌐 IP - بدون تكرار</th><th>💻 الجهاز</th><th>📄 كل الصفحات التي دخلها - بجانب بعض</th><th>📅 آخر وقت دخول فقط</th><th>🚫 حظر</th></tr></thead>
-      <tbody id="realTable"><tr><td colspan=5 style="padding:30px">⏳ جاري تحميل الأجهزة...</td></tr></tbody>
+      <thead><tr><th>🌐 IP</th><th>💻 الجهاز</th><th>📄 الصفحات</th><th>📅 آخر دخول</th><th>🚫</th></tr></thead>
+      <tbody id="realTable"><tr><td colspan=5 style="padding:30px">⏳ جاري التحميل...</td></tr></tbody>
     </table>
   </div>
 </div>
 
-<!-- الأجهزة المحظورة -->
+<!-- المحظورة -->
 <div class="card-3d">
-  <h3>🚫 الأجهزة المحظورة <span id="blockedCount" style="background:var(--danger);color:#fff;padding:2px 8px;border-radius:12px;font-size:10px">0</span></h3>
-  <div class="table-wrap" style="max-height:320px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <h3 style="margin:0;border:none;padding:0">🚫 الأجهزة المحظورة</h3>
+    <span id="blockedCount" style="background:var(--danger);color:#fff;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:800">0</span>
+  </div>
+  <div class="table-wrap" style="max-height:300px">
     <table>
-      <thead><tr><th>🌐 IP</th><th>💻 الجهاز</th><th>📝 السبب</th><th>📅 التاريخ</th><th>✅ فك</th></tr></thead>
-      <tbody id="blockedTable"><tr><td colspan=5 style="padding:20px">⏳ جاري تحميل...</td></tr></tbody>
+      <thead><tr><th>🌐 IP</th><th>💻 الجهاز</th><th>📝 السبب</th><th>📅 التاريخ</th><th>✅</th></tr></thead>
+      <tbody id="blockedTable"><tr><td colspan=5 style="padding:20px">⏳ جاري التحميل...</td></tr></tbody>
     </table>
   </div>
-  <div id="debug" class="status-3d" style="margin-top:12px;background:#0f172a;color:#6ee7b7;font-family:monospace;white-space:pre-wrap;max-height:140px;overflow-y:auto;direction:ltr;text-align:left">🔍 جاري تهيئة...</div>
 </div>
-
-<script src="/js/real-logger.js?v=20250909"></script>
-<script src="/js/protect.js?v=20250909"></script>
 
 <script>
 const API='/api/turso';
 const IP_API='/api/get-ip';
 
-function initThemeFixed(){
+// ثيم
+function initTheme(){
   const saved=localStorage.getItem('monitoring-theme')||'light';
   document.documentElement.setAttribute('data-theme',saved);
-  updateThemeBtnFixed(saved);
+  document.getElementById('themeBtn').innerHTML=saved==='dark'?'☀️ نهاري':'🌙 ليلي';
 }
-function toggleThemeFixed(){
+function toggleTheme(){
   const cur=document.documentElement.getAttribute('data-theme')||'light';
   const nxt=cur==='light'?'dark':'light';
   document.documentElement.setAttribute('data-theme',nxt);
   localStorage.setItem('monitoring-theme',nxt);
-  updateThemeBtnFixed(nxt);
+  document.getElementById('themeBtn').innerHTML=nxt==='dark'?'☀️ نهاري':'🌙 ليلي';
 }
-function updateThemeBtnFixed(t){
-  const btn=document.getElementById('themeBtn');
-  if(!btn) return;
-  btn.innerHTML=t==='dark'?'☀️ نهاري':'🌙 ليلي';
-}
-initThemeFixed();
-function updateClockFixed(){
-  const el=document.getElementById('clock');
-  if(el) el.textContent=new Date().toLocaleString('ar-EG',{weekday:'short',hour:'2-digit',minute:'2-digit',second:'2-digit'});
-}
-setInterval(updateClockFixed,1000);updateClockFixed();
+initTheme();
+setInterval(()=>{const el=document.getElementById('clock');if(el) el.textContent=new Date().toLocaleString('ar-EG',{hour:'2-digit',minute:'2-digit',second:'2-digit'});},1000);
 
-async function getIpFixed(){
+async function getIp(){
   try{
     const res=await fetch(IP_API,{cache:'no-store'});
     const data=await res.json();
     document.getElementById('myIp').innerText=data.ip;
+    document.getElementById('newAllowedIP').value=data.ip;
     return data.ip;
   }catch{
     const ip=localStorage.getItem('user_real_ip')||'unknown';
@@ -162,114 +172,165 @@ async function getIpFixed(){
   }
 }
 
-// تحميل مجمع بدون تكرار IP - كل الصفحات بجانب بعض - آخر وقت فقط
-async function loadRealGroupedFixed(){
+// إضافة IP - إصلاح مشكلة JSON
+async function addIP(){
+  const ipEl=document.getElementById('newAllowedIP');
+  const reasonEl=document.getElementById('newAllowedReason');
+  const ip=ipEl.value.trim();
+  const reason=reasonEl.value.trim()||'مسموح';
+  if(!ip || !ip.includes('.')){ alert('❌ أدخل IP صحيح'); return; }
+  try{
+    const res=await fetch('/api/add-allowed-ip',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ip,reason})});
+    const text=await res.text();
+    let data;
+    try{ data=JSON.parse(text); }catch{ alert('❌ خطأ في الاستجابة: '+text.slice(0,200)); return; }
+    if(data.success){
+      ipEl.value=''; reasonEl.value='';
+      loadAllowed();
+    } else {
+      alert('❌ فشل: '+(data.error||'خطأ غير معروف'));
+    }
+  }catch(e){ alert('❌ خطأ: '+e.message); }
+}
+
+async function loadAllowed(){
+  const listEl=document.getElementById('allowedList');
+  const statusEl=document.getElementById('whitelistStatus');
+  const countEl=document.getElementById('allowedCount');
+  const checkbox=document.getElementById('whitelistMode');
+  try{
+    const res=await fetch('/api/allowed-ips',{cache:'no-store'});
+    const text=await res.text();
+    let data;
+    try{ data=JSON.parse(text); }catch{ listEl.innerHTML='❌ خطأ في جلب البيانات'; return; }
+    const allowed=data.allowed||[];
+    const mode=data.mode||'all';
+    if(countEl) countEl.textContent=allowed.length+' IP';
+    if(allowed.length===0){
+      listEl.innerHTML='<div style="text-align:center;color:var(--text2);padding:20px">📭 لا يوجد IPs - أضف أول IP</div>';
+    } else {
+      listEl.innerHTML=allowed.map(item=>`
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid var(--border)">
+          <div><span class="ip-badge">${item.ip}</span><span style="font-size:10px;color:var(--text2);margin-right:8px">${item.reason||''}</span></div>
+          <button class="btn-3d btn-danger-3d" style="padding:4px 10px;font-size:10px" onclick="removeIP('${item.ip}')">🗑️ حذف</button>
+        </div>
+      `).join('');
+    }
+    if(mode==='whitelist'){
+      if(checkbox) checkbox.checked=true;
+      statusEl.innerHTML=`🔐 الوضع: قائمة بيضاء مفعلة - فقط ${allowed.length} IP مسموح - الباقي محظور`;
+      statusEl.style.background='#fef3c7'; statusEl.style.color='#92400e';
+    } else {
+      if(checkbox) checkbox.checked=false;
+      statusEl.innerHTML=`✅ الوضع: السماح للجميع`;
+      statusEl.style.background='var(--card2)'; statusEl.style.color='var(--text)';
+    }
+  }catch(e){ listEl.innerHTML='❌ خطأ: '+e.message; }
+}
+
+async function removeIP(ip){
+  if(!confirm('حذف IP: '+ip+' ؟')) return;
+  try{
+    const res=await fetch('/api/remove-allowed-ip',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ip})});
+    const data=await res.json();
+    if(data.success) loadAllowed(); else alert('❌ فشل');
+  }catch(e){ alert('❌ خطأ: '+e.message); }
+}
+
+async function toggleWhitelist(checked){
+  if(checked){
+    if(!confirm('🔐 تفعيل القائمة البيضاء؟ فقط المسموحين يدخلون')){ document.getElementById('whitelistMode').checked=false; return; }
+    try{
+      const res=await fetch('/api/enable-whitelist',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({})});
+      const data=await res.json();
+      if(data.success) loadAllowed(); else { alert('❌ فشل'); document.getElementById('whitelistMode').checked=false; }
+    }catch(e){ alert('❌ خطأ: '+e.message); document.getElementById('whitelistMode').checked=false; }
+  } else {
+    allowAll();
+  }
+}
+
+async function allowAll(){
+  if(!confirm('✅ السماح للجميع؟')) return;
+  try{
+    const res=await fetch('/api/disable-whitelist',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({})});
+    const data=await res.json();
+    if(data.success) loadAllowed();
+  }catch(e){ alert('❌ خطأ: '+e.message); }
+}
+
+// تجميع بدون تكرار
+async function loadRealGrouped(){
   try{
     const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sql:'SELECT * FROM real_page_logs ORDER BY created_at DESC LIMIT 200'})});
     const data=await res.json();
-    let rows=data.rows||JSON.parse(localStorage.getItem('real_page_logs')||'[]');
+    let rows=data.rows||[];
     const tbody=document.getElementById('realTable');
     const countEl=document.getElementById('realCount');
     tbody.innerHTML='';
-    
-    if(rows.length===0){
-      tbody.innerHTML='<tr><td colspan=5 style="padding:30px">📭 لا يوجد بيانات</td></tr>';
-      if(countEl) countEl.textContent='0';
-      return;
-    }
-
-    // تجميع حسب IP - بدون تكرار
+    if(rows.length===0){ tbody.innerHTML='<tr><td colspan=5>📭 لا يوجد بيانات</td></tr>'; if(countEl) countEl.textContent='0'; return; }
     const grouped={};
     rows.forEach(r=>{
-      const ip=(r.ip||'unknown').trim();
-      if(!ip || ip==='unknown' || !ip.includes('.')) return;
-      if(!grouped[ip]){
-        grouped[ip]={
-          ip:ip,
-          device_model:r.device_model||'',
-          pages:new Set(),
-          lastTime:r.created_at||'',
-          lastTimestamp: new Date(r.created_at||0).getTime() || 0
-        };
-      }
-      // إضافة الصفحة للقائمة - بدون تكرار
+      const ip=(r.ip||'').trim();
+      if(!ip || !ip.includes('.')) return;
+      if(!grouped[ip]) grouped[ip]={ip, device_model:r.device_model||'', pages:new Set(), lastTime:r.created_at||'', ts:new Date(r.created_at||0).getTime()||0};
       const page=(r.page||'').split('/').pop()||r.page;
       if(page) grouped[ip].pages.add(page);
-      
-      // تحديث آخر وقت
-      const currentTime = new Date(r.created_at||0).getTime() || 0;
-      if(currentTime > grouped[ip].lastTimestamp){
-        grouped[ip].lastTimestamp=currentTime;
-        grouped[ip].lastTime=r.created_at;
-        grouped[ip].device_model=r.device_model||grouped[ip].device_model;
-      }
+      const cur=new Date(r.created_at||0).getTime()||0;
+      if(cur>grouped[ip].ts){ grouped[ip].ts=cur; grouped[ip].lastTime=r.created_at; grouped[ip].device_model=r.device_model||grouped[ip].device_model; }
     });
-
-    const groupedArray=Object.values(grouped).sort((a,b)=>b.lastTimestamp - a.lastTimestamp);
-    if(countEl) countEl.textContent=groupedArray.length + ' IP فريد';
-
-    groupedArray.slice(0,50).forEach(g=>{
+    const arr=Object.values(grouped).sort((a,b)=>b.ts-a.ts);
+    if(countEl) countEl.textContent=arr.length;
+    arr.slice(0,50).forEach(g=>{
+      const pagesHTML=Array.from(g.pages).map(p=>`<span class="page-tag">${p}</span>`).join('');
       const tr=document.createElement('tr');
-      const pagesArray=Array.from(g.pages);
-      const pagesHTML=pagesArray.map(p=>`<span class="page-tag">${p}</span>`).join(' ');
-      const lastTime=(g.lastTime||'').slice(0,19);
-      tr.innerHTML=`
-        <td><span class="ip-badge">${g.ip}</span></td>
-        <td>${g.device_model}</td>
-        <td style="text-align:right;max-width:350px"><div style="display:flex;flex-wrap:wrap;gap:3px;justify-content:center">${pagesHTML}</div><div style="font-size:9px;color:var(--text2);margin-top:4px">${pagesArray.length} صفحة</div></td>
-        <td><span style="font-family:monospace;background:var(--card2);padding:4px 8px;border-radius:6px;border:1px solid var(--border);border-bottom-width:3px">${lastTime}</span></td>
-        <td><button class="btn-3d btn-danger-3d" onclick="blockDeviceFixed('${g.ip}','${(g.device_model||'').replace(/'/g,'')}')">🚫 حظر IP</button></td>
-      `;
+      tr.innerHTML=`<td><span class="ip-badge">${g.ip}</span></td><td>${g.device_model}</td><td style="max-width:300px"><div style="display:flex;flex-wrap:wrap;gap:3px;justify-content:center">${pagesHTML}</div></td><td><span style="font-family:monospace;background:var(--card2);padding:3px 8px;border-radius:6px;border:1px solid var(--border);border-bottom-width:3px">${(g.lastTime||'').slice(0,19)}</span></td><td><button class="btn-3d btn-danger-3d" style="padding:5px 10px;font-size:10px" onclick="blockIP('${g.ip}','${(g.device_model||'').replace(/'/g,'')}')">🚫 حظر</button></td>`;
       tbody.appendChild(tr);
     });
-
-    if(groupedArray.length===0){
-      tbody.innerHTML='<tr><td colspan=5>📭 لا يوجد IPs حقيقية</td></tr>';
-    }
-
-  }catch(e){
-    document.getElementById('realTable').innerHTML=`<tr><td colspan=5>❌ فشل: ${e.message}</td></tr>`;
-  }
-  loadBlockedFixed();
+  }catch(e){ document.getElementById('realTable').innerHTML=`<tr><td colspan=5>❌ ${e.message}</td></tr>`; }
+  loadBlocked();
 }
 
-async function loadBlockedFixed(){
-  const tbody=document.getElementById('blockedTable');
-  const debug=document.getElementById('debug');
-  const countEl=document.getElementById('blockedCount');
-  debug.textContent='🔍 جلب المحظورين...\n';
+async function loadBlocked(){
   try{
     const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sql:'SELECT * FROM blocked_devices ORDER BY created_at DESC LIMIT 50'})});
-    const txt=await res.text();
-    debug.textContent+='✅ '+txt.slice(0,200)+'\n';
-    let data; try{data=JSON.parse(txt);}catch{data={rows:[]}}
+    const data=await res.json();
     const rows=data.rows||[];
+    const tbody=document.getElementById('blockedTable');
+    const countEl=document.getElementById('blockedCount');
     if(countEl) countEl.textContent=rows.length;
     tbody.innerHTML='';
-    if(rows.length===0){
-      tbody.innerHTML='<tr><td colspan=5>✅ لا يوجد محظورين</td></tr>';
-      return;
-    }
+    if(rows.length===0){ tbody.innerHTML='<tr><td colspan=5>✅ لا يوجد محظورين</td></tr>'; return; }
     rows.forEach(r=>{
       const tr=document.createElement('tr');
-      tr.innerHTML=`<td><span class="ip-badge">${r.ip||''}</span></td><td>${r.device_model||''}</td><td>${r.reason||''}</td><td>${(r.created_at||'').slice(0,19)}</td><td><button class="btn-3d btn-success-3d" onclick="unblockDeviceFixed(${r.id})">✅ فك</button></td>`;
+      tr.innerHTML=`<td><span class="ip-badge">${r.ip||''}</span></td><td>${r.device_model||''}</td><td>${r.reason||''}</td><td>${(r.created_at||'').slice(0,19)}</td><td><button class="btn-3d btn-success-3d" style="padding:5px 10px;font-size:10px" onclick="unblockIP(${r.id})">✅ فك</button></td>`;
       tbody.appendChild(tr);
     });
-  }catch(e){
-    debug.textContent+='❌ '+e.message+'\n';
-  }
+  }catch{}
+}
+
+async function blockIP(ip, device){
+  if(!confirm('حظر IP: '+ip+' ؟')) return;
+  try{
+    const res=await fetch('/api/block-device-fixed',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ip,device_model:device,reason:'محظور من المراقبة'})});
+    const data=await res.json();
+    if(data.success){ loadBlocked(); loadRealGrouped(); } else alert('❌ فشل');
+  }catch(e){ alert('❌ '+e.message); }
+}
+
+async function unblockIP(id){
+  if(!confirm('فك حظر '+id+' ؟')) return;
+  try{
+    const res=await fetch('/api/unblock-device-fixed',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});
+    const data=await res.json();
+    if(data.success) loadBlocked();
+  }catch{}
 }
 
 window.addEventListener('load', async ()=>{
-  const myIP=await getIpFixed();
-  await loadRealGroupedFixed();
-  setTimeout(()=>{
-    if(typeof createMultiIPWhitelistUIFixed==='function'){
-      createMultiIPWhitelistUIFixed('multiIPContainer');
-    } else if(typeof window.createMultiIPUIFixed==='function'){
-      window.createMultiIPUIFixed('multiIPContainer');
-    }
-  }, 600);
+  await getIp();
+  await loadRealGrouped();
+  loadAllowed();
 });
 </script>
 
