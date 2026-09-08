@@ -33,10 +33,27 @@ async function tursoQuery(env, sql, params=[]){
 }
 
 function isBlocked(pageName, blockedList){
-  const low=pageName.toLowerCase().replace('.html','').trim();
+  // إصلاح: مطابقة تامة فقط - لا يحظر الصفحات المتشابهة
+  // مثال: إذا حظرت salaryold.html فقط salaryold.html ستحظر، وليس salary.html
+  const low = pageName.toLowerCase().trim();
+  const lowNoExt = low.replace('.html','').trim();
   for(const b of blockedList){
-    const bl=String(b).toLowerCase().replace('.html','').trim();
-    if(bl===low || low.includes(bl) || bl.includes(low)) return true;
+    const blFull = String(b).toLowerCase().trim();
+    const blNoExt = blFull.replace('.html','').trim();
+    // مطابقة تامة فقط: نفس الاسم بالكامل مع أو بدون .html
+    if(blFull===low || blNoExt===lowNoExt){
+      return true;
+    }
+  }
+  return false;
+}
+
+// دالة جديدة محسنة للتحقق الدقيق من الصفحات
+function isBlockedExact(pageName, blockedList){
+  const low = pageName.toLowerCase().trim();
+  for(const b of blockedList){
+    const bl = String(b).toLowerCase().trim();
+    if(bl===low) return true;
   }
   return false;
 }
@@ -135,294 +152,11 @@ async function handleUnblockDeviceRequestFixed(request, env){
   }
 }
 
-
-
-// ========== ميزة السماح لعدة IPs - قائمة بيضاء متعددة - دوال جديدة مضافة فقط ==========
-
-// دالة جديدة: إنشاء جدول الـ IPs المسموحة
-async function ensureAllowedIPsTableFixed(env){
-  const sql1 = `CREATE TABLE IF NOT EXISTS allowed_ips (
-    ip TEXT PRIMARY KEY,
-    reason TEXT DEFAULT 'مسموح',
-    added_at TEXT DEFAULT (datetime('now','localtime'))
-  )`;
-  await tursoQuery(env, sql1, []);
-  // تأكد أيضاً من وجود جدول إعدادات القائمة البيضاء
-  await ensureWhitelistTableFixed(env);
-}
-
-// دالة جديدة: إضافة IP إلى قائمة المسموحين
-async function addAllowedIPFixed(env, ip, reason){
-  await ensureAllowedIPsTableFixed(env);
-  const sql = "INSERT OR REPLACE INTO allowed_ips (ip, reason) VALUES (?, ?)";
-  const result = await tursoQuery(env, sql, [ip, reason||'مسموح']);
-  return result;
-}
-
-// دالة جديدة: حذف IP من قائمة المسموحين
-async function removeAllowedIPFixed(env, ip){
-  await ensureAllowedIPsTableFixed(env);
-  const result = await tursoQuery(env, "DELETE FROM allowed_ips WHERE ip=?", [ip]);
-  return result;
-}
-
-// دالة جديدة: جلب كل الـ IPs المسموحة
-async function getAllowedIPsFixed(env){
-  await ensureAllowedIPsTableFixed(env);
-  const q = await tursoQuery(env, "SELECT * FROM allowed_ips ORDER BY added_at DESC", []);
-  if(q.error) return {allowed:[], error:q.error};
-  let allowed=[];
-  if(q.result?.rows){
-    const cols=q.result.cols.map(c=>c.name);
-    allowed=q.result.rows.map(row=>{
-      const obj={};
-      row.forEach((cell,i)=>{ obj[cols[i]]=cell.value??cell.text??''; });
-      return obj;
-    });
-  }
-  return {allowed, error:null};
-}
-
-// دالة جديدة: تفعيل وضع القائمة البيضاء (فقط المسموحين يدخلون)
-async function enableWhitelistModeFixed(env){
-  await ensureAllowedIPsTableFixed(env);
-  await tursoQuery(env, "DELETE FROM ip_whitelist_config", []);
-  const result = await tursoQuery(env, "INSERT INTO ip_whitelist_config (allowed_ip, mode) VALUES ('multiple', 'whitelist')", []);
-  return result;
-}
-
-// دالة جديدة: تعطيل وضع القائمة البيضاء والسماح للجميع
-async function disableWhitelistModeFixed(env){
-  await ensureAllowedIPsTableFixed(env);
-  await tursoQuery(env, "DELETE FROM ip_whitelist_config", []);
-  const result = await tursoQuery(env, "INSERT INTO ip_whitelist_config (allowed_ip, mode) VALUES ('0.0.0.0', 'all')", []);
-  return result;
-}
-
-// دالة جديدة: فحص هل IP مسموح في وضع القائمة البيضاء المتعددة
-async function isIPAllowedInWhitelistFixed(env, currentIP){
-  const modeData = await getWhitelistModeFixedBackend(env);
-  if(modeData.mode!=='whitelist') return true; // إذا الوضع all فالكل مسموح
-  
-  // في وضع whitelist، يجب أن يكون IP في جدول allowed_ips
-  const allowedData = await getAllowedIPsFixed(env);
-  const isAllowed = allowedData.allowed.some(a=>a.ip===currentIP);
-  return isAllowed;
-}
-
-// دالة جديدة: HTML لصفحة محظورة بسبب وضع القائمة البيضاء
-function whitelistBlockedPageFixed(currentIP, allowedList){
-  const listHTML = allowedList.map(a=>`<span style="background:#dcfce7;color:#065f46;padding:2px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace">${a.ip}</span>`).join(' ');
-  return `<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>الموقع مغلق - قائمة بيضاء</title><style>body{min-height:100vh;background:linear-gradient(135deg,#fef3c7,#fde68a);display:flex;align-items:center;justify-content:center;font-family:Cairo,sans-serif} .box{background:#fff;padding:30px;border-radius:20px;text-align:center;box-shadow:0 16px 40px rgba(0,0,0,0.15);max-width:600px;width:92%} h1{color:#d97706} .ip{font-family:monospace;background:#fee2e2;color:#dc2626;padding:4px 10px;border-radius:8px;font-weight:800}</style></head><body><div class="box"><div style="font-size:60px">🔐</div><h1>الموقع في وضع القائمة البيضاء</h1><p>عذراً، الموقع متاح فقط لعناوين IP محددة</p><div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:12px;margin:12px 0;text-align:right;font-size:12px"><b>IP الخاص بك:</b> <span class="ip">${currentIP}</span><br><br><b>IPs المسموحة حالياً:</b><br>${listHTML||'لا يوجد'}<br><br>تواصل مع الإدارة لإضافة IP الخاص بك: 01092259655</div><a href="https://wa.me/201092259655" style="display:inline-block;padding:10px 20px;background:#25D366;color:#fff;border-radius:10px;text-decoration:none;font-weight:800;margin-top:12px">💬 واتساب</a></div></body></html>`;
-}
-
-// دالة جديدة: معالجة إضافة IP مسموح
-async function handleAddAllowedIPFixed(request, env){
-  try{
-    const body = await request.json();
-    const ip = body.ip?.trim();
-    const reason = body.reason?.trim() || 'مسموح';
-    if(!ip || !ip.includes('.')) return new Response(JSON.stringify({success:false, error:'IP غير صالح'}), {status:400, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
-    const result = await addAllowedIPFixed(env, ip, reason);
-    if(result.error) return new Response(JSON.stringify({success:false, error:result.error}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
-    return new Response(JSON.stringify({success:true, ip:ip}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
-  }catch(e){ return new Response(JSON.stringify({success:false, error:e.message}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}}); }
-}
-
-// دالة جديدة: معالجة حذف IP مسموح
-async function handleRemoveAllowedIPFixed(request, env){
-  try{
-    const body = await request.json();
-    const ip = body.ip?.trim();
-    if(!ip) return new Response(JSON.stringify({success:false, error:'IP مطلوب'}), {status:400, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
-    const result = await removeAllowedIPFixed(env, ip);
-    if(result.error) return new Response(JSON.stringify({success:false, error:result.error}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
-    return new Response(JSON.stringify({success:true}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
-  }catch(e){ return new Response(JSON.stringify({success:false, error:e.message}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}}); }
-}
-
-// دالة جديدة: معالجة جلب قائمة المسموحين
-async function handleGetAllowedIPsFixed(request, env){
-  try{
-    const allowedData = await getAllowedIPsFixed(env);
-    const modeData = await getWhitelistModeFixedBackend(env);
-    return new Response(JSON.stringify({allowed:allowedData.allowed, mode:modeData.mode, allowed_ip:modeData.allowed_ip, error:allowedData.error}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*','Cache-Control':'no-cache'}});
-  }catch(e){ return new Response(JSON.stringify({allowed:[], error:e.message}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}}); }
-}
-
-// دالة جديدة: معالجة تفعيل وضع القائمة البيضاء
-async function handleEnableWhitelistFixed(request, env){
-  try{
-    const result = await enableWhitelistModeFixed(env);
-    if(result.error) return new Response(JSON.stringify({success:false, error:result.error}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
-    return new Response(JSON.stringify({success:true, mode:'whitelist'}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
-  }catch(e){ return new Response(JSON.stringify({success:false, error:e.message}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}}); }
-}
-
-// دالة جديدة: معالجة تعطيل وضع القائمة البيضاء
-async function handleDisableWhitelistFixed(request, env){
-  try{
-    const result = await disableWhitelistModeFixed(env);
-    if(result.error) return new Response(JSON.stringify({success:false, error:result.error}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
-    return new Response(JSON.stringify({success:true, mode:'all'}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
-  }catch(e){ return new Response(JSON.stringify({success:false, error:e.message}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}}); }
-}
-
-
-// ========== ميزة IP واحد فقط - دوال جديدة مضافة فقط - بدون تعديل أي دالة قديمة ==========
-
-// دالة جديدة: إنشاء جدول إعدادات القائمة البيضاء إذا لم يكن موجود
-async function ensureWhitelistTableFixed(env){
-  const sql = `CREATE TABLE IF NOT EXISTS ip_whitelist_config (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    allowed_ip TEXT NOT NULL,
-    mode TEXT NOT NULL DEFAULT 'all',
-    created_at TEXT DEFAULT (datetime('now','localtime')),
-    updated_at TEXT DEFAULT (datetime('now','localtime'))
-  )`;
-  await tursoQuery(env, sql, []);
-}
-
-// دالة جديدة: تفعيل وضع IP واحد فقط
-async function enableSingleIPModeFixedBackend(env, allowedIP){
-  await ensureWhitelistTableFixed(env);
-  // حذف أي إعداد قديم
-  await tursoQuery(env, "DELETE FROM ip_whitelist_config", []);
-  // إدخال الإعداد الجديد - IP واحد مسموح والباقي محظور
-  const result = await tursoQuery(env, "INSERT INTO ip_whitelist_config (allowed_ip, mode) VALUES (?, 'single')", [allowedIP]);
-  return result;
-}
-
-// دالة جديدة: إلغاء وضع IP واحد والسماح للجميع
-async function disableSingleIPModeFixedBackend(env){
-  await ensureWhitelistTableFixed(env);
-  // حذف إعداد IP الواحد أو تحديثه إلى mode all
-  await tursoQuery(env, "DELETE FROM ip_whitelist_config", []);
-  const result = await tursoQuery(env, "INSERT INTO ip_whitelist_config (allowed_ip, mode) VALUES ('0.0.0.0', 'all')", []);
-  return result;
-}
-
-// دالة جديدة: جلب حالة وضع القائمة البيضاء
-async function getWhitelistModeFixedBackend(env){
-  await ensureWhitelistTableFixed(env);
-  const q = await tursoQuery(env, "SELECT * FROM ip_whitelist_config ORDER BY id DESC LIMIT 1", []);
-  if(q.error || !q.result?.rows || q.result.rows.length===0){
-    return {mode:'all', allowed_ip:null, count:0, total_blocked:0};
-  }
-  const cols=q.result.cols.map(c=>c.name);
-  const row=q.result.rows[0];
-  const obj={}; row.forEach((cell,i)=>{ obj[cols[i]]=cell.value??cell.text??''; });
-  
-  // جلب عدد المحاولات المحظورة
-  const blockedQ = await tursoQuery(env, "SELECT COUNT(*) as cnt FROM blocked_devices", []);
-  let total_blocked=0;
-  if(!blockedQ.error && blockedQ.result?.rows?.length>0){
-    total_blocked = blockedQ.result.rows[0][0]?.value || 0;
-  }
-  
-  return {
-    mode: obj.mode||'all',
-    allowed_ip: obj.allowed_ip,
-    created_at: obj.created_at,
-    count: 0,
-    total_blocked: total_blocked,
-    raw: obj
-  };
-}
-
-// دالة جديدة: فحص هل IP الحالي مسموح في وضع IP واحد
-async function isIPAllowedInSingleModeFixed(env, currentIP){
-  const modeData = await getWhitelistModeFixedBackend(env);
-  if(modeData.mode!=='single') return true; // إذا الوضع all فالكل مسموح
-  if(!modeData.allowed_ip) return true;
-  return currentIP===modeData.allowed_ip;
-}
-
-// دالة جديدة: HTML لصفحة محظورة بسبب وضع IP واحد
-function singleIPBlockedPageFixed(currentIP, allowedIP){
-  return `<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>الموقع مغلق - IP واحد فقط</title><style>body{min-height:100vh;background:linear-gradient(135deg,#fef3c7,#fde68a);display:flex;align-items:center;justify-content:center;font-family:Cairo,sans-serif} .box{background:#fff;padding:30px;border-radius:20px;text-align:center;box-shadow:0 16px 40px rgba(0,0,0,0.15);max-width:500px;width:92%} h1{color:#d97706} .ip{font-family:monospace;background:#fee2e2;color:#dc2626;padding:4px 10px;border-radius:8px;font-weight:800} .allowed{background:#dcfce7;color:#065f46;padding:4px 10px;border-radius:8px;font-family:monospace;font-weight:800}</style></head><body><div class="box"><div style="font-size:60px">🔐</div><h1>الموقع في وضع IP واحد فقط</h1><p>عذراً، الموقع متاح حالياً لعنوان IP واحد فقط</p><div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:12px;margin:12px 0;text-align:right;font-size:12px"><b>IP الخاص بك:</b> <span class="ip">${currentIP}</span><br><b>IP المسموح حالياً:</b> <span class="allowed">${allowedIP}</span><br><br>تواصل مع الإدارة للسماح لجهازك: 01092259655</div><a href="https://wa.me/201092259655" style="display:inline-block;padding:10px 20px;background:#25D366;color:#fff;border-radius:10px;text-decoration:none;font-weight:800;margin-top:12px">💬 تواصل واتساب</a></div></body></html>`;
-}
-
-// دالة جديدة: معالجة تفعيل وضع IP واحد - endpoint
-async function handleEnableSingleIPFixed(request, env){
-  try{
-    const body = await request.json();
-    const ip = body.ip?.trim();
-    if(!ip || !ip.includes('.')) return new Response(JSON.stringify({success:false, error:'IP غير صالح'}), {status:400, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
-    const result = await enableSingleIPModeFixedBackend(env, ip);
-    if(result.error) return new Response(JSON.stringify({success:false, error:result.error}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
-    return new Response(JSON.stringify({success:true, allowed_ip:ip, mode:'single'}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
-  }catch(e){ return new Response(JSON.stringify({success:false, error:e.message}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}}); }
-}
-
-// دالة جديدة: معالجة إلغاء وضع IP واحد
-async function handleDisableSingleIPFixed(request, env){
-  try{
-    const result = await disableSingleIPModeFixedBackend(env);
-    if(result.error) return new Response(JSON.stringify({success:false, error:result.error}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
-    return new Response(JSON.stringify({success:true, mode:'all'}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
-  }catch(e){ return new Response(JSON.stringify({success:false, error:e.message}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}}); }
-}
-
-// دالة جديدة: معالجة جلب حالة القائمة البيضاء
-async function handleGetWhitelistModeFixed(request, env){
-  try{
-    const data = await getWhitelistModeFixedBackend(env);
-    return new Response(JSON.stringify(data), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*','Cache-Control':'no-cache'}});
-  }catch(e){ return new Response(JSON.stringify({mode:'all', error:e.message}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}}); }
-}
-
-
 // ========== Worker الرئيسي - الدوال القديمة محفوظة + استدعاء الدوال الجديدة ==========
 export default {
   async fetch(request, env, ctx){
     const url = new URL(request.url);
     const path = url.pathname;
-
-    // === ميزة السماح لعدة IPs - قائمة بيضاء متعددة - endpoints جديدة ===
-    if(path==='/api/allowed-ips'){
-      return await handleGetAllowedIPsFixed(request, env);
-    }
-    if(path==='/api/add-allowed-ip'){
-      return await handleAddAllowedIPFixed(request, env);
-    }
-    if(path==='/api/remove-allowed-ip'){
-      return await handleRemoveAllowedIPFixed(request, env);
-    }
-    if(path==='/api/enable-whitelist'){
-      return await handleEnableWhitelistFixed(request, env);
-    }
-    if(path==='/api/disable-whitelist'){
-      return await handleDisableWhitelistFixed(request, env);
-    }
-
-    // === ميزة IP واحد فقط - endpoints جديدة مضافة فقط ===
-    if(path==='/api/enable-single-ip'){
-      return await handleEnableSingleIPFixed(request, env);
-    }
-    if(path==='/api/disable-single-ip'){
-      return await handleDisableSingleIPFixed(request, env);
-    }
-    if(path==='/api/whitelist-mode'){
-      return await handleGetWhitelistModeFixed(request, env);
-    }
-    // فحص وضع IP واحد أو القائمة البيضاء المتعددة قبل أي شيء
-    if(!['/api/','/js/','.js','.css','.json','.png','.jpg','.svg','.ico','Real-Monitoring','whitelist-mode','enable-single-ip','disable-single-ip','block-device-fixed','unblock-device-fixed','get-ip','get-ip-fixed','blocked-devices','blocked-list','turso','allowed-ips','add-allowed-ip','remove-allowed-ip','enable-whitelist','disable-whitelist'].some(s=>path.toLowerCase().includes(s.toLowerCase()))){
-      const currentIP = request.headers.get('CF-Connecting-IP') || request.headers.get('X-Forwarded-For')?.split(',')[0]?.trim() || '';
-      if(currentIP){
-        const modeData = await getWhitelistModeFixedBackend(env);
-        if(modeData.mode==='single' && modeData.allowed_ip && currentIP!==modeData.allowed_ip){
-          return new Response(singleIPBlockedPageFixed(currentIP, modeData.allowed_ip), {status:403, headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-cache'}});
-        }
-        if(modeData.mode==='whitelist'){
-          const allowed = await isIPAllowedInWhitelistFixed(env, currentIP);
-          if(!allowed){
-            const allowedData = await getAllowedIPsFixed(env);
-            return new Response(whitelistBlockedPageFixed(currentIP, allowedData.allowed), {status:403, headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-cache'}});
-          }
-        }
-      }
-    }
 
     // === endpoints جديدة مضافة فقط - تستخدم الدوال الجديدة ===
     if(path==='/api/block-device-fixed'){
