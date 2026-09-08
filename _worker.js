@@ -135,15 +135,34 @@ async function ensureAllowedIPsTableFixed(env){
   const sql1 = `CREATE TABLE IF NOT EXISTS allowed_ips (
     ip TEXT PRIMARY KEY,
     reason TEXT DEFAULT 'مسموح',
+    device_name TEXT DEFAULT '',
     added_at TEXT DEFAULT (datetime('now','localtime'))
   )`;
   await tursoQuery(env, sql1, []);
+  // محاولة إضافة عمود device_name إذا الجدول موجود قديم
+  try{
+    await tursoQuery(env, `ALTER TABLE allowed_ips ADD COLUMN device_name TEXT DEFAULT ''`, []);
+  }catch{}
   await ensureWhitelistTableFixed(env);
 }
 
-async function addAllowedIPFixed(env, ip, reason){
+async function ensureRealLogsDeviceNameFixed(env){
+  try{
+    await tursoQuery(env, `ALTER TABLE real_page_logs ADD COLUMN device_name TEXT DEFAULT ''`, []);
+  }catch{}
+  try{
+    await tursoQuery(env, `ALTER TABLE blocked_devices ADD COLUMN device_name TEXT DEFAULT ''`, []);
+  }catch{}
+}
+
+async function addAllowedIPFixed(env, ip, reason, device_name){
   await ensureAllowedIPsTableFixed(env);
-  return await tursoQuery(env, "INSERT OR REPLACE INTO allowed_ips (ip, reason) VALUES (?, ?)", [ip, reason||'مسموح']);
+  return await tursoQuery(env, "INSERT OR REPLACE INTO allowed_ips (ip, reason, device_name) VALUES (?, ?, ?)", [ip, reason||'مسموح', device_name||'']);
+}
+
+async function updateAllowedIPDeviceNameFixed(env, ip, device_name){
+  await ensureAllowedIPsTableFixed(env);
+  return await tursoQuery(env, "UPDATE allowed_ips SET device_name=? WHERE ip=?", [device_name||'', ip]);
 }
 
 async function removeAllowedIPFixed(env, ip){
@@ -208,10 +227,23 @@ async function handleAddAllowedIPFixed(request, env){
     const body = await request.json();
     const ip = body.ip?.trim();
     const reason = body.reason?.trim() || 'مسموح';
+    const device_name = body.device_name?.trim() || body.device||'';
     if(!ip || !ip.includes('.')) return new Response(JSON.stringify({success:false, error:'IP غير صالح'}), {status:400, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
-    const result = await addAllowedIPFixed(env, ip, reason);
+    const result = await addAllowedIPFixed(env, ip, reason, device_name);
     if(result.error) return new Response(JSON.stringify({success:false, error:result.error}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
     return new Response(JSON.stringify({success:true, ip:ip}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+  }catch(e){ return new Response(JSON.stringify({success:false, error:e.message}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}}); }
+}
+
+async function handleUpdateDeviceNameFixed(request, env){
+  try{
+    const body = await request.json();
+    const ip = body.ip?.trim();
+    const device_name = body.device_name?.trim() || '';
+    if(!ip) return new Response(JSON.stringify({success:false, error:'IP مطلوب'}), {status:400, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+    const result = await updateAllowedIPDeviceNameFixed(env, ip, device_name);
+    if(result.error) return new Response(JSON.stringify({success:false, error:result.error}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+    return new Response(JSON.stringify({success:true}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
   }catch(e){ return new Response(JSON.stringify({success:false, error:e.message}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}}); }
 }
 
@@ -261,6 +293,9 @@ export default {
     }
     if(path==='/api/add-allowed-ip'){
       return await handleAddAllowedIPFixed(request, env);
+    }
+    if(path==='/api/update-device-name'){
+      return await handleUpdateDeviceNameFixed(request, env);
     }
     if(path==='/api/remove-allowed-ip'){
       return await handleRemoveAllowedIPFixed(request, env);
