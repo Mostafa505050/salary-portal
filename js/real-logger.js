@@ -164,3 +164,264 @@ window.testBlockFixed = async function(){
   alert('IP الحالي: '+ip+'\nالجهاز: '+device+'\n\nسيتم محاولة حظر هذا IP كاختبار');
   window.blockDeviceFixed(ip, device);
 };
+
+// ========== ميزة IP واحد فقط - دوال جديدة في real-logger - إضافة فقط ==========
+
+// دالة جديدة: تفعيل وضع IP واحد
+window.enableSingleIPModeFixed = async function(allowedIP){
+  try{
+    const res = await fetch('/api/enable-single-ip', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ip: allowedIP})});
+    const data = await res.json();
+    return data;
+  }catch(e){ return {success:false, error:e.message}; }
+};
+
+// دالة جديدة: إلغاء وضع IP واحد
+window.disableSingleIPModeFixed = async function(){
+  try{
+    const res = await fetch('/api/disable-single-ip', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({})});
+    const data = await res.json();
+    return data;
+  }catch(e){ return {success:false, error:e.message}; }
+};
+
+// دالة جديدة: جلب حالة القائمة البيضاء
+window.getWhitelistModeFixed = async function(){
+  try{
+    const res = await fetch('/api/whitelist-mode');
+    const data = await res.json();
+    return data;
+  }catch(e){ return {mode:'all', allowed_ip:null}; }
+};
+
+// دالة جديدة: إنشاء Checkbox في صفحة المراقبة
+window.createWhitelistUIFixed = function(containerId){
+  const container = document.getElementById(containerId);
+  if(!container) return;
+  
+  // جلب IP الحالي
+  fetch('/api/get-ip').then(r=>r.json()).then(ipData=>{
+    const currentIP = ipData.ip||'';
+    container.innerHTML = `
+      <div style="background:linear-gradient(135deg,#fffbeb,#fef3c7);border:2px solid #f59e0b;border-radius:14px;padding:16px;margin:16px 0">
+        <h3 style="margin:0 0 12px;font-size:14px;color:#92400e">🔐 ميزة IP واحد فقط - السماح لجهاز واحد وحظر الباقي</h3>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:800;background:#fff;padding:8px 12px;border-radius:8px;border:1.5px solid #fcd34d">
+            <input type="checkbox" id="singleIPCheckbox" style="width:20px;height:20px" onchange="window.toggleSingleIPFixed(this.checked)">
+            تفعيل وضع IP واحد فقط
+          </label>
+          <input type="text" id="allowedIPInput" value="${currentIP}" placeholder="45.102.74.114" style="padding:8px 12px;border:1.5px solid #fcd34d;border-radius:8px;font-family:monospace;width:170px;font-weight:700">
+          <button onclick="window.applySingleIPUIFixed()" style="padding:8px 14px;background:#f59e0b;color:#fff;border:none;border-radius:8px;font-weight:800;cursor:pointer">🔒 تطبيق الحظر</button>
+          <button onclick="window.allowAllUIFixed()" style="padding:8px 14px;background:#10b981;color:#fff;border:none;border-radius:8px;font-weight:800;cursor:pointer">✅ السماح للجميع</button>
+        </div>
+        <div id="whitelistStatusFixed" style="background:#fff;padding:10px;border-radius:8px;font-size:12px;color:#92400e;border:1px solid #fde68a">⏳ جاري تحميل الحالة...</div>
+        <div style="margin-top:10px;background:#fef3c7;padding:8px;border-radius:6px;font-size:11px;color:#92400e;line-height:1.6">
+          <b>💡 كيف تعمل:</b><br>
+          • <b>عند التفعيل:</b> فقط الـ IP المكتوب يدخل الموقع، أي IP آخر يرى صفحة <b>🚫 تم حظر جهازك - وضع IP واحد مفعل</b><br>
+          • <b>عند الإلغاء:</b> يعود السماح للجميع مع إمكانية حظر أجهزة محددة من جدول الأجهزة المحظورة<br>
+          • <b>مثال:</b> إذا كنت تريد الموقع لك فقط، ضع IP الخاص بك ${currentIP} وفعّل الوضع
+        </div>
+      </div>
+    `;
+    
+    // تحميل الحالة
+    window.getWhitelistModeFixed().then(data=>{
+      const cb=document.getElementById('singleIPCheckbox');
+      const inp=document.getElementById('allowedIPInput');
+      const status=document.getElementById('whitelistStatusFixed');
+      if(data.mode==='single'){
+        if(cb) cb.checked=true;
+        if(inp && data.allowed_ip) inp.value=data.allowed_ip;
+        if(status) status.innerHTML=`🔒 <b>الوضع الحالي:</b> IP واحد فقط - المسموح: <span style="background:#fee2e2;color:#dc2626;padding:3px 8px;border-radius:6px;font-family:monospace;font-weight:800">${data.allowed_ip}</span> - باقي IPs محظورة (${data.count||0} محاولة محظورة)`;
+      } else {
+        if(status) status.innerHTML=`✅ <b>الوضع الحالي:</b> السماح للجميع - ${data.total_blocked||0} جهاز محظور محدد`;
+      }
+    });
+  });
+};
+
+window.toggleSingleIPFixed = async function(checked){
+  if(checked){
+    await window.applySingleIPUIFixed();
+  } else {
+    await window.allowAllUIFixed();
+  }
+};
+
+window.applySingleIPUIFixed = async function(){
+  const ip = document.getElementById('allowedIPInput')?.value?.trim();
+  if(!ip || !ip.includes('.')){ alert('❌ أدخل IP صحيح'); return; }
+  if(!confirm(`🔒 تفعيل وضع IP واحد فقط؟\n\nIP المسموح: ${ip}\nباقي الأجهزة ستحظر\n\nمتأكد؟`)) return;
+  const result = await window.enableSingleIPModeFixed(ip);
+  if(result.success){
+    alert(`✅ تم التفعيل\nالمسموح: ${ip}\nالباقي محظور`);
+    location.reload();
+  } else {
+    alert('❌ فشل: '+(result.error||'خطأ'));
+  }
+};
+
+window.allowAllUIFixed = async function(){
+  if(!confirm('✅ السماح للجميع وإلغاء وضع IP واحد؟')) return;
+  const result = await window.disableSingleIPModeFixed();
+  if(result.success){
+    alert('✅ تم السماح للجميع');
+    location.reload();
+  } else {
+    alert('❌ فشل: '+(result.error||'خطأ'));
+  }
+};
+
+// دالة جديدة: اختبار هل IP الحالي مسموح
+window.checkIfCurrentIPAllowedFixed = async function(){
+  const mode = await window.getWhitelistModeFixed();
+  if(mode.mode==='single'){
+    const currentRes = await fetch('/api/get-ip');
+    const currentData = await currentRes.json();
+    const currentIP = currentData.ip;
+    if(currentIP!==mode.allowed_ip){
+      console.log('🚫 IP الحالي محظور في وضع IP واحد:', currentIP, 'المسموح:', mode.allowed_ip);
+      return false;
+    }
+  }
+  return true;
+};
+
+// ========== ميزة السماح لعدة IPs - قائمة بيضاء متعددة - دوال جديدة مضافة فقط ==========
+
+window.addAllowedIPFixed = async function(ip, reason){
+  try{
+    const res = await fetch('/api/add-allowed-ip', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ip: ip, reason: reason||'مسموح'})});
+    const data = await res.json();
+    return data;
+  }catch(e){ return {success:false, error:e.message}; }
+};
+
+window.removeAllowedIPFixed = async function(ip){
+  try{
+    const res = await fetch('/api/remove-allowed-ip', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ip: ip})});
+    const data = await res.json();
+    return data;
+  }catch(e){ return {success:false, error:e.message}; }
+};
+
+window.getAllowedIPsFixed = async function(){
+  try{
+    const res = await fetch('/api/allowed-ips');
+    const data = await res.json();
+    return data;
+  }catch(e){ return {allowed:[], mode:'all'}; }
+};
+
+window.enableWhitelistModeFixed = async function(){
+  try{
+    const res = await fetch('/api/enable-whitelist', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({})});
+    const data = await res.json();
+    return data;
+  }catch(e){ return {success:false, error:e.message}; }
+};
+
+window.disableWhitelistModeFixed = async function(){
+  try{
+    const res = await fetch('/api/disable-whitelist', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({})});
+    const data = await res.json();
+    return data;
+  }catch(e){ return {success:false, error:e.message}; }
+};
+
+window.createMultiIPUIFixed = function(containerId){
+  const container = document.getElementById(containerId);
+  if(!container) return;
+  
+  fetch('/api/get-ip').then(r=>r.json()).then(ipData=>{
+    const currentIP = ipData.ip||'';
+    container.innerHTML = `
+      <div style="background:linear-gradient(135deg,#ecfdf5,#d1fae5);border:2px solid #10b981;border-radius:14px;padding:16px;margin:16px 0">
+        <h3 style="margin:0 0 12px;font-size:14px;color:#065f46">✅ إضافة أي IP للسماح - قائمة بيضاء متعددة</h3>
+        <div style="background:#fff;border-radius:10px;padding:12px;margin-bottom:12px;border:1px solid #a7f3d0">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px">
+            <input type="text" id="newAllowedIP2" value="${currentIP}" placeholder="45.102.74.114" style="padding:8px 12px;border:1.5px solid #6ee7b7;border-radius:8px;font-family:monospace;width:180px;font-weight:700">
+            <input type="text" id="newAllowedReason2" placeholder="السبب مثل: مكتب الإدارة" style="padding:8px 12px;border:1.5px solid #6ee7b7;border-radius:8px;width:180px">
+            <button onclick="window.addNewAllowedIP2Fixed()" style="padding:8px 14px;background:#10b981;color:#fff;border:none;border-radius:8px;font-weight:800;cursor:pointer">➕ إضافة IP للسماح</button>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:800;background:#ecfdf5;padding:8px 12px;border-radius:8px;border:1.5px solid #6ee7b7">
+              <input type="checkbox" id="whitelistModeCheckbox2" style="width:20px;height:20px" onchange="window.toggleWhitelist2Fixed(this.checked)">
+              تفعيل وضع القائمة البيضاء (فقط المسموحين)
+            </label>
+            <button onclick="window.refreshAllowed2Fixed()" style="padding:6px 12px;background:#059669;color:#fff;border:none;border-radius:6px;font-weight:700;cursor:pointer">🔄 تحديث</button>
+            <button onclick="window.allowAllMulti2Fixed()" style="padding:6px 12px;background:#6b7280;color:#fff;border:none;border-radius:6px;font-weight:700;cursor:pointer">✅ السماح للجميع</button>
+          </div>
+        </div>
+        <div id="allowedIPsList2Fixed" style="background:#fff;border-radius:10px;padding:10px;border:1px solid #a7f3d0;max-height:300px;overflow-y:auto">⏳ جاري تحميل...</div>
+        <div id="multiIPStatus2Fixed" style="margin-top:10px;background:#fff;padding:10px;border-radius:8px;font-size:12px;color:#065f46;border:1px solid #a7f3d0">⏳ جاري تحميل الحالة...</div>
+      </div>
+    `;
+    window.refreshAllowed2Fixed();
+  });
+};
+
+window.refreshAllowed2Fixed = async function(){
+  const listDiv=document.getElementById('allowedIPsList2Fixed');
+  const statusDiv=document.getElementById('multiIPStatus2Fixed');
+  const cb=document.getElementById('whitelistModeCheckbox2');
+  try{
+    const data=await window.getAllowedIPsFixed();
+    const allowed=data.allowed||[];
+    const mode=data.mode||'all';
+    if(listDiv){
+      if(allowed.length===0){
+        listDiv.innerHTML='<div style="text-align:center;color:#6b7280;padding:20px">لا يوجد IPs - أضف أول IP</div>';
+      } else {
+        listDiv.innerHTML=allowed.map(item=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid #ecfdf5"><div><span style="font-family:monospace;background:#dcfce7;color:#065f46;padding:4px 10px;border-radius:6px;font-weight:800">${item.ip}</span><span style="font-size:11px;color:#6b7280;margin-right:8px">${item.reason||''} - ${item.added_at||''}</span></div><button onclick="window.removeAllowedUIFixed('${item.ip}')" style="padding:4px 10px;background:#ef4444;color:#fff;border:none;border-radius:6px;font-weight:700;cursor:pointer">🗑️ حذف</button></div>`).join('');
+      }
+    }
+    if(statusDiv){
+      if(mode==='whitelist'){
+        if(cb) cb.checked=true;
+        statusDiv.innerHTML=`🔐 الوضع: قائمة بيضاء مفعلة - ${allowed.length} IP مسموح - الباقي محظور`;
+        statusDiv.style.background='#fef3c7';
+      } else if(mode==='single'){
+        statusDiv.innerHTML=`🔒 الوضع: IP واحد - ${data.allowed_ip} - استخدم ميزة IP واحد`;
+      } else {
+        if(cb) cb.checked=false;
+        statusDiv.innerHTML=`✅ الوضع: السماح للجميع - ${allowed.length} IP في القائمة (غير مفعلة)`;
+        statusDiv.style.background='#fff';
+      }
+    }
+  }catch(e){ if(listDiv) listDiv.innerHTML='❌ خطأ: '+e.message; }
+};
+
+window.addNewAllowedIP2Fixed = async function(){
+  const ip=document.getElementById('newAllowedIP2')?.value?.trim();
+  const reason=document.getElementById('newAllowedReason2')?.value?.trim()||'مسموح';
+  if(!ip || !ip.includes('.')){ alert('❌ أدخل IP صحيح'); return; }
+  const result=await window.addAllowedIPFixed(ip, reason);
+  if(result.success){ alert(`✅ تم إضافة IP: ${ip}`); document.getElementById('newAllowedIP2').value=''; document.getElementById('newAllowedReason2').value=''; window.refreshAllowed2Fixed(); }
+  else{ alert('❌ فشل: '+(result.error||'خطأ')); }
+};
+
+window.removeAllowedUIFixed = async function(ip){
+  if(!confirm(`حذف IP: ${ip} من المسموحين؟`)) return;
+  const result=await window.removeAllowedIPFixed(ip);
+  if(result.success){ alert(`✅ تم حذف ${ip}`); window.refreshAllowed2Fixed(); }
+  else{ alert('❌ فشل: '+(result.error||'خطأ')); }
+};
+
+window.toggleWhitelist2Fixed = async function(checked){
+  if(checked){
+    if(!confirm('🔐 تفعيل القائمة البيضاء؟ فقط المسموحين يدخلون')){ document.getElementById('whitelistModeCheckbox2').checked=false; return; }
+    const result=await window.enableWhitelistModeFixed();
+    if(result.success){ alert('✅ تم التفعيل'); window.refreshAllowed2Fixed(); }
+    else{ alert('❌ فشل: '+(result.error||'خطأ')); document.getElementById('whitelistModeCheckbox2').checked=false; }
+  } else {
+    await window.allowAllMulti2Fixed();
+  }
+};
+
+window.allowAllMulti2Fixed = async function(){
+  if(!confirm('✅ السماح للجميع؟')) return;
+  const result=await window.disableWhitelistModeFixed();
+  if(result.success){ alert('✅ السماح للجميع'); window.refreshAllowed2Fixed(); }
+  else{ alert('❌ فشل: '+(result.error||'خطأ')); }
+};
