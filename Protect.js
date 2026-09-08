@@ -13,12 +13,33 @@
     document.addEventListener('click', function(e){
       const a = e.target.closest('a');
       if(!a) return;
-      const href = (a.getAttribute('href')||'').toLowerCase();
-      if(blocked.some(b=>href.includes(b.replace('.html','')))){
+      let href = (a.getAttribute('href')||'').toLowerCase().trim();
+      // إصلاح: مطابقة تامة فقط - لا يحظر الصفحات المتشابهة
+      // مثال: salaryold.html لا تحظر salary.html
+      const hrefFile = href.split('/').pop().split('?')[0].split('#')[0]; // فقط اسم الملف
+      const hrefNoExt = hrefFile.replace('.html','').trim();
+      const isBlocked = blocked.some(b=>{
+        const bl = String(b).toLowerCase().trim();
+        const blFile = bl.split('/').pop();
+        const blNoExt = blFile.replace('.html','').trim();
+        // مطابقة تامة فقط
+        return blFile===hrefFile || blNoExt===hrefNoExt || bl===href;
+      });
+      if(isBlocked){
         e.preventDefault();
-        alert('🔒 هذه الصفحة مغلقة (مفعلة=0 في صفحات_الموقع)');
+        alert('🔒 هذه الصفحة مغلقة (مفعلة=0 في صفحات_الموقع)\nالصفحة: '+hrefFile);
       }
     });
+  }
+  
+  // دالة جديدة محسنة للتحقق الدقيق
+  function isBlockedExactFixed(pageName, blockedList){
+    const low = pageName.toLowerCase().trim().split('/').pop();
+    for(const b of blockedList){
+      const bl = String(b).toLowerCase().trim().split('/').pop();
+      if(bl===low) return true;
+    }
+    return false;
   }
   init();
 })();
