@@ -43,8 +43,7 @@ tr:hover td{background:var(--card2)}
 
 <div class="header-3d">
   <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙 ليلي</button>
-  <h1>📱 لوحة المراقبة - كشف اسم الجهاز الحقيقي للزائر</h1>
-  <p style="font-size:12px;opacity:0.9;margin-top:4px">يكشف موديل الموبايل الحقيقي: Samsung Galaxy S23 Ultra (SM-S918B) - Android 13 - Chrome</p>
+  <h1>📱 لوحة المراقبة </h1>
   <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
     <span style="background:rgba(255,255,255,0.2);padding:6px 12px;border-radius:20px;font-size:12px;font-weight:800">
       IP: <span id="myIp" style="background:#fff;color:#dc2626;padding:2px 8px;border-radius:12px;font-family:monospace">جاري...</span>
@@ -57,15 +56,6 @@ tr:hover td{background:var(--card2)}
 </div>
 
 <div class="card-3d">
-  <div class="explain">
-    <b>🔍 كيف نكشف اسم الجهاز الحقيقي؟</b><br>
-    • <b>أندرويد:</b> نستخرج الموديل الحقيقي من UserAgent مثل <code>SM-S918B</code> (Galaxy S23 Ultra), <code>Redmi Note 12</code>, <code>CPH2449</code> (OPPO Reno10) ونحول الكود لاسم تجاري<br>
-    • <b>آيفون:</b> آبل لا تعطي الموديل في المتصفح لأسباب الخصوصية، نكشف نوع الآيفون من دقة الشاشة + إصدار iOS + المتصفح (مثال: iPhone 14 Pro - iOS 17.2 - Safari 390x844)<br>
-    • <b>ويندوز/ماك:</b> نكشف إصدار النظام + المتصفح + دقة الشاشة<br>
-    • <b>ميزة حديثة:</b> نستخدم <code>navigator.userAgentData</code> التي تعطي موديل الجهاز الحقيقي في أندرويد الحديث (Pixel 7, Galaxy S23...)<br>
-    ⚠️ <b>تنبيه:</b> اسم الجهاز الشخصي مثل "iPhone Ahmed" لا يمكن كشفه أبداً من المتصفح لأسباب الخصوصية - المتصفح لا يسمح بذلك
-  </div>
-
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
     <h3 style="margin:0">🔐 IPs المسموحة</h3>
     <span id="allowedCount" style="background:var(--primary);color:#fff;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:800">0</span>
@@ -89,12 +79,12 @@ tr:hover td{background:var(--card2)}
 
 <div class="card-3d">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-    <h3 style="margin:0">📱 الأجهزة التي دخلت - مع اسم الجهاز الحقيقي (موديل الموبايل)</h3>
+    <h3 style="margin:0">📱 الأجهزة التي دخلت </h3>
     <span id="realCount" style="background:var(--primary);color:#fff;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:800">0</span>
   </div>
   <div class="table-wrap">
     <table>
-      <thead><tr><th>🌐 IP</th><th>📱 اسم الجهاز الحقيقي - موديل الموبايل</th><th>📄 الصفحات</th><th>📅 آخر دخول</th><th>🚫</th></tr></thead>
+      <thead><tr><th>🌐 IP</th><th>📱 اسم الجهاز الحقيقي</th><th>📄 الصفحات</th><th>📅 آخر دخول</th><th>🚫</th></tr></thead>
       <tbody id="realTable"><tr><td colspan=5 style="padding:30px">⏳ جاري التحميل...</td></tr></tbody>
     </table>
   </div>
