@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>بيانات حقيقية - مراقبة الاستهلاك</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+*{font-family:'Cairo',sans-serif;box-sizing:border-box}
+body{margin:0;background:linear-gradient(135deg,#f0f9ff 0%,#e0f2fe 100%);min-height:100vh;padding:20px}
+.header{max-width:1100px;margin:0 auto 20px;background:#fff;border-radius:16px;padding:18px;box-shadow:0 8px 24px rgba(0,0,0,0.06);text-align:center;border:2px solid #0ea5e9}
+.header h1{margin:0;color:#0c4a6e;font-size:18px;font-weight:800}
+.header p{margin:6px 0 0;color:#64748b;font-size:11px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;max-width:1100px;margin:0 auto 20px}
+.stat{background:#fff;border-radius:14px;padding:16px;box-shadow:0 6px 16px rgba(0,0,0,0.05);border:1.5px solid #e0f2fe;text-align:center}
+.stat h3{margin:0 0 6px;font-size:11px;color:#64748b}
+.stat .val{font-size:24px;font-weight:800;color:#0c4a6e}
+.stat .sub{font-size:10px;color:#64748b;margin-top:4px}
+.bar{height:8px;background:#e0f2fe;border-radius:10px;overflow:hidden;margin-top:8px}
+.fill{height:100%;border-radius:10px;transition:width 0.5s}
+.fill.safe{background:#10b981}
+.fill.warn{background:#f59e0b}
+.fill.danger{background:#ef4444}
+.box{max-width:1100px;margin:0 auto 20px;background:#fff;border-radius:16px;padding:16px;box-shadow:0 8px 20px rgba(0,0,0,0.05);border:1.5px solid #e0f2fe}
+.box h2{margin:0 0 12px;font-size:14px;color:#0c4a6e;font-weight:800}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th{background:#f0f9ff;padding:8px;font-weight:800;color:#0c4a6e;white-space:nowrap}
+td{padding:8px;border-bottom:1px solid #f0f9ff;text-align:center}
+.badge{padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700}
+.safe{background:#dcfce7;color:#065f46}
+.warn{background:#fef3c7;color:#92400e}
+.danger{background:#fee2e2;color:#991b1b}
+.empty{padding:40px;text-align:center;color:#64748b;font-size:12px;line-height:1.8}
+.btn{padding:8px 14px;border-radius:10px;border:none;font-weight:700;cursor:pointer;font-size:11px;background:#0ea5e9;color:#fff}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📊 بيانات حقيقية فقط - لا يوجد أي بيانات وهمية</h1>
+  <p>يعرض الصفحات التي تم التعامل معها فعلياً بالوقت والتاريخ ونسبة الأمان 50% = 50,000 طلب | واتساب: 01092259655</p>
+  <p style="color:#dc2626;font-weight:800;margin-top:8px">🛡️ حد الأمان الخاص بك: 50,000 طلب/يوم - تنبيه عند التجاوز</p>
+</div>
+
+<div class="stats">
+  <div class="stat">
+    <h3>📅 استهلاك اليوم (حقيقي)</h3>
+    <div id="todayCount" class="val">0</div>
+    <div id="todayPct" class="sub">0% من 100k | 0% من 50k</div>
+    <div class="bar"><div id="todayBar" class="fill safe" style="width:0%"></div></div>
+  </div>
+  <div class="stat">
+    <h3>📈 إجمالي الشهر (حقيقي)</h3>
+    <div id="monthCount" class="val">0</div>
+    <div id="monthAvg" class="sub">متوسط يومي: 0</div>
+  </div>
+  <div class="stat">
+    <h3>🔺 أكثر صفحة استخداماً</h3>
+    <div id="topPage" class="val" style="font-size:14px">-</div>
+    <div id="topPageCount" class="sub">0 مرة</div>
+  </div>
+  <div class="stat">
+    <h3>🛡️ حالة الأمان</h3>
+    <div id="safetyStatus" class="val" style="font-size:16px">✅ آمن</div>
+    <div id="safetySub" class="sub">أقل من 50%</div>
+  </div>
+</div>
+
+<div class="box">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+    <h2>📋 الصفحات التي تم التعامل معها - بالوقت والتاريخ (بيانات حقيقية فقط)</h2>
+    <button class="btn" onclick="loadRealData()">🔄 تحديث البيانات الحقيقية</button>
+  </div>
+  <div style="overflow-x:auto">
+    <table>
+      <thead><tr><th>التاريخ والوقت</th><th>الصفحة</th><th>الموقع</th><th>الجهاز</th><th>IP</th><th>نسبة الأمان 50%</th><th>الحالة</th></tr></thead>
+      <tbody id="realTable"></tbody>
+    </table>
+  </div>
+  <div id="emptyReal" class="empty" style="display:none">
+    لا يوجد بيانات حقيقية بعد<br>
+    <b>السبب:</b> لم يتم إنشاء جداول التتبع أو لم يدخل أحد للموقع بعد تفعيل التتبع<br>
+    <b>الحل:</b><br>
+    1. شغل هذا SQL في Turso مرة واحدة:<br>
+    <code style="background:#1e293b;color:#6ee7b7;padding:8px;border-radius:8px;display:block;margin:8px 0;text-align:left;direction:ltr;font-size:10px;white-space:pre">CREATE TABLE IF NOT EXISTS real_page_logs (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  page TEXT NOT NULL,
+  site TEXT NOT NULL,
+  device_model TEXT,
+  ip TEXT,
+  user_agent TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now','localtime'))
+);
+CREATE TABLE IF NOT EXISTS daily_consumption_real (
+  date TEXT PRIMARY KEY,
+  site TEXT,
+  requests INTEGER DEFAULT 1,
+  created_at TEXT
+);</code>
+    2. أضف هذا الكود في كل صفحة من موقعك (قبل &lt;/body&gt;):<br>
+    <code style="background:#fef3c7;color:#92400e;padding:8px;border-radius:8px;display:block;margin:8px 0;text-align:left;direction:ltr;font-size:10px">&lt;script src="/js/real-logger.js"&gt;&lt;/script&gt;</code>
+    3. بعدها أي زيارة حقيقية ستظهر هنا فوراً بالوقت والتاريخ
+  </div>
+</div>
+
+<div class="box">
+  <h2>📅 سجل الاستهلاك اليومي (حقيقي - من قاعدة البيانات)</h2>
+  <div style="overflow-x:auto">
+    <table>
+      <thead><tr><th>التاريخ</th><th>الموقع</th><th>عدد الطلبات الحقيقية</th><th>أدنى ساعة</th><th>أقصى ساعة</th><th>نسبة من 50k</th><th>الحالة</th></tr></thead>
+      <tbody id="dailyTable"></tbody>
+    </table>
+  </div>
+  <div id="emptyDaily" class="empty" style="display:none">لا يوجد استهلاك يومي مسجل بعد - سيبدأ التسجيل تلقائياً عند أول زيارة</div>
+</div>
+
+<div class="box">
+  <h2>📆 سجل الاستهلاك الشهري (حقيقي)</h2>
+  <div style="overflow-x:auto">
+    <table>
+      <thead><tr><th>الشهر</th><th>الموقع</th><th>إجمالي الطلبات</th><th>متوسط يومي</th><th>أعلى يوم</th><th>أقل يوم</th><th>أيام تجاوز 50%</th><th>نسبة الأمان</th></tr></thead>
+      <tbody id="monthlyTable"></tbody>
+    </table>
+  </div>
+  <div id="emptyMonthly" class="empty" style="display:none">لا يوجد سجل شهري بعد</div>
+</div>
+
+<script>
+const API = 'https://turso-api.mostafa-voic77729.workers.dev/api/turso';
+const SAFE_LIMIT = 50000;
+const FULL_LIMIT = 100000;
+
+async function loadRealData(){
+  document.getElementById('realTable').innerHTML = '<tr><td colspan=7>⏳ جاري جلب البيانات الحقيقية من قاعدة البيانات...</td></tr>';
+  
+  try{
+    // جلب الصفحات الحقيقية فقط
+    const res1 = await fetch(API, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({sql: 'SELECT * FROM real_page_logs ORDER BY created_at DESC LIMIT 100'})
+    });
+    const data1 = await res1.json();
+    const realLogs = data1.rows || [];
+    
+    const tbody = document.getElementById('realTable');
+    const empty = document.getElementById('emptyReal');
+    
+    if(realLogs.length===0){
+      tbody.innerHTML='';
+      empty.style.display='block';
+      updateStats([], []);
+      return;
+    }
+    empty.style.display='none';
+    tbody.innerHTML='';
+    
+    // حساب استهلاك اليوم الحقيقي
+    const todayStr = new Date().toISOString().split('T')[0];
+    const todayLogs = realLogs.filter(r=> (r.created_at||'').startsWith(todayStr));
+    
+    realLogs.forEach(r=>{
+      const date = new Date(r.created_at);
+      const isToday = (r.created_at||'').startsWith(todayStr);
+      const safePct = ((todayLogs.length / SAFE_LIMIT)*100).toFixed(2);
+      const status = todayLogs.length >= SAFE_LIMIT ? (todayLogs.length>=FULL_LIMIT?'danger':'warn') : 'safe';
+      const statusText = status==='danger'?'🔴 خطر':status==='warn'?'🟡 تجاوز 50%':'✅ آمن';
+      
+      const tr=document.createElement('tr');
+      if(isToday) tr.style.background='#f0fdf4';
+      tr.innerHTML=`
+        <td>${r.created_at||''}</td>
+        <td><b>${r.page||''}</b></td>
+        <td>${r.site||''}</td>
+        <td>${r.device_model||''}</td>
+        <td>${r.ip||''}</td>
+        <td>${safePct}%</td>
+        <td><span class="badge ${status}">${statusText}</span></td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    // جلب الاستهلاك اليومي الحقيقي
+    const res2 = await fetch(API, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({sql: 'SELECT date, site, COUNT(*) as requests, MIN(created_at) as first, MAX(created_at) as last FROM real_page_logs GROUP BY date, site ORDER BY date DESC LIMIT 30'})
+    });
+    const data2 = await res2.json();
+    const dailyLogs = data2.rows || [];
+    renderDaily(dailyLogs);
+
+    // جلب الشهري الحقيقي
+    const res3 = await fetch(API, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({sql: "SELECT substr(date,1,7) as month, site, COUNT(*) as total, AVG(requests) as avg_daily, MAX(requests) as max_day, MIN(requests) as min_day FROM (SELECT date, site, COUNT(*) as requests FROM real_page_logs GROUP BY date, site) GROUP BY month, site ORDER BY month DESC"})
+    });
+    const data3 = await res3.json();
+    const monthlyLogs = data3.rows || [];
+    renderMonthly(monthlyLogs);
+
+    updateStats(realLogs, dailyLogs);
+
+    // تنبيه إذا تجاوز 50%
+    if(todayLogs.length >= SAFE_LIMIT){
+      sendRealAlert(todayLogs.length);
+    }
+
+  }catch(e){
+    document.getElementById('realTable').innerHTML = `<tr><td colspan=7>❌ خطأ في جلب البيانات الحقيقية: ${e.message}<br>تأكد من إنشاء الجداول في Turso</td></tr>`;
+  }
+}
+
+function renderDaily(logs){
+  const tbody = document.getElementById('dailyTable');
+  const empty = document.getElementById('emptyDaily');
+  if(logs.length===0){ tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  tbody.innerHTML='';
+  logs.forEach(r=>{
+    const pct = ((r.requests / SAFE_LIMIT)*100).toFixed(1);
+    const status = r.requests>=SAFE_LIMIT ? (r.requests>=FULL_LIMIT?'danger':'warn') : 'safe';
+    const statusText = status==='danger'?'🔴 خطر':status==='warn'?'🟡 تجاوز 50%':'✅ آمن';
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${r.date||''}</td><td>${r.site||''}</td><td><b>${r.requests||0}</b></td><td>${(r.first||'').slice(11,16)||'-'}</td><td>${(r.last||'').slice(11,16)||'-'}</td><td>${pct}%</td><td><span class="badge ${status}">${statusText}</span></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderMonthly(logs){
+  const tbody = document.getElementById('monthlyTable');
+  const empty = document.getElementById('emptyMonthly');
+  if(logs.length===0){ tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  tbody.innerHTML='';
+  logs.forEach(r=>{
+    const safePct = ((r.total / (SAFE_LIMIT*30))*100).toFixed(1);
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${r.month||''}</td><td>${r.site||''}</td><td><b>${r.total||0}</b></td><td>${Math.round(r.avg_daily||0)}</td><td>${r.max_day||0}</td><td>${r.min_day||0}</td><td>${r.total>SAFE_LIMIT ? '⚠️' : '0'}</td><td>${safePct}%</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function updateStats(realLogs, dailyLogs){
+  const todayStr = new Date().toISOString().split('T')[0];
+  const todayCount = realLogs.filter(r=> (r.created_at||'').startsWith(todayStr)).length;
+  const monthCount = realLogs.length;
+  const avg = dailyLogs.length>0 ? Math.round(dailyLogs.reduce((s,r)=>s+(r.requests||0),0)/dailyLogs.length) : 0;
+  
+  document.getElementById('todayCount').innerText = todayCount;
+  document.getElementById('todayPct').innerText = `${((todayCount/FULL_LIMIT)*100).toFixed(1)}% من 100k | ${((todayCount/SAFE_LIMIT)*100).toFixed(1)}% من 50k`;
+  document.getElementById('todayBar').style.width = Math.min(100, (todayCount/SAFE_LIMIT)*100)+'%';
+  document.getElementById('todayBar').className = 'fill '+(todayCount>=FULL_LIMIT?'danger':todayCount>=SAFE_LIMIT?'warn':'safe');
+  
+  document.getElementById('monthCount').innerText = monthCount;
+  document.getElementById('monthAvg').innerText = `متوسط يومي: ${avg}`;
+  
+  // أكثر صفحة
+  const pageCounts = {};
+  realLogs.forEach(r=>{ pageCounts[r.page] = (pageCounts[r.page]||0)+1; });
+  const top = Object.entries(pageCounts).sort((a,b)=>b[1]-a[1])[0];
+  if(top){
+    document.getElementById('topPage').innerText = top[0];
+    document.getElementById('topPageCount').innerText = top[1]+' مرة';
+  }
+  
+  const safetyEl = document.getElementById('safetyStatus');
+  const safetySub = document.getElementById('safetySub');
+  if(todayCount>=FULL_LIMIT){ safetyEl.innerText='🔴 خطر'; safetyEl.style.color='#dc2626'; safetySub.innerText='تجاوز 100%'; }
+  else if(todayCount>=SAFE_LIMIT){ safetyEl.innerText='🟡 تحذير 50%'; safetyEl.style.color='#d97706'; safetySub.innerText=`${((todayCount/SAFE_LIMIT)*100).toFixed(0)}% من حد الأمان`; }
+  else { safetyEl.innerText='✅ آمن'; safetyEl.style.color='#059669'; safetySub.innerText=`${((todayCount/SAFE_LIMIT)*100).toFixed(0)}% - أقل من 50%`; }
+}
+
+async function sendRealAlert(count){
+  const msg = `⚠️ تنبيه حقيقي - تجاوز 50%\n📊 الاستهلاك الحقيقي اليوم: ${count}\n🛡️ حد الأمان: 50,000\n📈 النسبة: ${((count/SAFE_LIMIT)*100).toFixed(1)}%\n⏰ ${new Date().toLocaleString('ar-EG')}\nنظام الحوافز`;
+  try{
+    await fetch('https://hafez-api.mostafa-voic77729.workers.dev/api/hafez/send-email-outlook',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({to:'mostafa.voic77729@gmail.com',subject:`⚠️ تنبيه حقيقي ${count} - تجاوز 50%`,body:msg})
+    });
+  }catch(e){}
+  if(!sessionStorage.getItem('alerted_'+new Date().toISOString().split('T')[0])){
+    const div=document.createElement('div');
+    div.style.cssText='position:fixed;top:20px;left:50%;transform:translateX(-50%);background:linear-gradient(180deg,#fca5a5,#ef4444);color:#fff;padding:14px 20px;border-radius:14px;z-index:9999;font-weight:800;box-shadow:0 12px 32px rgba(0,0,0,0.2);max-width:90%;text-align:center';
+    div.innerHTML=`⚠️ بيانات حقيقية: تجاوزت ${count} طلب (${((count/SAFE_LIMIT)*100).toFixed(0)}% من 50k)<br>📱 واتساب 01092259655`;
+    document.body.appendChild(div);
+    setTimeout(()=>div.remove(),6000);
+    sessionStorage.setItem('alerted_'+new Date().toISOString().split('T')[0],'1');
+  }
+}
+
+loadRealData();
+// تحديث كل دقيقة ببيانات حقيقية فقط
+setInterval(loadRealData, 60000);
+</script>
+</body>
+</html>
