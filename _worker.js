@@ -1,10 +1,15 @@
-// _worker.js - إصلاح كامل: حظر دقيق للصفحة فقط + قائمة بيضاء متعددة بدون تكرار + كاش لكل صفحة V2
+// _worker.js - إصلاح كامل: حظر دقيق للصفحة فقط + قائمة بيضاء متعددة بدون تكرار + كاش لكل صفحة V2 - إصلاح عدم تحميل أسماء الصفحات بدون حذف أي دالة
 const HARDCODED_TURSO_URL = "https://company-alldata-mostafadarwish-mostafa505050.aws-eu-west-1.turso.io";
 const HARDCODED_TURSO_TOKEN = "PASTE_YOUR_TURSO_TOKEN_HERE";
 const FALLBACK_BLOCKED = ['addhafez1.html', 'tables.html'];
-
+// ========== إصلاح صارم: صفحات لوحة التحكم لا يتم تخزينها في الكاش أبداً - بدون حذف أي دالة ==========
+const NEVER_CACHE_PAGES = ['Real-Monitoring','Cache-Dashboard','cache-dashboard','real-monitoring','Real-Monitoring-Cache','Cache-Dashboard-Real-Monitoring','Real-Monitoring-V2','dashboard','whitelist','allowed-ips','blocked','login','auth','cache-dashboard-real-monitoring'];
+function shouldNeverCache(pageName, pathname){
+  const combined = ((pageName||'') + ' ' + (pathname||'')).toLowerCase();
+  return NEVER_CACHE_PAGES.some(p => combined.includes(p.toLowerCase()));
+}
 // ========== كود الكاش المضاف - بدون حذف أي دالة قديمة ==========
-let GLOBAL_CACHE = new Map(); // key -> {data, headers, expiresAt, originalExpiresAt, page, createdAt}
+let GLOBAL_CACHE = new Map();
 let STATS = {
   workerRequestsToday: 0,
   tursoQueriesToday: 0,
@@ -18,9 +23,8 @@ let STATS = {
   rowsRead: 0,
   storageUsed: 0,
   startOfDay: new Date().toDateString(),
-  pagesConfig: {} // { 'Hafez.html': {enabled:true, duration:300, unit:'minutes', durationValue:5, lastRefresh, nextExpiry} }
+  pagesConfig: {}
 };
-
 function parseDuration(payload){
   if(typeof payload === 'number') return payload;
   if(!payload) return 3600;
@@ -32,17 +36,16 @@ function parseDuration(payload){
   if(u==='infinite') return Infinity;
   return v * (map[u] || 3600);
 }
-
 function getCacheKey(request, pageName){
   const url = new URL(request.url);
   const page = (pageName || url.pathname.split('/').pop() || 'index.html').trim();
   const keyPage = page === '' ? 'index.html' : page;
   return keyPage + '|' + url.pathname + url.search;
 }
-
 function getCached(key){
   if(!STATS.cacheEnabled) return null;
   const page = key.split('|')[0];
+  if(shouldNeverCache(page, key)) return null;
   const cfg = STATS.pagesConfig[page];
   if(cfg && cfg.enabled === false) return null;
   const entry = GLOBAL_CACHE.get(key);
@@ -51,10 +54,10 @@ function getCached(key){
   STATS.cacheHits++; STATS.savedQueries++;
   return entry;
 }
-
 function setCached(key, data, headers, pageName){
   if(!STATS.cacheEnabled) return;
   const page = pageName || key.split('|')[0];
+  if(shouldNeverCache(page, key)) return;
   const cfg = STATS.pagesConfig[page];
   const durationSec = cfg ? parseDuration(cfg) : STATS.cacheDuration;
   if(durationSec===0) return;
@@ -72,7 +75,6 @@ function setCached(key, data, headers, pageName){
   STATS.nextExpiry = new Date(expiresAt).toISOString();
   STATS.storageUsed = GLOBAL_CACHE.size;
 }
-
 async function ensureCacheConfigTableFixed(env){
   const sql = `CREATE TABLE IF NOT EXISTS cache_config (
     page TEXT PRIMARY KEY,
@@ -85,7 +87,6 @@ async function ensureCacheConfigTableFixed(env){
   )`;
   await tursoQuery(env, sql, []);
 }
-
 async function loadPagesConfigFixed(env){
   try{
     await ensureCacheConfigTableFixed(env);
@@ -100,7 +101,6 @@ async function loadPagesConfigFixed(env){
     }
   }catch{}
 }
-
 function getTursoConfig(env){
   let url = (env.TURSO_URL || env.TURSO_URLL || HARDCODED_TURSO_URL || '').trim();
   let token = (env.TURSO_TOKEN || env.TURSO_TOKENL || HARDCODED_TURSO_TOKEN || '').trim();
@@ -109,7 +109,6 @@ function getTursoConfig(env){
   if(url && !url.startsWith('https://')) url='https://'+url;
   return {url, token};
 }
-
 async function tursoQuery(env, sql, params=[]){
   const {url, token} = getTursoConfig(env);
   if(!url || !token) return {error:'no config - الصق التوكن في Worker'};
@@ -127,7 +126,6 @@ async function tursoQuery(env, sql, params=[]){
     return {result: data.results?.[0]?.response?.result, raw:data};
   }catch(e){ return {error:e.message}; }
 }
-
 function isBlocked(pageName, blockedList){
   const low = pageName.toLowerCase().trim();
   const lowNoExt = low.replace('.html','').trim();
@@ -140,7 +138,6 @@ function isBlocked(pageName, blockedList){
   }
   return false;
 }
-
 function isBlockedExact(pageName, blockedList){
   const low = pageName.toLowerCase().trim();
   for(const b of blockedList){
@@ -149,21 +146,17 @@ function isBlockedExact(pageName, blockedList){
   }
   return false;
 }
-
 function blockedPageHTML(pageName, source){
   return `<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>مغلقة</title><style>body{min-height:100vh;background:#0a0a1a;color:#fff;display:flex;align-items:center;justify-content:center;font-family:Cairo,sans-serif} .box{background:rgba(255,255,255,0.07);padding:30px;border-radius:20px;text-align:center}</style></head><body><div class="box"><h1>🔒 الصفحة مغلقة</h1><p>${pageName}</p><p style="font-size:10px">Source: ${source}</p><a href="/" style="color:#a78bfa">الرئيسية</a></div></body></html>`;
 }
-
 function blockedDeviceHTML(ip, device, reason){
   return `<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>محظور</title><style>body{min-height:100vh;background:linear-gradient(135deg,#fee2e2,#fecaca);display:flex;align-items:center;justify-content:center;font-family:Cairo,sans-serif} .box{background:#fff;padding:30px;border-radius:20px;text-align:center;box-shadow:0 16px 40px rgba(0,0,0,0.15)} h1{color:#dc2626}</style></head><body><div class="box"><div style="font-size:60px">🚫</div><h1>تم حظر جهازك</h1><p>IP: ${ip}<br>الجهاز: ${device}<br>السبب: ${reason||'محظور'}<br>01092259655</p><a href="https://wa.me/201092259655" style="display:inline-block;padding:10px 20px;background:#25D366;color:#fff;border-radius:10px;text-decoration:none;margin-top:12px">واتساب</a></div></body></html>`;
 }
-
 async function insertBlockedDeviceFixed(env, device_model, ip, reason){
   const sql = "INSERT INTO blocked_devices (device_model, ip, reason) VALUES (?, ?, ?)";
   const params = [device_model, ip, reason];
   return await tursoQuery(env, sql, params);
 }
-
 async function getBlockedDevicesFixed(env){
   const result = await tursoQuery(env, "SELECT * FROM blocked_devices ORDER BY id DESC LIMIT 100", []);
   if(result.error) return {blocked:[], error:result.error};
@@ -178,15 +171,12 @@ async function getBlockedDevicesFixed(env){
   }
   return {blocked, error:null};
 }
-
 async function deleteBlockedDeviceFixed(env, id){
   return await tursoQuery(env, "DELETE FROM blocked_devices WHERE id=?", [id]);
 }
-
 function getRealIPFixed(request){
   return request.headers.get('CF-Connecting-IP') || request.headers.get('X-Forwarded-For')?.split(',')[0]?.trim() || request.headers.get('X-Real-IP') || 'unknown';
 }
-
 async function handleBlockDeviceRequestFixed(request, env){
   try{
     const body = await request.json();
@@ -203,7 +193,6 @@ async function handleBlockDeviceRequestFixed(request, env){
     return new Response(JSON.stringify({success:false, error:e.message}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
   }
 }
-
 async function handleUnblockDeviceRequestFixed(request, env){
   try{
     const body = await request.json();
@@ -216,7 +205,6 @@ async function handleUnblockDeviceRequestFixed(request, env){
     return new Response(JSON.stringify({success:false, error:e.message}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
   }
 }
-
 async function ensureWhitelistTableFixed(env){
   const sql = `CREATE TABLE IF NOT EXISTS ip_whitelist_config (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -227,7 +215,6 @@ async function ensureWhitelistTableFixed(env){
   )`;
   await tursoQuery(env, sql, []);
 }
-
 async function ensureAllowedIPsTableFixed(env){
   const sql1 = `CREATE TABLE IF NOT EXISTS allowed_ips (
     ip TEXT PRIMARY KEY,
@@ -239,27 +226,22 @@ async function ensureAllowedIPsTableFixed(env){
   try{ await tursoQuery(env, `ALTER TABLE allowed_ips ADD COLUMN device_name TEXT DEFAULT ''`, []); }catch{}
   await ensureWhitelistTableFixed(env);
 }
-
 async function ensureRealLogsDeviceNameFixed(env){
   try{ await tursoQuery(env, `ALTER TABLE real_page_logs ADD COLUMN device_name TEXT DEFAULT ''`, []); }catch{}
   try{ await tursoQuery(env, `ALTER TABLE blocked_devices ADD COLUMN device_name TEXT DEFAULT ''`, []); }catch{}
 }
-
 async function addAllowedIPFixed(env, ip, reason, device_name){
   await ensureAllowedIPsTableFixed(env);
   return await tursoQuery(env, "INSERT OR REPLACE INTO allowed_ips (ip, reason, device_name) VALUES (?, ?, ?)", [ip, reason||'مسموح', device_name||'']);
 }
-
 async function updateAllowedIPDeviceNameFixed(env, ip, device_name){
   await ensureAllowedIPsTableFixed(env);
   return await tursoQuery(env, "UPDATE allowed_ips SET device_name=? WHERE ip=?", [device_name||'', ip]);
 }
-
 async function removeAllowedIPFixed(env, ip){
   await ensureAllowedIPsTableFixed(env);
   return await tursoQuery(env, "DELETE FROM allowed_ips WHERE ip=?", [ip]);
 }
-
 async function getAllowedIPsFixed(env){
   await ensureAllowedIPsTableFixed(env);
   const q = await tursoQuery(env, "SELECT * FROM allowed_ips ORDER BY added_at DESC", []);
@@ -275,19 +257,16 @@ async function getAllowedIPsFixed(env){
   }
   return {allowed, error:null};
 }
-
 async function enableWhitelistModeFixed(env){
   await ensureAllowedIPsTableFixed(env);
   await tursoQuery(env, "DELETE FROM ip_whitelist_config", []);
   return await tursoQuery(env, "INSERT INTO ip_whitelist_config (allowed_ip, mode) VALUES ('multiple', 'whitelist')", []);
 }
-
 async function disableWhitelistModeFixed(env){
   await ensureAllowedIPsTableFixed(env);
   await tursoQuery(env, "DELETE FROM ip_whitelist_config", []);
   return await tursoQuery(env, "INSERT INTO ip_whitelist_config (allowed_ip, mode) VALUES ('0.0.0.0', 'all')", []);
 }
-
 async function getWhitelistModeFixedBackend(env){
   await ensureWhitelistTableFixed(env);
   const q = await tursoQuery(env, "SELECT * FROM ip_whitelist_config ORDER BY id DESC LIMIT 1", []);
@@ -299,19 +278,16 @@ async function getWhitelistModeFixedBackend(env){
   const obj={}; row.forEach((cell,i)=>{ obj[cols[i]]=cell.value??cell.text??''; });
   return {mode: obj.mode||'all', allowed_ip: obj.allowed_ip, created_at: obj.created_at, raw: obj};
 }
-
 async function isIPAllowedInWhitelistFixed(env, currentIP){
   const modeData = await getWhitelistModeFixedBackend(env);
   if(modeData.mode!=='whitelist') return true;
   const allowedData = await getAllowedIPsFixed(env);
   return allowedData.allowed.some(a=>a.ip===currentIP);
 }
-
 function whitelistBlockedPageFixed(currentIP, allowedList){
   const listHTML = allowedList.map(a=>`<span style="background:#dcfce7;color:#065f46;padding:2px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace">${a.ip}</span>`).join(' ');
   return `<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>مغلق - قائمة بيضاء</title><style>body{min-height:100vh;background:linear-gradient(135deg,#fef3c7,#fde68a);display:flex;align-items:center;justify-content:center;font-family:Cairo,sans-serif} .box{background:#fff;padding:30px;border-radius:20px;text-align:center;box-shadow:0 16px 40px rgba(0,0,0,0.15);max-width:600px;width:92%} h1{color:#d97706} .ip{font-family:monospace;background:#fee2e2;color:#dc2626;padding:4px 10px;border-radius:8px;font-weight:800}</style></head><body><div class="box"><div style="font-size:60px">🔐</div><h1>الموقع في وضع القائمة البيضاء</h1><p>متاح فقط لعناوين محددة</p><div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:12px;margin:12px 0;text-align:right;font-size:12px"><b>IP الخاص بك:</b> <span class="ip">${currentIP}</span><br><br><b>المسموح:</b><br>${listHTML||'لا يوجد'}<br><br>تواصل: 01092259655</div><a href="https://wa.me/201092259655" style="display:inline-block;padding:10px 20px;background:#25D366;color:#fff;border-radius:10px;text-decoration:none;font-weight:800">💬 واتساب</a></div></body></html>`;
 }
-
 async function handleAddAllowedIPFixed(request, env){
   try{
     const body = await request.json();
@@ -324,7 +300,6 @@ async function handleAddAllowedIPFixed(request, env){
     return new Response(JSON.stringify({success:true, ip:ip}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
   }catch(e){ return new Response(JSON.stringify({success:false, error:e.message}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}}); }
 }
-
 async function handleUpdateDeviceNameFixed(request, env){
   try{
     const body = await request.json();
@@ -336,7 +311,6 @@ async function handleUpdateDeviceNameFixed(request, env){
     return new Response(JSON.stringify({success:true}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
   }catch(e){ return new Response(JSON.stringify({success:false, error:e.message}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}}); }
 }
-
 async function handleRemoveAllowedIPFixed(request, env){
   try{
     const body = await request.json();
@@ -347,7 +321,6 @@ async function handleRemoveAllowedIPFixed(request, env){
     return new Response(JSON.stringify({success:true}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
   }catch(e){ return new Response(JSON.stringify({success:false, error:e.message}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}}); }
 }
-
 async function handleGetAllowedIPsFixed(request, env){
   try{
     const allowedData = await getAllowedIPsFixed(env);
@@ -355,7 +328,6 @@ async function handleGetAllowedIPsFixed(request, env){
     return new Response(JSON.stringify({allowed:allowedData.allowed, mode:modeData.mode, allowed_ip:modeData.allowed_ip, error:allowedData.error}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*','Cache-Control':'no-cache'}});
   }catch(e){ return new Response(JSON.stringify({allowed:[], error:e.message}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}}); }
 }
-
 async function handleEnableWhitelistFixed(request, env){
   try{
     const result = await enableWhitelistModeFixed(env);
@@ -363,7 +335,6 @@ async function handleEnableWhitelistFixed(request, env){
     return new Response(JSON.stringify({success:true, mode:'whitelist'}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
   }catch(e){ return new Response(JSON.stringify({success:false, error:e.message}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}}); }
 }
-
 async function handleDisableWhitelistFixed(request, env){
   try{
     const result = await disableWhitelistModeFixed(env);
@@ -371,7 +342,6 @@ async function handleDisableWhitelistFixed(request, env){
     return new Response(JSON.stringify({success:true, mode:'all'}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
   }catch(e){ return new Response(JSON.stringify({success:false, error:e.message}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}}); }
 }
-
 export default {
   async fetch(request, env, ctx){
     const url = new URL(request.url);
@@ -379,17 +349,18 @@ export default {
     const today = new Date().toDateString();
     if(STATS.startOfDay !== today){ STATS.startOfDay=today; STATS.workerRequestsToday=0; STATS.tursoQueriesToday=0; STATS.cacheHits=0; STATS.cacheMisses=0; STATS.savedQueries=0; }
     STATS.workerRequestsToday++;
-
+    for(let k of GLOBAL_CACHE.keys()){
+      if(shouldNeverCache(k.split('|')[0], k)){
+        GLOBAL_CACHE.delete(k);
+      }
+    }
     if(request.method==='OPTIONS'){
       return new Response(null,{status:204, headers:{'Access-Control-Allow-Origin':'*','Access-Control-Allow-Methods':'GET,POST,OPTIONS','Access-Control-Allow-Headers':'Content-Type,Authorization'}});
     }
-
-    // ========== APIs الكاش الجديدة - بدون حذف القديم ==========
     if(path==='/api/cache-stats'){
       await loadPagesConfigFixed(env);
       return new Response(JSON.stringify(STATS),{headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*','Cache-Control':'no-cache'}});
     }
-
     if(path==='/api/cache-config' && request.method==='POST'){
       try{
         const body = await request.json();
@@ -399,6 +370,7 @@ export default {
         if(typeof body.enabled === 'boolean') STATS.cacheEnabled = body.enabled;
         if(body.pages){
           for(const [page, cfg] of Object.entries(body.pages)){
+            if(shouldNeverCache(page, '')) continue;
             const dur = cfg.duration || parseDuration(cfg);
             const unit = cfg.unit || 'hours';
             const durVal = cfg.durationValue ?? cfg.value ?? 1;
@@ -411,12 +383,14 @@ export default {
         return new Response(JSON.stringify({ok:true, config:STATS}),{headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
       }catch(e){ return new Response(JSON.stringify({ok:false, error:e.message}),{status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}}); }
     }
-
     if(path==='/api/cache-refresh'){
       try{
         const isGetPreheat = url.searchParams.get('preheat');
         if(request.method==='GET' && isGetPreheat){
           const page = isGetPreheat;
+          if(shouldNeverCache(page, '')){
+            return new Response(JSON.stringify({ok:true, skipped:true, reason:'never cache dashboard'}),{headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+          }
           for(let k of [...GLOBAL_CACHE.keys()]){ if(k.startsWith(page+'|')) GLOBAL_CACHE.delete(k); }
           STATS.lastRefresh = new Date().toISOString();
           return new Response(JSON.stringify({ok:true, preheated:page}),{headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
@@ -426,14 +400,15 @@ export default {
         const singlePage = body.page;
         const pages = body.pages;
         const all = body.all;
-
         if(singlePage){
+          if(shouldNeverCache(singlePage, '')){
+            for(let k of [...GLOBAL_CACHE.keys()]){ if(k.startsWith(singlePage+'|')) GLOBAL_CACHE.delete(k); }
+            return new Response(JSON.stringify({ok:true, cleared: singlePage, dashboard:true}),{headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+          }
           for(let [k, v] of [...GLOBAL_CACHE.entries()]){
             if(k.startsWith(singlePage+'|')){
               if(preserve){
-                const orig = v.originalExpiresAt || v.expiresAt;
                 GLOBAL_CACHE.delete(k);
-                // نحتفظ بالتوقيت الأصلي في الإحصائيات
                 if(STATS.pagesConfig[singlePage]) STATS.pagesConfig[singlePage].lastRefresh = new Date().toISOString();
               } else {
                 GLOBAL_CACHE.delete(k);
@@ -445,11 +420,9 @@ export default {
               }
             }
           }
-          if(GLOBAL_CACHE.size===0 || ![...GLOBAL_CACHE.keys()].some(k=>k.startsWith(singlePage+'|'))){
-            // مسح كامل للصفحة تم
-          }
         } else if(pages && Array.isArray(pages)){
           for(let page of pages){
+            if(shouldNeverCache(page, '')) continue;
             for(let k of [...GLOBAL_CACHE.keys()]){ if(k.startsWith(page+'|')) GLOBAL_CACHE.delete(k); }
             if(STATS.pagesConfig[page] && !preserve){
               const dur = STATS.pagesConfig[page].duration || STATS.cacheDuration;
@@ -460,16 +433,17 @@ export default {
             }
           }
         } else if(all || !singlePage){
-          if(!preserve){
-            GLOBAL_CACHE.clear();
-            for(let p in STATS.pagesConfig){
+          const dashboardKeys = [...GLOBAL_CACHE.keys()].filter(k=> shouldNeverCache(k.split('|')[0], k));
+          GLOBAL_CACHE.clear();
+          for(let p in STATS.pagesConfig){
+            if(shouldNeverCache(p, '')) continue;
+            if(!preserve){
               const dur = STATS.pagesConfig[p].duration || STATS.cacheDuration;
               STATS.pagesConfig[p].lastRefresh = new Date().toISOString();
               STATS.pagesConfig[p].nextExpiry = new Date(Date.now() + dur*1000).toISOString();
+            } else {
+              STATS.pagesConfig[p].lastRefresh = new Date().toISOString();
             }
-          } else {
-            GLOBAL_CACHE.clear();
-            for(let p in STATS.pagesConfig){ STATS.pagesConfig[p].lastRefresh = new Date().toISOString(); }
           }
         }
         STATS.lastRefresh = new Date().toISOString();
@@ -477,8 +451,6 @@ export default {
         return new Response(JSON.stringify({ok:true, preserveTimer:preserve, clearedAt:STATS.lastRefresh, remainingKeys:GLOBAL_CACHE.size}),{headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
       }catch(e){ return new Response(JSON.stringify({ok:false, error:e.message}),{status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}}); }
     }
-
-    // ========== الدوال القديمة - بدون أي تعديل أو حذف ==========
     if(path==='/api/allowed-ips'){
       return await handleGetAllowedIPsFixed(request, env);
     }
@@ -556,7 +528,6 @@ export default {
       const isBlocked = blocked.some(b=>b.ip===ip);
       return new Response(JSON.stringify({blocked, isBlocked, currentIp:ip, count:blocked.length}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*','Cache-Control':'no-cache'}});
     }
-
     if(!['/api/','/js/','.js','.css','.json','.png','.jpg','.svg','.ico','Real-Monitoring','whitelist','allowed-ips','add-allowed-ip','remove-allowed-ip','block-device','unblock-device','get-ip','blocked-devices','blocked-list','turso','cache-'].some(s=>path.toLowerCase().includes(s.toLowerCase()))){
       const currentIP = request.headers.get('CF-Connecting-IP') || request.headers.get('X-Forwarded-For')?.split(',')[0]?.trim() || '';
       if(currentIP){
@@ -570,7 +541,6 @@ export default {
         }
       }
     }
-
     if(!['/api/','/js/','.js','.css','.json','.png','.jpg','.svg','.ico','Real-Monitoring'].some(s=>path.toLowerCase().includes(s.toLowerCase()))){
       const currentIp = request.headers.get('CF-Connecting-IP') || '';
       if(currentIp){
@@ -583,7 +553,6 @@ export default {
         }
       }
     }
-
     if(!['database-manager','turso-api','hafez-api','auth-api','favicon','.js','.css','.json','.png','.jpg','.svg','.ico','/api/'].some(s=>path.toLowerCase().includes(s.toLowerCase()))){
       let pageName = path.split('/').pop() || 'index.html';
       if(path==='/' || path==='') pageName='index.html';
@@ -601,30 +570,25 @@ export default {
         }
       }
     }
-
-    // محاولة تقديم كاش HTML (بعد فحوصات الحظر)
     const isHtmlPage = path.endsWith('.html') || path==='/' || (!path.includes('.') && !path.startsWith('/api/'));
-    if(isHtmlPage && request.method==='GET'){
-      const pageNameForCache = path.split('/').pop() || 'index.html';
+    const pageNameForCache = path.split('/').pop() || 'index.html';
+    const isDashboard = shouldNeverCache(pageNameForCache, path);
+    if(isHtmlPage && !isDashboard && request.method==='GET'){
       const cacheKey = getCacheKey(request, pageNameForCache);
       const cached = getCached(cacheKey);
       if(cached){
         return new Response(cached.data, {status:200, headers:{'Content-Type':'text/html; charset=utf-8','X-Cache':'HIT','Cache-Control':'no-cache'}});
       }
     }
-
     let response;
     try{
       if(env.ASSETS) response=await env.ASSETS.fetch(request);
       else response=await fetch(request);
     }catch{ return new Response('Not found',{status:404}); }
-
-    // تخزين في الكاش بعد الجلب
-    if(isHtmlPage && response.status===200){
+    if(isHtmlPage && !isDashboard && response.status===200){
       try{
         const cloned = response.clone();
         const text = await cloned.text();
-        const pageNameForCache = path.split('/').pop() || 'index.html';
         const cacheKey = getCacheKey(request, pageNameForCache);
         setCached(cacheKey, text, {'Content-Type':'text/html; charset=utf-8'}, pageNameForCache);
         const contentType=response.headers.get('Content-Type')||'';
@@ -640,7 +604,6 @@ export default {
         return new Response(text, {status:200, headers:{'Content-Type':'text/html; charset=utf-8','X-Cache':'MISS'}});
       }catch{}
     }
-
     const contentType=response.headers.get('Content-Type')||'';
     if(contentType.includes('text/html') && response.status===200 && !path.toLowerCase().includes('real-monitoring')){
       return new HTMLRewriter()
