@@ -257,6 +257,7 @@ body.light .modal-3d-box .btn-3d{filter:brightness(1.05)}
   background:#fefcf7 !important;
   box-shadow:0 8px 24px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.8) !important;
   position:relative !important;
+  z-index: 1 !important; /* <-- أضف السطر ده */
 }
 #mainTable{border-collapse:separate !important;border-spacing:0 !important;width:max-content !important;min-width:100% !important;table-layout:fixed !important; background:#fefcf7 !important;}
 #mainTable th{
@@ -271,7 +272,7 @@ body.light .modal-3d-box .btn-3d{filter:brightness(1.05)}
   line-height:1.2 !important;
   position:sticky !important;
   top:0 !important;
-  z-index:20 !important;
+  z-index:2 !important;
   text-align:center !important;
   vertical-align:middle !important;
   cursor:pointer !important;
@@ -286,19 +287,19 @@ body.light .modal-3d-box .btn-3d{filter:brightness(1.05)}
   box-shadow:-3px 0 12px rgba(0,0,0,0.1), -1px 0 0 #a89a7d !important;
 }
 #mainTable th.name-frozen{
-  position:sticky !important;right:60px !important;top:0 !important;z-index:49 !important;
+  position:sticky !important;right:60px !important;top:0 !important;z-index:3 !important;
   width:200px !important;min-width:200px !important;
   box-shadow:-3px 0 12px rgba(0,0,0,0.1), -1px 0 0 #a89a7d !important;
   background:linear-gradient(180deg, #a8c0a0 0%, #9ab894 100%) !important;
 }
 #mainTable td.m-frozen{
-  position:sticky !important;right:0 !important;z-index:30 !important;
+  position:sticky !important;right:0 !important;z-index:3 !important;
   background:#f5efe0 !important;
   width:60px !important;min-width:60px !important;max-width:60px !important;
   box-shadow:-3px 0 12px rgba(0,0,0,0.08), -1px 0 0 #a89a7d !important;
 }
 #mainTable td.name-frozen{
-  position:sticky !important;right:60px !important;z-index:29 !important;
+  position:sticky !important;right:60px !important;z-index:2 !important;
   background:#fffef9 !important;
   width:200px !important;min-width:200px !important;
   box-shadow:-3px 0 12px rgba(0,0,0,0.08), -1px 0 0 #a89a7d !important;
@@ -356,7 +357,8 @@ body.light .modal-3d-box .btn-3d{filter:brightness(1.05)}
 body.light .table-wrap{background:#fefcf7 !important; border-color:#a89a7d !important}
 body.light #mainTable th{background:linear-gradient(180deg, #a8c0a0 0%, #9ab894 100%) !important; color:#2d3a2e !important}
 body.light #mainTable td{color:#3a2f1e !important}
-
+.frame{ z-index: 9999 !important; overflow:visible !important; }
+.dropdown-list{ z-index: 999999 !important; }
 </style>
 
 <style>
