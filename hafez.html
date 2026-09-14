@@ -332,25 +332,6 @@ body.light .table-wrap{background:#fefcf7 !important; border-color:#a89a7d !impo
 body.light #mainTable th{background:linear-gradient(180deg, #a8c0a0 0%, #9ab894 100%) !important; color:#2d3a2e !important}
 body.light #mainTable td{color:#3a2f1e !important}
 
- /* === FIX: القوائم فوق الجدول بدون تعديل دوال === */
-.card, .frame, .row, .custom-select{ overflow: visible !important; }
-.frame{ position: relative !important; z-index: 9999 !important; }
-.row{ position: relative !important; z-index: 9998 !important; }
-.row.second-row{ z-index: 10000 !important; }
-.custom-select{ position: relative !important; }
-.dropdown-list{
-  z-index: 999999 !important;
-  position: absolute !important;
-  box-shadow: 0 25px 60px rgba(0,0,0,0.8) !important;
-}
-#dropdownStation, #dropdownAdmin, #dropdownType, #dropdownMonth, #dropdownYear, #dropdownResp, #dropdownEmp{
-  z-index: 999999 !important;
-}
-.table-wrap{ z-index: 1 !important; position: relative !important; }
-#mainTable th.m-frozen, #mainTable th.name-frozen{ z-index: 3 !important; }
-#mainTable th, #mainTable td.m-frozen, #mainTable td.name-frozen{ z-index: 2 !important; }
-#mainTable{ z-index: 1 !important; } 
-  
 </style>
 
 <style>
