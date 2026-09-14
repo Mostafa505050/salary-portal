@@ -69,32 +69,7 @@ body.light .btn-theme{background:#3e2723!important;color:#ffecb3!important;borde
 #previewText{padding:5px 14px;background:linear-gradient(180deg,rgba(16,185,129,0.28),rgba(5,95,70,0.45));border:1px solid rgba(16,185,129,0.6);border-radius:999px;color:#ffffff;font-weight:900;font-size:12px;box-shadow:0 2px 0 rgba(0,0,0,0.2)}
 body.light #previewText{background:#5d4037!important;color:#ffecb3!important;border-color:#3e2723!important}
 #saveResult{padding:5px 12px;background:linear-gradient(180deg,rgba(16,185,129,0.28),rgba(5,95,70,0.45));border:1px solid rgba(16,185,129,0.6);border-radius:999px;font-size:12px;font-weight:900;color:#ffffff;text-align:center;display:inline-flex;align-items:center;box-shadow:0 2px 0 rgba(0,0,0,0.2)}
-.table-wrap{
-  max-width:1080px;
-  margin:14px auto 0 auto;
-  overflow:auto !important;
-  max-height:62vh !important;
-  border:1.5px solid #a89a7d !important;
-  border-radius:14px !important;
-  background:#fefcf7 !important;
-  position:relative !important;
-  z-index: 1 !important; /* <-- ده اللي بيرجع الجدول خلف القائمة */
-}
-#mainTable{
-  z-index: 1 !important;
-  position: relative !important;
-}
-#mainTable th{
-  z-index: 2 !important; /* كان 20 و 50 - نزلناه */
-}
-#mainTable th.m-frozen,
-#mainTable th.name-frozen{
-  z-index: 3 !important; /* كان 50 - نزلناه */
-}
-#mainTable td.m-frozen,
-#mainTable td.name-frozen{
-  z-index: 2 !important; /* كان 30 - نزلناه */
-}
+.table-wrap{max-width:1080px;margin:14px auto 0 auto;overflow-x:auto}
 table{width:100%;border-collapse:collapse!important;border-spacing:0;background:linear-gradient(180deg,rgba(255,255,255,0.08),rgba(0,0,0,0.2));backdrop-filter:blur(10px);border-radius:14px;overflow:hidden;border:1.5px solid rgba(255,255,255,0.2);table-layout:fixed}
 th{background:linear-gradient(180deg,rgba(255,255,255,0.15),rgba(0,0,0,0.3))!important;color:#ffffff!important;padding:10px 6px!important;font-size:13px!important;font-weight:900!important;border:1.5px solid rgba(16,185,129,0.4)!important;border-bottom:2.5px solid rgba(16,185,129,0.7)!important;cursor:pointer;position:relative;user-select:none;white-space:nowrap;text-align:center!important}
 td{padding:8px 6px;border:1px solid rgba(255,255,255,0.15)!important;font-size:13px;font-weight:900;text-align:center;color:#ffffff!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -257,7 +232,6 @@ body.light .modal-3d-box .btn-3d{filter:brightness(1.05)}
   background:#fefcf7 !important;
   box-shadow:0 8px 24px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.8) !important;
   position:relative !important;
-  z-index: 1 !important; /* <-- أضف السطر ده */
 }
 #mainTable{border-collapse:separate !important;border-spacing:0 !important;width:max-content !important;min-width:100% !important;table-layout:fixed !important; background:#fefcf7 !important;}
 #mainTable th{
@@ -272,7 +246,7 @@ body.light .modal-3d-box .btn-3d{filter:brightness(1.05)}
   line-height:1.2 !important;
   position:sticky !important;
   top:0 !important;
-  z-index:2 !important;
+  z-index:20 !important;
   text-align:center !important;
   vertical-align:middle !important;
   cursor:pointer !important;
@@ -287,19 +261,19 @@ body.light .modal-3d-box .btn-3d{filter:brightness(1.05)}
   box-shadow:-3px 0 12px rgba(0,0,0,0.1), -1px 0 0 #a89a7d !important;
 }
 #mainTable th.name-frozen{
-  position:sticky !important;right:60px !important;top:0 !important;z-index:3 !important;
+  position:sticky !important;right:60px !important;top:0 !important;z-index:49 !important;
   width:200px !important;min-width:200px !important;
   box-shadow:-3px 0 12px rgba(0,0,0,0.1), -1px 0 0 #a89a7d !important;
   background:linear-gradient(180deg, #a8c0a0 0%, #9ab894 100%) !important;
 }
 #mainTable td.m-frozen{
-  position:sticky !important;right:0 !important;z-index:3 !important;
+  position:sticky !important;right:0 !important;z-index:30 !important;
   background:#f5efe0 !important;
   width:60px !important;min-width:60px !important;max-width:60px !important;
   box-shadow:-3px 0 12px rgba(0,0,0,0.08), -1px 0 0 #a89a7d !important;
 }
 #mainTable td.name-frozen{
-  position:sticky !important;right:60px !important;z-index:2 !important;
+  position:sticky !important;right:60px !important;z-index:29 !important;
   background:#fffef9 !important;
   width:200px !important;min-width:200px !important;
   box-shadow:-3px 0 12px rgba(0,0,0,0.08), -1px 0 0 #a89a7d !important;
@@ -357,6 +331,7 @@ body.light .modal-3d-box .btn-3d{filter:brightness(1.05)}
 body.light .table-wrap{background:#fefcf7 !important; border-color:#a89a7d !important}
 body.light #mainTable th{background:linear-gradient(180deg, #a8c0a0 0%, #9ab894 100%) !important; color:#2d3a2e !important}
 body.light #mainTable td{color:#3a2f1e !important}
+
 </style>
 
 <style>
