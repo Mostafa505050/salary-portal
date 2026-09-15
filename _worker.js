@@ -1,7 +1,81 @@
 // _worker.js - إصلاح كامل: حظر دقيق للصفحة فقط + قائمة بيضاء متعددة بدون تكرار + كاش لكل صفحة V2 - إصلاح عدم تحميل أسماء الصفحات بدون حذف أي دالة
+// + منع دخول أي صفحة إلا عبر index.html - بدون حذف أي دالة
 const HARDCODED_TURSO_URL = "https://company-alldata-mostafadarwish-mostafa505050.aws-eu-west-1.turso.io";
 const HARDCODED_TURSO_TOKEN = "PASTE_YOUR_TURSO_TOKEN_HERE";
 const FALLBACK_BLOCKED = ['addhafez1.html', 'tables.html'];
+
+// ========== إضافة إجبارية: منع الدخول إلا عبر index.html - بدون حذف أي دالة ==========
+const ENTRY_PAGE = 'index.html';
+const ENTRY_COOKIE_NAME = 'entry_via_index';
+const ENTRY_COOKIE_MAX_AGE = 3600; // ساعة
+const ENTRY_ALLOWED_PAGES = ['index.html', '']; // الصفحات المسموحة دائماً كمدخل
+
+function getCookieFixed(request, name){
+  try{
+    const cookieHeader = request.headers.get('Cookie') || '';
+    const cookies = cookieHeader.split(';').map(c=>c.trim());
+    for(const c of cookies){
+      const [k,...rest] = c.split('=');
+      if(k && k.trim()===name) return rest.join('=').trim();
+    }
+  }catch{}
+  return null;
+}
+function hasValidEntry(request){
+  const entryCookie = getCookieFixed(request, ENTRY_COOKIE_NAME);
+  if(entryCookie && entryCookie==='1') return true;
+  // أيضاً السماح لو الـ Referer يحتوي index.html
+  try{
+    const ref = request.headers.get('Referer') || request.headers.get('referer') || '';
+    if(ref.toLowerCase().includes('index.html') || ref.endsWith('/') || ref.includes('/index')) return true;
+  }catch{}
+  return false;
+}
+function isEntryHtmlPage(path){
+  const low = path.toLowerCase();
+  // استثناءات لا يطبق عليها منع الدخول
+  if(['/api/','/js/','.js','.css','.json','.png','.jpg','.svg','.ico','real-monitoring','whitelist','allowed-ips','add-allowed-ip','remove-allowed-ip','block-device','unblock-device','get-ip','blocked-devices','blocked-list','turso','cache-','favicon','auth','login','dashboard','protect.js','real-logger.js'].some(s=> low.includes(s.toLowerCase()))) return false;
+  let pageName = path.split('/').pop() || '';
+  if(path==='/' || path==='' || pageName==='' ) return false; // الصفحة الرئيسية مسموحة
+  if(pageName.toLowerCase()==='index.html') return false; // index مسموحة
+  // أي صفحة.html أخرى تعتبر محمية
+  if(path.endsWith('.html')) return true;
+  // بدون امتداد و ليست api تعتبر صفحة
+  if(!pageName.includes('.') &&!path.startsWith('/api/')) return true;
+  return false;
+}
+function entryBlockedHTMLFixed(pageName){
+  return `<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>الدخول عبر الرئيسية فقط</title><style>
+  body{min-height:100vh;background:linear-gradient(135deg,#0a0e1a,#111827);color:#fff;display:flex;align-items:center;justify-content:center;font-family:Cairo,Tahoma,sans-serif;margin:0}
+ .box{background:rgba(255,255,255,0.08);backdrop-filter:blur(20px);border:1px solid rgba(99,102,241,0.3);padding:40px 30px;border-radius:24px;text-align:center;box-shadow:0 25px 50px rgba(0,0,0,0.5);max-width:480px;width:92%}
+  h1{color:#f59e0b;font-size:26px;margin:0 0 12px}
+  p{color:#cbd5e1;font-size:14px;line-height:1.8;margin:8px 0}
+ .page{background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);padding:6px 12px;border-radius:10px;font-family:monospace;font-size:12px;display:inline-block;margin:8px 0}
+ .btn{display:inline-block;margin-top:18px;padding:12px 28px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border-radius:14px;text-decoration:none;font-weight:900;box-shadow:0 8px 0 #4338ca}
+ .btn:active{transform:translateY(4px);box-shadow:0 4px 0 #4338ca}
+  small{color:#94a3b8;font-size:10px;display:block;margin-top:14px}
+  </style></head><body><div class="box">
+  <div style="font-size:56px">🔐</div>
+  <h1>الدخول عبر الصفحة الرئيسية فقط</h1>
+  <p>لا يمكن فتح هذه الصفحة مباشرة</p>
+  <div class="page">📄 ${pageName}</div>
+  <p>يجب الدخول أولاً عبر <b style="color:#10b981">index.html</b> ثم التنقل من القائمة</p>
+  <a class="btn" href="/index.html">🏠 الذهاب للرئيسية</a>
+  <small>تم الحظر بواسطة Worker - مصطفى درويش 01092259655<br>Source: entry-guard via index.html</small>
+  </div><script>setTimeout(()=>{window.location.href='/index.html'},4000);</script></body></html>`;
+}
+function addEntryCookieToResponse(response){
+  try{
+    const newHeaders = new Headers(response.headers);
+    newHeaders.set('Set-Cookie', `${ENTRY_COOKIE_NAME}=1; Path=/; Max-Age=${ENTRY_COOKIE_MAX_AGE}; SameSite=Lax`);
+    newHeaders.set('Cache-Control', 'no-cache');
+    return new Response(response.body, {status:response.status, headers:newHeaders});
+  }catch{
+    return response;
+  }
+}
+// ========== نهاية الإضافة الإجبارية ==========
+
 // ========== إصلاح صارم: صفحات لوحة التحكم لا يتم تخزينها في الكاش أبداً - بدون حذف أي دالة ==========
 const NEVER_CACHE_PAGES = ['Real-Monitoring','Cache-Dashboard','cache-dashboard','real-monitoring','Real-Monitoring-Cache','Cache-Dashboard-Real-Monitoring','Real-Monitoring-V2','dashboard','whitelist','allowed-ips','blocked','login','auth','cache-dashboard-real-monitoring'];
 function shouldNeverCache(pageName, pathname){
@@ -31,15 +105,15 @@ function parseDuration(payload){
   if(payload.duration === 0 || payload.unit === 'infinite') return Infinity;
   if(typeof payload.duration === 'number' && payload.duration>0) return payload.duration;
   const map = { seconds:1, minutes:60, hours:3600, days:86400, weeks:604800, months:2592000, years:31536000 };
-  const v = payload.durationValue ?? payload.value ?? 1;
-  const u = payload.unit ?? 'hours';
+  const v = payload.durationValue?? payload.value?? 1;
+  const u = payload.unit?? 'hours';
   if(u==='infinite') return Infinity;
   return v * (map[u] || 3600);
 }
 function getCacheKey(request, pageName){
   const url = new URL(request.url);
   const page = (pageName || url.pathname.split('/').pop() || 'index.html').trim();
-  const keyPage = page === '' ? 'index.html' : page;
+  const keyPage = page === ''? 'index.html' : page;
   return keyPage + '|' + url.pathname + url.search;
 }
 function getCached(key){
@@ -59,10 +133,10 @@ function setCached(key, data, headers, pageName){
   const page = pageName || key.split('|')[0];
   if(shouldNeverCache(page, key)) return;
   const cfg = STATS.pagesConfig[page];
-  const durationSec = cfg ? parseDuration(cfg) : STATS.cacheDuration;
+  const durationSec = cfg? parseDuration(cfg) : STATS.cacheDuration;
   if(durationSec===0) return;
   const now = Date.now();
-  const expiresAt = isFinite(durationSec) ? now + durationSec*1000 : now + 365*24*3600*1000;
+  const expiresAt = isFinite(durationSec)? now + durationSec*1000 : now + 365*24*3600*1000;
   const existing = GLOBAL_CACHE.get(key);
   const originalExpiresAt = existing?.originalExpiresAt || expiresAt;
   GLOBAL_CACHE.set(key, { data, headers, expiresAt, originalExpiresAt, page, createdAt: now });
@@ -106,12 +180,12 @@ function getTursoConfig(env){
   let token = (env.TURSO_TOKEN || env.TURSO_TOKENL || HARDCODED_TURSO_TOKEN || '').trim();
   if(token.includes("PASTE_YOUR")) return {url:null, token:null};
   if(url.startsWith('libsql://')) url='https://'+url.slice(8);
-  if(url && !url.startsWith('https://')) url='https://'+url;
+  if(url &&!url.startsWith('https://')) url='https://'+url;
   return {url, token};
 }
 async function tursoQuery(env, sql, params=[]){
   const {url, token} = getTursoConfig(env);
-  if(!url || !token) return {error:'no config - الصق التوكن في Worker'};
+  if(!url ||!token) return {error:'no config - الصق التوكن في Worker'};
   try{
     const args = params.map(v=>({type:'text', value:String(v)}));
     const res = await fetch(`${url}/v2/pipeline`, {
@@ -147,13 +221,13 @@ function isBlockedExact(pageName, blockedList){
   return false;
 }
 function blockedPageHTML(pageName, source){
-  return `<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>مغلقة</title><style>body{min-height:100vh;background:#0a0a1a;color:#fff;display:flex;align-items:center;justify-content:center;font-family:Cairo,sans-serif} .box{background:rgba(255,255,255,0.07);padding:30px;border-radius:20px;text-align:center}</style></head><body><div class="box"><h1>🔒 الصفحة مغلقة</h1><p>${pageName}</p><p style="font-size:10px">Source: ${source}</p><a href="/" style="color:#a78bfa">الرئيسية</a></div></body></html>`;
+  return `<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>مغلقة</title><style>body{min-height:100vh;background:#0a0a1a;color:#fff;display:flex;align-items:center;justify-content:center;font-family:Cairo,sans-serif}.box{background:rgba(255,255,255,0.07);padding:30px;border-radius:20px;text-align:center}</style></head><body><div class="box"><h1>🔒 الصفحة مغلقة</h1><p>${pageName}</p><p style="font-size:10px">Source: ${source}</p><a href="/" style="color:#a78bfa">الرئيسية</a></div></body></html>`;
 }
 function blockedDeviceHTML(ip, device, reason){
-  return `<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>محظور</title><style>body{min-height:100vh;background:linear-gradient(135deg,#fee2e2,#fecaca);display:flex;align-items:center;justify-content:center;font-family:Cairo,sans-serif} .box{background:#fff;padding:30px;border-radius:20px;text-align:center;box-shadow:0 16px 40px rgba(0,0,0,0.15)} h1{color:#dc2626}</style></head><body><div class="box"><div style="font-size:60px">🚫</div><h1>تم حظر جهازك</h1><p>IP: ${ip}<br>الجهاز: ${device}<br>السبب: ${reason||'محظور'}<br>01092259655</p><a href="https://wa.me/201092259655" style="display:inline-block;padding:10px 20px;background:#25D366;color:#fff;border-radius:10px;text-decoration:none;margin-top:12px">واتساب</a></div></body></html>`;
+  return `<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>محظور</title><style>body{min-height:100vh;background:linear-gradient(135deg,#fee2e2,#fecaca);display:flex;align-items:center;justify-content:center;font-family:Cairo,sans-serif}.box{background:#fff;padding:30px;border-radius:20px;text-align:center;box-shadow:0 16px 40px rgba(0,0,0,0.15)} h1{color:#dc2626}</style></head><body><div class="box"><div style="font-size:60px">🚫</div><h1>تم حظر جهازك</h1><p>IP: ${ip}<br>الجهاز: ${device}<br>السبب: ${reason||'محظور'}<br>01092259655</p><a href="https://wa.me/201092259655" style="display:inline-block;padding:10px 20px;background:#25D366;color:#fff;border-radius:10px;text-decoration:none;margin-top:12px">واتساب</a></div></body></html>`;
 }
 async function insertBlockedDeviceFixed(env, device_model, ip, reason){
-  const sql = "INSERT INTO blocked_devices (device_model, ip, reason) VALUES (?, ?, ?)";
+  const sql = "INSERT INTO blocked_devices (device_model, ip, reason) VALUES (?,?,?)";
   const params = [device_model, ip, reason];
   return await tursoQuery(env, sql, params);
 }
@@ -183,7 +257,7 @@ async function handleBlockDeviceRequestFixed(request, env){
     const ip = body.ip || '';
     const device_model = body.device_model || body.device || 'Unknown';
     const reason = body.reason || 'محظور من لوحة المراقبة';
-    if(!ip || !ip.includes('.')){
+    if(!ip ||!ip.includes('.')){
       return new Response(JSON.stringify({success:false, error:'IP غير صالح: '+ip}), {status:400, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
     }
     const result = await insertBlockedDeviceFixed(env, device_model, ip, reason);
@@ -232,7 +306,7 @@ async function ensureRealLogsDeviceNameFixed(env){
 }
 async function addAllowedIPFixed(env, ip, reason, device_name){
   await ensureAllowedIPsTableFixed(env);
-  return await tursoQuery(env, "INSERT OR REPLACE INTO allowed_ips (ip, reason, device_name) VALUES (?, ?, ?)", [ip, reason||'مسموح', device_name||'']);
+  return await tursoQuery(env, "INSERT OR REPLACE INTO allowed_ips (ip, reason, device_name) VALUES (?,?,?)", [ip, reason||'مسموح', device_name||'']);
 }
 async function updateAllowedIPDeviceNameFixed(env, ip, device_name){
   await ensureAllowedIPsTableFixed(env);
@@ -270,7 +344,7 @@ async function disableWhitelistModeFixed(env){
 async function getWhitelistModeFixedBackend(env){
   await ensureWhitelistTableFixed(env);
   const q = await tursoQuery(env, "SELECT * FROM ip_whitelist_config ORDER BY id DESC LIMIT 1", []);
-  if(q.error || !q.result?.rows || q.result.rows.length===0){
+  if(q.error ||!q.result?.rows || q.result.rows.length===0){
     return {mode:'all', allowed_ip:null};
   }
   const cols=q.result.cols.map(c=>c.name);
@@ -286,7 +360,7 @@ async function isIPAllowedInWhitelistFixed(env, currentIP){
 }
 function whitelistBlockedPageFixed(currentIP, allowedList){
   const listHTML = allowedList.map(a=>`<span style="background:#dcfce7;color:#065f46;padding:2px 8px;border-radius:6px;margin:2px;display:inline-block;font-family:monospace">${a.ip}</span>`).join(' ');
-  return `<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>مغلق - قائمة بيضاء</title><style>body{min-height:100vh;background:linear-gradient(135deg,#fef3c7,#fde68a);display:flex;align-items:center;justify-content:center;font-family:Cairo,sans-serif} .box{background:#fff;padding:30px;border-radius:20px;text-align:center;box-shadow:0 16px 40px rgba(0,0,0,0.15);max-width:600px;width:92%} h1{color:#d97706} .ip{font-family:monospace;background:#fee2e2;color:#dc2626;padding:4px 10px;border-radius:8px;font-weight:800}</style></head><body><div class="box"><div style="font-size:60px">🔐</div><h1>الموقع في وضع القائمة البيضاء</h1><p>متاح فقط لعناوين محددة</p><div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:12px;margin:12px 0;text-align:right;font-size:12px"><b>IP الخاص بك:</b> <span class="ip">${currentIP}</span><br><br><b>المسموح:</b><br>${listHTML||'لا يوجد'}<br><br>تواصل: 01092259655</div><a href="https://wa.me/201092259655" style="display:inline-block;padding:10px 20px;background:#25D366;color:#fff;border-radius:10px;text-decoration:none;font-weight:800">💬 واتساب</a></div></body></html>`;
+  return `<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>مغلق - قائمة بيضاء</title><style>body{min-height:100vh;background:linear-gradient(135deg,#fef3c7,#fde68a);display:flex;align-items:center;justify-content:center;font-family:Cairo,sans-serif}.box{background:#fff;padding:30px;border-radius:20px;text-align:center;box-shadow:0 16px 40px rgba(0,0,0,0.15);max-width:600px;width:92%} h1{color:#d97706}.ip{font-family:monospace;background:#fee2e2;color:#dc2626;padding:4px 10px;border-radius:8px;font-weight:800}</style></head><body><div class="box"><div style="font-size:60px">🔐</div><h1>الموقع في وضع القائمة البيضاء</h1><p>متاح فقط لعناوين محددة</p><div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:12px;margin:12px 0;text-align:right;font-size:12px"><b>IP الخاص بك:</b> <span class="ip">${currentIP}</span><br><br><b>المسموح:</b><br>${listHTML||'لا يوجد'}<br><br>تواصل: 01092259655</div><a href="https://wa.me/201092259655" style="display:inline-block;padding:10px 20px;background:#25D366;color:#fff;border-radius:10px;text-decoration:none;font-weight:800">💬 واتساب</a></div></body></html>`;
 }
 async function handleAddAllowedIPFixed(request, env){
   try{
@@ -294,7 +368,7 @@ async function handleAddAllowedIPFixed(request, env){
     const ip = body.ip?.trim();
     const reason = body.reason?.trim() || 'مسموح';
     const device_name = body.device_name?.trim() || body.device||'';
-    if(!ip || !ip.includes('.')) return new Response(JSON.stringify({success:false, error:'IP غير صالح'}), {status:400, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+    if(!ip ||!ip.includes('.')) return new Response(JSON.stringify({success:false, error:'IP غير صالح'}), {status:400, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
     const result = await addAllowedIPFixed(env, ip, reason, device_name);
     if(result.error) return new Response(JSON.stringify({success:false, error:result.error}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
     return new Response(JSON.stringify({success:true, ip:ip}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
@@ -347,7 +421,7 @@ export default {
     const url = new URL(request.url);
     const path = url.pathname;
     const today = new Date().toDateString();
-    if(STATS.startOfDay !== today){ STATS.startOfDay=today; STATS.workerRequestsToday=0; STATS.tursoQueriesToday=0; STATS.cacheHits=0; STATS.cacheMisses=0; STATS.savedQueries=0; }
+    if(STATS.startOfDay!== today){ STATS.startOfDay=today; STATS.workerRequestsToday=0; STATS.tursoQueriesToday=0; STATS.cacheHits=0; STATS.cacheMisses=0; STATS.savedQueries=0; }
     STATS.workerRequestsToday++;
     for(let k of GLOBAL_CACHE.keys()){
       if(shouldNeverCache(k.split('|')[0], k)){
@@ -357,6 +431,16 @@ export default {
     if(request.method==='OPTIONS'){
       return new Response(null,{status:204, headers:{'Access-Control-Allow-Origin':'*','Access-Control-Allow-Methods':'GET,POST,OPTIONS','Access-Control-Allow-Headers':'Content-Type,Authorization'}});
     }
+
+    // ========== فحص إجباري: منع الدخول إلا عبر index.html ==========
+    if(isEntryHtmlPage(path)){
+      if(!hasValidEntry(request)){
+        let pageName = path.split('/').pop() || path;
+        return new Response(entryBlockedHTMLFixed(pageName), {status:403, headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-cache, no-store','Set-Cookie':`${ENTRY_COOKIE_NAME}=0; Path=/; Max-Age=0`}});
+      }
+    }
+    // ========== نهاية الفحص الإجباري ==========
+
     if(path==='/api/cache-stats'){
       await loadPagesConfigFixed(env);
       return new Response(JSON.stringify(STATS),{headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*','Cache-Control':'no-cache'}});
@@ -373,7 +457,7 @@ export default {
             if(shouldNeverCache(page, '')) continue;
             const dur = cfg.duration || parseDuration(cfg);
             const unit = cfg.unit || 'hours';
-            const durVal = cfg.durationValue ?? cfg.value ?? 1;
+            const durVal = cfg.durationValue?? cfg.value?? 1;
             STATS.pagesConfig[page] = { enabled: cfg.enabled!==false, duration: dur, unit: unit, durationValue: durVal, lastRefresh: new Date().toISOString(), nextExpiry: new Date(Date.now() + dur*1000).toISOString() };
             try{
               await tursoQuery(env, "INSERT OR REPLACE INTO cache_config (page, enabled, duration, unit, durationValue, lastRefresh, nextExpiry) VALUES (?,?,?,?,?,?,?)", [page, STATS.pagesConfig[page].enabled?1:0, STATS.pagesConfig[page].duration, STATS.pagesConfig[page].unit, STATS.pagesConfig[page].durationValue, STATS.pagesConfig[page].lastRefresh, STATS.pagesConfig[page].nextExpiry]);
@@ -424,7 +508,7 @@ export default {
           for(let page of pages){
             if(shouldNeverCache(page, '')) continue;
             for(let k of [...GLOBAL_CACHE.keys()]){ if(k.startsWith(page+'|')) GLOBAL_CACHE.delete(k); }
-            if(STATS.pagesConfig[page] && !preserve){
+            if(STATS.pagesConfig[page] &&!preserve){
               const dur = STATS.pagesConfig[page].duration || STATS.cacheDuration;
               STATS.pagesConfig[page].lastRefresh = new Date().toISOString();
               STATS.pagesConfig[page].nextExpiry = new Date(Date.now() + dur*1000).toISOString();
@@ -432,7 +516,7 @@ export default {
               STATS.pagesConfig[page].lastRefresh = new Date().toISOString();
             }
           }
-        } else if(all || !singlePage){
+        } else if(all ||!singlePage){
           const dashboardKeys = [...GLOBAL_CACHE.keys()].filter(k=> shouldNeverCache(k.split('|')[0], k));
           GLOBAL_CACHE.clear();
           for(let p in STATS.pagesConfig){
@@ -556,7 +640,7 @@ export default {
     if(!['database-manager','turso-api','hafez-api','auth-api','favicon','.js','.css','.json','.png','.jpg','.svg','.ico','/api/'].some(s=>path.toLowerCase().includes(s.toLowerCase()))){
       let pageName = path.split('/').pop() || 'index.html';
       if(path==='/' || path==='') pageName='index.html';
-      const isHtml = path.endsWith('.html') || path==='/' || path==='' || (!path.includes('.') && !path.startsWith('/api/'));
+      const isHtml = path.endsWith('.html') || path==='/' || path==='' || (!path.includes('.') &&!path.startsWith('/api/'));
       if(isHtml){
         const q = await tursoQuery(env, 'SELECT "اسم_الصفحة" FROM "صفحات_الموقع" WHERE "مفعلة"=0');
         let pages=FALLBACK_BLOCKED;
@@ -570,14 +654,17 @@ export default {
         }
       }
     }
-    const isHtmlPage = path.endsWith('.html') || path==='/' || (!path.includes('.') && !path.startsWith('/api/'));
+    const isHtmlPage = path.endsWith('.html') || path==='/' || (!path.includes('.') &&!path.startsWith('/api/'));
     const pageNameForCache = path.split('/').pop() || 'index.html';
     const isDashboard = shouldNeverCache(pageNameForCache, path);
-    if(isHtmlPage && !isDashboard && request.method==='GET'){
+    if(isHtmlPage &&!isDashboard && request.method==='GET'){
       const cacheKey = getCacheKey(request, pageNameForCache);
       const cached = getCached(cacheKey);
       if(cached){
-        return new Response(cached.data, {status:200, headers:{'Content-Type':'text/html; charset=utf-8','X-Cache':'HIT','Cache-Control':'no-cache'}});
+        // إضافة كوكي دخول حتى مع الكاش
+        let headers = {'Content-Type':'text/html; charset=utf-8','X-Cache':'HIT','Cache-Control':'no-cache'};
+        if(pageNameForCache==='index.html' || path==='/' || path==='') headers['Set-Cookie'] = `${ENTRY_COOKIE_NAME}=1; Path=/; Max-Age=${ENTRY_COOKIE_MAX_AGE}; SameSite=Lax`;
+        return new Response(cached.data, {status:200, headers});
       }
     }
     let response;
@@ -585,34 +672,48 @@ export default {
       if(env.ASSETS) response=await env.ASSETS.fetch(request);
       else response=await fetch(request);
     }catch{ return new Response('Not found',{status:404}); }
-    if(isHtmlPage && !isDashboard && response.status===200){
+    if(isHtmlPage &&!isDashboard && response.status===200){
       try{
         const cloned = response.clone();
         const text = await cloned.text();
         const cacheKey = getCacheKey(request, pageNameForCache);
         setCached(cacheKey, text, {'Content-Type':'text/html; charset=utf-8'}, pageNameForCache);
         const contentType=response.headers.get('Content-Type')||'';
-        if(contentType.includes('text/html') && !path.toLowerCase().includes('real-monitoring')){
-          return new HTMLRewriter()
-            .on('body', {
+        if(contentType.includes('text/html') &&!path.toLowerCase().includes('real-monitoring')){
+          const isIndex = (pageNameForCache==='index.html' || path==='/' || path==='');
+          const rewriterResponse = new HTMLRewriter()
+           .on('body', {
               element(el){
                 el.append(`<script>if(!window.__rl){window.__rl=true;var s=document.createElement('script');s.src='/js/real-logger.js?v='+Date.now();s.async=true;document.head.appendChild(s);var s2=document.createElement('script');s2.src='/js/protect.js?v='+Date.now();s2.async=true;document.head.appendChild(s2);}</script>`, {html:true});
               }
             })
-            .transform(new Response(text, {status:200, headers:{'Content-Type':'text/html; charset=utf-8','X-Cache':'MISS'}}));
+           .transform(new Response(text, {status:200, headers:{'Content-Type':'text/html; charset=utf-8','X-Cache':'MISS'}}));
+          if(isIndex){
+            return addEntryCookieToResponse(rewriterResponse);
+          }
+          return rewriterResponse;
         }
-        return new Response(text, {status:200, headers:{'Content-Type':'text/html; charset=utf-8','X-Cache':'MISS'}});
+        let headers = {'Content-Type':'text/html; charset=utf-8','X-Cache':'MISS'};
+        if(pageNameForCache==='index.html' || path==='/' || path==='') headers['Set-Cookie'] = `${ENTRY_COOKIE_NAME}=1; Path=/; Max-Age=${ENTRY_COOKIE_MAX_AGE}; SameSite=Lax`;
+        return new Response(text, {status:200, headers});
       }catch{}
     }
     const contentType=response.headers.get('Content-Type')||'';
-    if(contentType.includes('text/html') && response.status===200 && !path.toLowerCase().includes('real-monitoring')){
-      return new HTMLRewriter()
-        .on('body', {
+    if(contentType.includes('text/html') && response.status===200 &&!path.toLowerCase().includes('real-monitoring')){
+      const isIndex = (path==='/' || path==='' || path.toLowerCase().endsWith('index.html'));
+      const transformed = new HTMLRewriter()
+       .on('body', {
           element(el){
             el.append(`<script>if(!window.__rl){window.__rl=true;var s=document.createElement('script');s.src='/js/real-logger.js?v='+Date.now();s.async=true;document.head.appendChild(s);var s2=document.createElement('script');s2.src='/js/protect.js?v='+Date.now();s2.async=true;document.head.appendChild(s2);}</script>`, {html:true});
           }
         })
-        .transform(response);
+       .transform(response);
+      if(isIndex) return addEntryCookieToResponse(transformed);
+      return transformed;
+    }
+    // إضافة كوكي عند دخول index
+    if(path==='/' || path==='' || path.toLowerCase().endsWith('index.html')){
+      return addEntryCookieToResponse(response);
     }
     return response;
   }
