@@ -586,7 +586,7 @@ if(path==='/api/salary-turso'){
       return new Response(JSON.stringify({found:false, error:'كود غير صالح'}), {status:400, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
     }
 
-    const TABLE_NAME = env.SALARY_TABLE || "المرتبات"; // غير اسم الجدول حسب قاعدتك
+    const TABLE_NAME = "مرتبات_شهرية";
 
     // PREPARED STATEMENT - القيم منفصلة عن SQL
     const sql = `SELECT * FROM "${TABLE_NAME}" WHERE "السنه" =? AND "الشهر" =? AND ("كود_العامل" =? OR "الكود_البنكى" =? OR "emptid" =?) LIMIT 1`;
