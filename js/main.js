@@ -17,6 +17,8 @@ const APP_SECURITY = {
 
 let lastData = null;
 let isFetching = false;
+let lastFetchTime = 0;
+const FETCH_DEBOUNCE = 1500; // لا تسمح بأكثر من طلب كل 1.5 ثانية
 
 // دوال آمنة لاستخراج بيانات المستخدم
 function safeJsonParse(str, fallback=null){
@@ -101,10 +103,16 @@ export function logout(){
 
 // بحث آمن
 async function executeSearch(){
+  const now = Date.now();
   if(isFetching){
-    console.log('[App] Already fetching');
+    console.log('[App] Already fetching - skip');
     return;
   }
+  if(now - lastFetchTime < FETCH_DEBOUNCE){
+    console.log('[App] Debounce - skip duplicate call');
+    return;
+  }
+  lastFetchTime = now;
 
   const code = getEmpCodeFromHeader();
   if(!code){
@@ -268,3 +276,4 @@ if(document.readyState === 'loading'){
 
 // تصدير للاستخدام في HTML القديم
 export { executeSearch, getEmpCodeFromHeader, getEmpNameFromHeader };
+
