@@ -1,0 +1,58 @@
+/* variables.css - غير الألوان من هنا فقط */
+:root{
+  --bg-page:#8b7a62;
+  --bg-page-glow-1:rgba(255,251,243,0.28);
+  --bg-page-glow-2:rgba(60,50,35,0.28);
+  --header-bg:linear-gradient(180deg, rgba(255,251,243,0.55), rgba(255,251,243,0.25));
+  --header-border:rgba(120,100,80,0.25);
+  --header-border-accent:#7a6652;
+  --header-title:#3a2f24;
+  --header-subtitle:rgba(58,47,36,0.7);
+  --card-bg:linear-gradient(180deg, rgba(255,251,243,0.58), rgba(255,251,243,0.28));
+  --card-border:rgba(120,100,80,0.22);
+  --card-text:#3a2f24;
+  --text-title:#3a2f24;
+  --text-subtitle:rgba(58,47,36,0.7);
+  --text-label:#4a3f32;
+  --input-bg:rgba(255,251,243,0.85);
+  --input-border:rgba(120,100,80,0.25);
+  --input-text:#3a2f24;
+  --table-head:#7a6652;
+  --table-cell-bg:#ffffff;
+  --table-cell-text:#000000;
+  --table-border:#d6c8b3;
+  --btn-primary-top:#7a6652;--btn-primary-bottom:#4a3f32;--btn-primary-shadow:#3a2f24;--btn-primary-text:#ffffff;
+  --btn-success-top:#34d399;--btn-success-bottom:#065f46;--btn-success-shadow:#064e3b;
+  --btn-info-top:#60a5fa;--btn-info-bottom:#1d4ed8;--btn-info-shadow:#1e3a8a;
+  --btn-warning-top:#fbbf24;--btn-warning-bottom:#92400e;--btn-warning-shadow:#78350f;--btn-warning-text:#000000;
+  --radius:12px;--radius-lg:16px;--radius-pill:999px;
+  --shadow-3d:0 6px 0 var(--shadow-color), 0 10px 20px rgba(60,50,35,0.15);
+}
+[data-theme="dark"]{
+  --bg-page:#0a0e1a;
+  --bg-page-glow-1:rgba(99,102,241,0.15);
+  --bg-page-glow-2:rgba(139,92,246,0.08);
+  --header-bg:linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.1) 50%, rgba(6,182,214,0.1));
+  --header-border:rgba(99,102,241,0.3);
+  --header-border-accent:#6366f1;
+  --header-title:#f8fafc;
+  --header-subtitle:#94a3b8;
+  --card-bg:rgba(255,255,255,0.08);
+  --card-border:rgba(99,102,241,0.3);
+  --card-text:#f8fafc;
+  --text-title:#f8fafc;
+  --text-subtitle:#94a3b8;
+  --text-label:#cbd5e1;
+  --input-bg:rgba(255,255,255,0.06);
+  --input-border:rgba(99,102,241,0.28);
+  --input-text:#f8fafc;
+  --table-head:#6366f1;
+  --table-cell-bg:#1e293b;
+  --table-cell-text:#f8fafc;
+  --table-border:rgba(99,102,241,0.2);
+  --btn-primary-top:#6366f1;--btn-primary-bottom:#4338ca;--btn-primary-shadow:#312e81;
+  --btn-success-top:#10b981;--btn-success-bottom:#065f46;
+  --btn-info-top:#3b82f6;--btn-info-bottom:#1d4ed8;
+  --btn-warning-top:#f59e0b;--btn-warning-bottom:#d97706;--btn-warning-text:#ffffff;
+  --shadow-3d:0 6px 0 var(--shadow-color), 0 10px 20px rgba(0,0,0,0.3);
+}
