@@ -6,7 +6,7 @@ const WORKER_BASE_URL = "https://turso-api.mostafa-voic77729.workers.dev";
 
 const SECURITY = {
   TIMEOUT_MS: 12000,
-  RATE_LIMIT_MS: 600,
+  RATE_LIMIT_MS: 0, // معطل
   MAX_RETRIES: 2,
   CODE_REGEX: /^[A-Za-z0-9_\-]{2,30}$/,
   YEAR_MIN: 2015,
@@ -21,17 +21,13 @@ const monthNameMap = {
   7:"يوليو", 8:"أغسطس", 9:"سبتمبر", 10:"أكتوبر", 11:"نوفمبر", 12:"ديسمبر"
 };
 
-// Rate limiter - نسخة مصححة لا ترمي خطأ بل تنتظر
+// Rate limiter معطل من Frontend - الحماية في Worker فقط
 let lastCallTs = 0;
 async function checkRateLimit(){
-  const now = Date.now();
-  const diff = now - lastCallTs;
-  if(diff < SECURITY.RATE_LIMIT_MS){
-    const wait = SECURITY.RATE_LIMIT_MS - diff;
-    console.log(`[RateLimit] Waiting ${wait}ms`);
-    await new Promise(r => setTimeout(r, wait));
-  }
+  // تم تعطيله - كان يسبب "طلبات كثيرة"
+  // الحماية الحقيقية يجب أن تكون في turso-api Worker
   lastCallTs = Date.now();
+  return;
 }
 
 // Validation صارمة
@@ -186,11 +182,16 @@ export async function fetchSalary(year, monthArabic, code){
 
     }catch(err){
       lastErr = err;
-      if(err.message.includes('طلبات كثيرة') || err.message.includes('بيانات مشبوهة')){
-        throw err; // أخطاء أمنية لا نعيد محاولتها
+      if(err.message.includes('بيانات مشبوهة')){
+        throw err;
+      }
+      // لا نرمي "طلبات كثيرة" - نعيد المحاولة بصمت
+      if(err.message.includes('طلبات كثيرة') || err.message.includes('ضغط على الخادم')){
+        console.warn('[API] Rate limited, retrying...');
+        await new Promise(r=> setTimeout(r, 1000));
       }
       if(attempt < SECURITY.MAX_RETRIES){
-        await new Promise(r=> setTimeout(r, 500 * (attempt+1)));
+        await new Promise(r=> setTimeout(r, 800 * (attempt+1)));
         continue;
       }
     }
