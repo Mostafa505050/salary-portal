@@ -2,7 +2,7 @@
 // api.js - طبقة API مؤمنة سيبرانياً - لا يمكن حقن SQL أو XSS
 'use strict';
 
-const WORKER_BASE_URL = "https://turso-api.mostafa-voic77729.workers.dev";
+const WORKER_BASE_URL = "https://salary-portal.mostafa-voic77729.workers.dev"; // نفس دومين الصفحة - تم الإصلاح
 
 const SECURITY = {
   TIMEOUT_MS: 12000,
