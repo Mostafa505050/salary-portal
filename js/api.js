@@ -6,7 +6,7 @@ const WORKER_BASE_URL = "https://turso-api.mostafa-voic77729.workers.dev";
 
 const SECURITY = {
   TIMEOUT_MS: 12000,
-  RATE_LIMIT_MS: 1500,
+  RATE_LIMIT_MS: 600,
   MAX_RETRIES: 2,
   CODE_REGEX: /^[A-Za-z0-9_\-]{2,30}$/,
   YEAR_MIN: 2015,
@@ -21,14 +21,17 @@ const monthNameMap = {
   7:"يوليو", 8:"أغسطس", 9:"سبتمبر", 10:"أكتوبر", 11:"نوفمبر", 12:"ديسمبر"
 };
 
-// Rate limiter
+// Rate limiter - نسخة مصححة لا ترمي خطأ بل تنتظر
 let lastCallTs = 0;
-function checkRateLimit(){
+async function checkRateLimit(){
   const now = Date.now();
-  if(now - lastCallTs < SECURITY.RATE_LIMIT_MS){
-    throw new Error('طلبات كثيرة جداً - انتظر ثانية');
+  const diff = now - lastCallTs;
+  if(diff < SECURITY.RATE_LIMIT_MS){
+    const wait = SECURITY.RATE_LIMIT_MS - diff;
+    console.log(`[RateLimit] Waiting ${wait}ms`);
+    await new Promise(r => setTimeout(r, wait));
   }
-  lastCallTs = now;
+  lastCallTs = Date.now();
 }
 
 // Validation صارمة
@@ -72,7 +75,7 @@ function sanitizeForLog(str){
 
 // Fetch مؤمن مع Timeout
 async function secureFetch(url, options={}){
-  checkRateLimit();
+  await checkRateLimit();
   
   const controller = new AbortController();
   const timeoutId = setTimeout(()=> controller.abort(), SECURITY.TIMEOUT_MS);
@@ -196,3 +199,4 @@ export async function fetchSalary(year, monthArabic, code){
 }
 
 export { monthNameMap };
+
