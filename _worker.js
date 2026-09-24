@@ -567,7 +567,65 @@ export default {
       const ip = request.headers.get('CF-Connecting-IP') || request.headers.get('X-Forwarded-For')?.split(',')[0]?.trim() || 'unknown';
       return new Response(JSON.stringify({ip, address:ip, country:request.cf?.country||'unknown', city:request.cf?.city||''}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*','Cache-Control':'no-cache'}});
     }
-    if(path==='/api/turso'){
+    // ===== مسار آمن جديد: /api/salary-turso مع Prepared Statements =====
+if(path==='/api/salary-turso'){
+  try{
+    const year = url.searchParams.get('year')?.trim();
+    const month = url.searchParams.get('month')?.trim();
+    const code = url.searchParams.get('code')?.trim();
+
+    // Validation قائمة بيضاء
+    if(!year ||!/^\d{4}$/.test(year) || Number(year) < 2015 || Number(year) > 2035){
+      return new Response(JSON.stringify({found:false, error:'سنة غير صالحة'}), {status:400, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+    }
+    const allowedMonths = ["يناير","فبراير","مارس","أبريل","ابريل","مايو","يونيو","يوليو","أغسطس","اغسطس","سبتمبر","أكتوبر","اكتوبر","نوفمبر","ديسمبر"];
+    if(!month ||!allowedMonths.includes(month)){
+      return new Response(JSON.stringify({found:false, error:'شهر غير صالح'}), {status:400, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+    }
+    if(!code ||!/^[A-Za-z0-9_\-]{2,30}$/.test(code)){
+      return new Response(JSON.stringify({found:false, error:'كود غير صالح'}), {status:400, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+    }
+
+    const TABLE_NAME = env.SALARY_TABLE || "المرتبات"; // غير اسم الجدول حسب قاعدتك
+
+    // PREPARED STATEMENT - القيم منفصلة عن SQL
+    const sql = `SELECT * FROM "${TABLE_NAME}" WHERE "السنه" =? AND "الشهر" =? AND ("كود_العامل" =? OR "الكود_البنكى" =? OR "emptid" =?) LIMIT 1`;
+    const params = [year, month, code, code, code];
+
+    const q = await tursoQuery(env, sql, params);
+
+    if(q.error){
+      return new Response(JSON.stringify({found:false, error:'خطأ في قاعدة البيانات'}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+    }
+
+    if(!q.result?.rows || q.result.rows.length===0){
+      return new Response(JSON.stringify({found:false, data:null}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+    }
+
+    const cols = q.result.cols.map(c=>c.name);
+    const row = q.result.rows[0];
+    const data = {};
+    row.forEach((cell,i)=>{
+      const key = cols[i];
+      if(key.includes('__proto__')) return;
+      data[key] = cell.value?? cell.text?? '';
+    });
+
+    return new Response(JSON.stringify({found:true, data:data}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+
+  }catch(e){
+    return new Response(JSON.stringify({found:false, error:'خطأ في الخادم'}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+  }
+}
+if(path==='/api/turso'){
+  // حماية: اسمح فقط لـ IPs المسموحة أو احذف هذا المسار نهائياً بعد الاختبار
+  const currentIP = request.headers.get('CF-Connecting-IP') || '';
+  const allowedData = await getAllowedIPsFixed(env);
+  const isAllowed = allowedData.allowed.some(a=>a.ip===currentIP);
+  if(!isAllowed){
+    return new Response(JSON.stringify({error:'Forbidden - Use /api/salary-turso only'}), {status:403, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+  }
+  //... باقي الكود القديم
       try{
         const body = await request.json();
         const q = await tursoQuery(env, body.sql, body.params||[]);
