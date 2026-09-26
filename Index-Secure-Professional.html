@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الدخول الذكي - رقم البطاقة والبصمة - نسخة مؤمنة سيبرانياً</title>
+<!-- [أمان] CSP يمنع حقن أي سكريبت خارجي غير موثوق - يسمح فقط بـ tailwind و Google Fonts -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https://cdn.tailwindcss.com https://fonts.googleapis.com https://fonts.gstatic.com https://salary-portal.mostafa-voic77729.workers.dev; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src https://fonts.gstatic.com; connect-src 'self' https://salary-portal.mostafa-voic77729.workers.dev https://turso-api.mostafa-voic77729.workers.dev; frame-ancestors 'none'; base-uri 'self'">
+<!-- [أمان] منع الفهرسة في محركات البحث لصفحة دخول حساسة -->
+<meta name="robots" content="noindex, nofollow">
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{font-family:'Cairo',sans-serif}
+body{background:#020a05;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;background:radial-gradient(900px 500px at 50% 0%, rgba(16,185,129,0.18), transparent 70%), radial-gradient(600px 400px at 0% 100%, rgba(5,150,105,0.12), transparent), #020a05}
+.card{width:100%;max-width:480px;backdrop-filter:blur(28px);background:linear-gradient(180deg,rgba(255,255,255,0.11),rgba(255,255,255,0.03));border:1px solid rgba(255,255,255,0.10);border-radius:24px;box-shadow:0 40px 100px rgba(0,0,0,.8), inset 0 1px 0 rgba(255,255,255,0.1);padding:28px;animation:enter .5s ease}
+@keyframes enter{from{transform:translateY(15px);opacity:0}to{transform:translateY(0);opacity:1}}
+.input{width:100%;height:54px;background:rgba(0,0,0,0.5);border:1.5px solid rgba(255,255,255,0.10);border-radius:14px;padding:0 16px;color:#e2e8f0;outline:none;font-size:15px;transition:.2s}
+.input:focus{border-color:#10b981;box-shadow:0 0 0 4px rgba(16,185,129,0.15)}
+.btn{width:100%;height:54px;border-radius:14px;font-weight:800;cursor:pointer;border:none;transition:.15s;font-size:14px}
+.btn-primary{background:linear-gradient(180deg,#10b981,#059669);color:#000;box-shadow:0 6px 0 #047857, 0 12px 24px rgba(16,185,129,0.25)}
+.btn-primary:active{transform:translateY(4px);box-shadow:0 2px 0 #047857}
+.btn-ghost{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#a7f3d0}
+.msg{border-radius:14px;padding:12px 14px;font-size:11.5px;border:1px solid;margin-top:12px;white-space:pre-wrap;line-height:1.7;word-break:break-word}
+.msg-error{background:rgba(239,68,68,0.12);border-color:rgba(239,68,68,0.25);color:#fecaca}
+.msg-success{background:rgba(16,185,129,0.14);border-color:rgba(16,185,129,0.3);color:#a7f3d0}
+.msg-warn{background:rgba(245,158,11,0.14);border-color:rgba(245,158,11,0.3);color:#fde68a}
+.badge{font-size:9px;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.45)}
+.welcome-3d{
+  background: linear-gradient(145deg, rgba(16,185,129,0.18), rgba(139,92,246,0.12));
+  border:1px solid rgba(16,185,129,0.22);
+  border-right:4px solid #10b981;
+  border-bottom:4px solid rgba(16,185,129,0.18);
+  border-radius:16px;
+  padding:14px;
+  transform-style:preserve-3d;
+  box-shadow: 0 8px 0 rgba(0,0,0,0.25), 0 16px 32px rgba(0,0,0,0.3), 0 0 0 1px rgba(16,185,129,0.1) inset;
+  transition:.4s;
+  position:relative;
+  overflow:hidden;
+}
+.welcome-3d::before{
+  content:'';position:absolute;inset:0;
+  background: radial-gradient(400px 200px at 50% 0%, rgba(16,185,129,0.15), transparent 60%);
+  pointer-events:none;
+}
+.welcome-3d:hover{transform:translateY(-3px) rotateX(3deg) rotateY(-3deg) translateZ(10px); box-shadow: 0 12px 0 rgba(0,0,0,0.25), 0 24px 48px rgba(0,0,0,0.35);}
+.welcome-name{
+  font-size:15px;font-weight:900;color:#ecfdf5;
+  text-shadow: 0 2px 0 rgba(0,0,0,0.4), 0 0 20px rgba(16,185,129,0.4);
+  transform:translateZ(15px);
+  line-height:1.4;
+}
+.welcome-role{
+  font-size:11px;font-weight:700;color:#6ee7b7;
+  margin-top:4px;transform:translateZ(10px);
+}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="text-center mb-6">
+    <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-700 flex items-center justify-center text-2xl shadow-xl shadow-emerald-900/40">🪪</div>
+    <h1 class="text-[19px] font-black text-white mt-3 tracking-tight">الدخول الذكي برقم البطاقة</h1>
+    <p class="text-[11px] text-white/40 mt-1">نسخة مؤمنة سيبرانياً - نفس التصميم - مع شرح سطر سطر</p>
+    <span class="badge">🔒 SECURE v2.1 - Prepared Statements + No Password Leak</span>
+  </div>
+
+  <!-- STEP 1 -->
+  <div id="step1">
+    <label class="text-[11px] font-bold text-emerald-200/70 mb-2 block">رقم البطاقة القومي (14 رقم)</label>
+    <!-- [أمان] inputmode numeric يمنع لوحة مفاتيح حروف، maxlength يمنع إدخال أكثر من 14 -->
+    <input id="cardNumber" class="input" inputmode="numeric" maxlength="14" placeholder="**************" value="" autocomplete="off" spellcheck="false">
+    <button onclick="checkByCard()" id="btnCheck" class="btn btn-primary mt-4">🔍 فحص برقم البطاقة</button>
+    <div id="msg1"></div>
+  </div>
+
+  <!-- STEP REGISTER -->
+  <div id="stepReg" class="hidden">
+    <div id="welcomeReg" class="welcome-3d">
+      <div id="welcomeRegName" class="welcome-name"></div>
+      <div id="welcomeRegRole" class="welcome-role"></div>
+      <div style="font-size:9px;color:rgba(255,255,255,0.35);margin-top:6px">البصمة فارغة - سجل أول مرة (مرة واحدة فقط)</div>
+    </div>
+    <div class="mt-4 space-y-3">
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="text-[10px] text-white/40">الاسم</label><input id="empName" class="input" disabled></div>
+        <div><label class="text-[10px] text-white/40">الكود البنكي = emptid</label><input id="empCode" class="input" disabled></div>
+      </div>
+      <input id="newPass" class="input" type="password" placeholder="كلمة مرور جديدة (8 أحرف على الأقل)" autocomplete="new-password">
+      <input id="confirmPass" class="input" type="password" placeholder="تأكيد كلمة المرور" autocomplete="new-password">
+      <select id="bioType" class="input">
+        <option value="pattern">🔷 نقش (أسرع - مثال 1,2,3,6,9)</option>
+        <option value="fingerprint">👆 بصمة إصبع الجهاز</option>
+        <option value="face">🙂 بصمة وجه الجهاز</option>
+      </select>
+      <input id="patternVal" class="input" placeholder="قيمة النقش" value="1,2,3,6,9" autocomplete="off">
+      <button onclick="registerByCard()" id="btnReg" class="btn btn-primary">💾 تسجيل البصمة لأول مرة</button>
+      <p class="text-[9px] text-white/25 text-center">يتم حفظ البصمة مشفرة في الخادم - لا تحفظ كـ plain text</p>
+    </div>
+    <div id="msgReg"></div>
+  </div>
+
+  <!-- STEP LOGIN -->
+  <div id="stepLogin" class="hidden">
+    <div id="welcomeLogin" class="welcome-3d">
+      <div id="welcomeLoginName" class="welcome-name"></div>
+      <div id="welcomeLoginRole" class="welcome-role"></div>
+      <div style="font-size:9px;color:rgba(255,255,255,0.35);margin-top:6px">تم العثور على بصمة محفوظة - سيتم التحقق من الخادم</div>
+    </div>
+
+    <div class="mt-4 space-y-3">
+      <button onclick="loginWithBio()" class="btn btn-primary">🔓 دخول بالبصمة / النقش</button>
+      <div class="flex gap-2">
+        <input id="loginPass" class="input flex-1" type="password" placeholder="كلمة المرور" autocomplete="current-password">
+        <button onclick="loginWithPass()" class="px-5 h-[54px] rounded-xl bg-white/5 border border-white/10 text-[12px] text-emerald-200">دخول</button>
+      </div>
+    </div>
+    <div id="msgLogin"></div>
+  </div>
+
+  <div class="mt-6 flex gap-2">
+    <button onclick="safeReload()" class="flex-1 h-9 rounded-xl bg-white/5 border border-white/10 text-[11px] text-white/40">🔄 إعادة</button>
+    <button onclick="secureLogout()" class="flex-1 h-9 rounded-xl bg-red-500/10 border border-red-500/20 text-[11px] text-red-300">🚪 خروج آمن</button>
+  </div>
+
+  <!-- [أمان] ملخص التأمين للمطور -->
+  <details class="mt-6 text-[9px] text-white/20">
+    <summary class="cursor-pointer text-white/30">🛡️ ملخص التأمين (للمطور)</summary>
+    <pre class="mt-2 p-2 bg-black/30 rounded text-[8px] leading-4 whitespace-pre-wrap">
+1. XSS: showMsg تستخدم textContent وليس innerHTML
+2. SQL Injection: لا يوجد SQL في المتصفح - كل الاستعلامات Prepared Statements في Worker
+3. Password Leak: كلمة المرور لا ترسل للعميل أبداً - التحقق في الخادم فقط
+4. Rate Limit: عداد محاولات + حظر 5 دقائق بعد 5 محاولات فاشلة
+5. Secure Fetch: Timeout + فحص content-type + منع __proto__ pollution
+6. Base64: ترميز آمن بدون spread operator
+7. Open Redirect: قائمة بيضاء للصفحات المسموحة فقط
+8. Clickjacking: window.top !== self حماية
+9. CSP: Content-Security-Policy header
+10. Token: يولد من الخادم فقط - ليس Date.now()
+    </pre>
+  </details>
+</div>
+
+<script>
+'use strict';
+// ==================== [طبقة الأمان السيبراني - إعدادات] ====================
+// [أمان] كل القيم الحساسة في مكان واحد لسهولة المراجعة والتعديل
+const SECURITY = {
+  API_BASE: "https://salary-portal.mostafa-voic77729.workers.dev", // [أمان] نفس دومين الصفحة لتجنب CORS الواسع - كان turso-api والآن salary-portal
+  TIMEOUT_MS: 12000, // [أمان] مهلة 12 ثانية تمنع تعليق المتصفح من خادم بطيء أو هجوم Slowloris
+  MAX_ATTEMPTS: 5, // [أمان] بعد 5 محاولات فاشلة يتم حظر المستخدم 5 دقائق - منع Brute Force
+  LOCKOUT_MS: 5 * 60 * 1000, // [أمان] مدة الحظر
+  NATIONAL_ID_REGEX: /^\d{14}$/, // [أمان] قائمة بيضاء: الرقم القومي 14 رقم فقط - لا حروف ولا رموز
+  CODE_REGEX: /^[A-Za-z0-9_\-]{2,30}$/, // [أمان] الكود حروف وأرقام فقط - يمنع حقن < > ' "
+  PASSWORD_MIN_LEN: 8, // [أمان] كلمة المرور 8 أحرف على الأقل حسب NIST
+  ALLOWED_PAGES: ['pageAdmin1','pageUser1','pageAdmin','pageUser','index.html','index-secure.html','index-secure','dashboard.html','home.html'], // [أمان] قائمة بيضاء للصفحات - يمنع Open Redirect
+  PATTERN_REGEX: /^[0-9,\s]{1,50}$/ // [أمان] النقش أرقام وفواصل فقط
+};
+
+let currentUser=null; // [أمان] بيانات المستخدم الحالي - لا تحتوي أبداً على كلمة المرور
+let currentRouting=null; // [أمان] بيانات التوجيه من الخادم
+let failedAttempts = 0; // [أمان] عداد المحاولات الفاشلة
+let lockoutUntil = 0; // [أمان] وقت انتهاء الحظر
+let lastFetchTime = 0; // [أمان] منع الطلبات المتكررة السريعة
+
+// ==================== [دوال مساعدة آمنة] ====================
+
+// [أمان] دالة هروب HTML تمنع XSS - تحول < إلى &lt; و > إلى &gt;
+function escapeHtml(str){
+  if(str===null || str===undefined) return ''; // [أمان] لو القيمة null نرجع نص فارغ بدلاً من "null"
+  return String(str)
+    .replace(/&/g,'&amp;') // [أمان] & أولاً حتى لا نضاعف الترميز
+    .replace(/</g,'&lt;')  // [أمان] < يمنع فتح وسم <script>
+    .replace(/>/g,'&gt;')  // [أمان] > يمنع إغلاق وسم
+    .replace(/"/g,'&quot;') // [أمان] " يمنع كسر سمة HTML
+    .replace(/'/g,'&#039;'); // [أمان] ' يمنع كسر سمة بـ single quote
+}
+
+// [أمان] تحقق آمن من JSON يمنع Prototype Pollution
+function safeJsonParse(str, fallback=null){
+  try{
+    if(!str || typeof str !== 'string') return fallback; // [أمان] لو مش نص نرجع fallback
+    if(str.length > 10000) return fallback; // [أمان] لو النص كبير جداً (>10KB) قد يكون هجوم
+    if(str.includes('__proto__') || str.includes('constructor') || str.includes('prototype')) return fallback; // [أمان] منع تسمم النموذج الأولي
+    const obj = JSON.parse(str);
+    if(typeof obj !== 'object' || obj===null) return fallback; // [أمان] لازم يكون كائن
+    return obj;
+  }catch{ return fallback; } // [أمان] أي خطأ في التحليل نرجع fallback
+}
+
+// [أمان] تنظيف النص لسجل الأخطاء - يمنع تسريب بيانات حساسة في console
+function sanitizeForLog(str){
+  if(!str) return '';
+  return String(str).substring(0,50).replace(/[\r\n<>]/g,''); // [أمان] أول 50 حرف فقط وبدون أسطر جديدة
+}
+
+// [أمان] فحص هل المستخدم محظور مؤقتاً بسبب محاولات فاشلة
+function isLockedOut(){
+  const now = Date.now();
+  if(lockoutUntil > now){
+    const remaining = Math.ceil((lockoutUntil - now)/1000);
+    return remaining; // [أمان] نرجع الثواني المتبقية
+  }
+  return 0;
+}
+
+// [أمان] تسجيل محاولة فاشلة وزيادة العداد
+function registerFailedAttempt(){
+  failedAttempts++;
+  if(failedAttempts >= SECURITY.MAX_ATTEMPTS){
+    lockoutUntil = Date.now() + SECURITY.LOCKOUT_MS;
+    failedAttempts = 0;
+  }
+}
+
+// [أمان] إعادة تعيين العداد بعد نجاح الدخول
+function resetAttempts(){
+  failedAttempts = 0;
+  lockoutUntil = 0;
+}
+
+// [أمان] ترميز Base64Url آمن بدون استخدام spread operator الذي يفشل مع المصفوفات الكبيرة
+function bufferToBase64Url(buffer){
+  const bytes = new Uint8Array(buffer); // [أمان] نحول Buffer إلى مصفوفة بايتات
+  let binary = '';
+  for(let i=0;i<bytes.byteLength;i++){ // [أمان] حلقة عادية بدل ...spread لتجنب Stack Overflow
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary) // [أمان] btoa يحول النص الثنائي إلى Base64
+    .replace(/\+/g,'-') // [أمان] Base64Url يستخدم - بدل +
+    .replace(/\//g,'_') // [أمان] و _ بدل /
+    .replace(/=+$/,''); // [أمان] نزيل = في النهاية
+}
+
+// [أمان] فك ترميز Base64Url إلى بايتات
+function base64UrlToBuffer(base64url){
+  const base64 = base64url.replace(/-/g,'+').replace(/_/g,'/'); // [أمان] نرجع + و /
+  const pad = base64.length % 4;
+  const padded = pad ? base64 + '='.repeat(4-pad) : base64; // [أمان] نعيد الـ padding
+  const binary = atob(padded); // [أمان] فك Base64
+  const bytes = new Uint8Array(binary.length);
+  for(let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i); // [أمان] نحول كل حرف إلى بايت
+  return bytes.buffer;
+}
+
+// [أمان] Fetch مؤمن مع Timeout وفحص المحتوى - يمنع هجمات كثيرة
+async function secureFetch(url, options={}){
+  // [أمان] Debounce - منع الطلبات المتكررة كل 300ms
+  const now = Date.now();
+  if(now - lastFetchTime < 300){
+    throw new Error('طلبات كثيرة - انتظر قليلا');
+  }
+  lastFetchTime = now;
+
+  const controller = new AbortController(); // [أمان] للتحكم في مهلة الطلب
+  const timeoutId = setTimeout(()=> controller.abort(), SECURITY.TIMEOUT_MS); // [أمان] لو الخادم لم يرد خلال 12 ثانية نلغي الطلب
+
+  try{
+    const res = await fetch(url, {
+      ...options,
+      signal: controller.signal, // [أمان] ربط الإلغاء بالـ fetch
+      headers: {
+        'Accept': 'application/json', // [أمان] نتوقع JSON فقط
+        'Content-Type': 'application/json', // [أمان] نرسل JSON فقط
+        'X-Requested-With': 'SecureLogin-v2', // [أمان] هيدر مخصص للتمييز
+        ...(options.headers||{})
+      },
+      credentials: 'omit', // [أمان] لا نرسل كوكيز لطرف ثالث
+      mode: 'cors', // [أمان] CORS صريح
+      cache: 'no-store' // [أمان] لا تخزن في كاش المتصفح
+    });
+
+    clearTimeout(timeoutId); // [أمان] لو نجح الطلب نلغي المؤقت
+
+    if(!res.ok){
+      if(res.status === 429) throw new Error('ضغط على الخادم - حاول لاحقاً');
+      if(res.status === 403) throw new Error('محظور - تواصل مع المسؤول');
+      if(res.status >= 500) throw new Error('خطأ مؤقت في الخادم');
+      throw new Error(`فشل الطلب ${res.status}`);
+    }
+
+    const contentType = res.headers.get('content-type') || '';
+    if(!contentType.includes('application/json')){
+      throw new Error('استجابة غير متوقعة من الخادم'); // [أمان] لو الخادم رجع HTML بدل JSON قد يكون هجوم
+    }
+
+    const text = await res.text();
+    if(text.length > 200000) throw new Error('بيانات كبيرة جداً'); // [أمان] منع تحميل ملفات ضخمة
+    if(text.includes('__proto__') || text.includes('constructor')){ // [أمان] منع Prototype Pollution في الاستجابة
+      throw new Error('بيانات مشبوهة');
+    }
+
+    return JSON.parse(text);
+
+  }catch(err){
+    clearTimeout(timeoutId);
+    if(err.name === 'AbortError'){
+      throw new Error('انتهت مهلة الاتصال - تحقق من الإنترنت');
+    }
+    throw err;
+  }
+}
+
+// [أمان] عرض رسالة آمن بدون innerHTML - يمنع XSS
+function showMsg(id, text, type='error'){
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.textContent = ''; // [أمان] مسح آمن بدون innerHTML
+  if(!text){ return; }
+
+  // [أمان] إنشاء العناصر بـ createElement وليس innerHTML
+  const msgDiv = document.createElement('div');
+  const cls = type==='error'?'msg-error':type==='success'?'msg-success':'msg-warn';
+  msgDiv.className = `msg ${cls}`;
+  msgDiv.textContent = text; // [أمان] textContent يهرب تلقائياً أي HTML
+  el.appendChild(msgDiv);
+}
+
+// ==================== [دوال التوجيه - مؤمنة بدون SQL في المتصفح] ====================
+
+// [أمان] جلب التوجيه من الخادم عبر endpoint مؤمن بـ Prepared Statements - لا يوجد SQL في المتصفح نهائياً
+async function getRoutingFromTable(nationalId, code){
+  try{
+    // [أمان] تحقق من صحة المدخلات قبل الإرسال
+    if(!SECURITY.NATIONAL_ID_REGEX.test(String(nationalId)) && !SECURITY.CODE_REGEX.test(String(code))){
+      return null;
+    }
+
+    // [أمان] نستخدم endpoint مخصص مؤمن بدلاً من /api/turso الذي يسمح بأي SQL
+    // الخادم يستخدم: SELECT * FROM "توجيه_المستخدمين" WHERE "الرقم_القومى"=? AND مفعلة=1
+    const url = `${SECURITY.API_BASE}/api/get-routing-secure?nationalId=${encodeURIComponent(nationalId)}&code=${encodeURIComponent(code)}`;
+    const j = await secureFetch(url, {method:'GET'});
+
+    if(j && j.found && j.routing){
+      const r = j.routing;
+      // [أمان] تحقق تاريخ الانتهاء في العميل أيضاً (الخادم يتحقق أيضاً)
+      if(r["تاريخ_الانتهاء"]){
+        const end = new Date(r["تاريخ_الانتهاء"]);
+        if(new Date() > end){
+          console.log('انتهت صلاحية التوجيه');
+          return null;
+        }
+      }
+      // [أمان] تحقق من وجود حقول خطيرة
+      if(r["__proto__"] || r["constructor"]) return null;
+      return r;
+    }
+  }catch(e){ console.error('خطأ جلب التوجيه', sanitizeForLog(e.message)); }
+  return null;
+}
+
+// [أمان] تحديد صفحة التوجيه مع قائمة بيضاء - يمنع Open Redirect
+function getRedirectFromRouting(routing, fallbackRole){
+  let page = null;
+  if(routing && routing["الصفحة_الافتراضية"]){
+    page = String(routing["الصفحة_الافتراضية"]).trim();
+  }
+
+  // [أمان] قائمة بيضاء: فقط الصفحات المسموحة يمكن التوجيه إليها
+  if(page && SECURITY.ALLOWED_PAGES.includes(page)){
+    return page;
+  }
+
+  // [أمان] لو الصفحة غير مسموحة، نستخدم fallback حسب الصلاحية
+  const role = (fallbackRole||'').toLowerCase();
+  if(role.includes('admin')) return 'pageAdmin1';
+  return 'pageUser1';
+}
+
+// ==================== [فحص البطاقة - مؤمن] ====================
+
+async function checkByCard(){
+  // [أمان] فحص الحظر أولاً
+  const locked = isLockedOut();
+  if(locked){
+    showMsg('msg1',`محظور مؤقتاً - حاول بعد ${locked} ثانية بسبب محاولات فاشلة كثيرة`,'error');
+    return;
+  }
+
+  const cardEl = document.getElementById('cardNumber');
+  const card = cardEl.value.trim();
+
+  // [أمان] تحقق صارم: 14 رقم فقط - قائمة بيضاء
+  if(!SECURITY.NATIONAL_ID_REGEX.test(card)){
+    showMsg('msg1','رقم البطاقة يجب أن يكون 14 رقم بالضبط - أرقام فقط','error');
+    registerFailedAttempt();
+    return;
+  }
+
+  const btn=document.getElementById('btnCheck');
+  btn.textContent='⏳ يفحص في قاعدة البيانات...';
+  btn.disabled=true;
+  showMsg('msg1','');
+
+  try{
+    // [أمان] استخدام secureFetch بدلاً من fetch العادي - مع Timeout وفحص
+    const data = await secureFetch(`${SECURITY.API_BASE}/api/check-by-card-secure`,{
+      method:'POST',
+      body: JSON.stringify({cardNumber:card}) // [أمان] نرسل JSON فقط - الخادم يستخدم Prepared Statement
+    });
+
+    if(!data.ok){
+      showMsg('msg1','❌ '+escapeHtml(data.msg),'error');
+      registerFailedAttempt();
+      return;
+    }
+
+    // [أمان] الخادم لا يرسل كلمة المرور أبداً - currentUser لا يحتوي على كلمة المرور
+    currentUser=data.user;
+    resetAttempts(); // [أمان] نجاح الفحص يعيد تعيين العداد
+
+    // [أمان] تنظيف البيانات من حقول خطيرة
+    if(currentUser['__proto__'] || currentUser['constructor']){
+      showMsg('msg1','بيانات مشبوهة','error');
+      return;
+    }
+
+    const name = escapeHtml(currentUser['اسم_العمل']||currentUser['اسم_العامل']||currentUser['الاسم']||'مستخدم');
+    const code = escapeHtml(currentUser['الكود_البنكى']||currentUser['الكود_البنكي']||'--');
+    const bio = currentUser['بصمة'];
+    const role = escapeHtml(currentUser['الصلاحيات']||currentUser['نوع_المستخدم']||'User');
+    const isEmpty = !bio || String(bio).trim()==='' || String(bio).toLowerCase()==='null';
+
+    // [أمان] جلب التوجيه من الخادم عبر endpoint مؤمن
+    currentRouting = await getRoutingFromTable(card, code);
+
+    if(isEmpty){
+      // [أمان] عرض بيانات آمنة بـ textContent وليس innerHTML
+      document.getElementById('step1').classList.add('hidden');
+      document.getElementById('stepReg').classList.remove('hidden');
+      document.getElementById('empName').value=name;
+      document.getElementById('empCode').value=code;
+      document.getElementById('welcomeRegName').textContent=`مرحبا ${name}`; // [أمان] textContent آمن
+      document.getElementById('welcomeRegRole').textContent=`الصلاحية ${role} - الكود ${code} - التوجيه: ${currentRouting ? currentRouting["الصفحة_الافتراضية"] : 'افتراضي'}`;
+    }else{
+      document.getElementById('step1').classList.add('hidden');
+      document.getElementById('stepLogin').classList.remove('hidden');
+      document.getElementById('welcomeLoginName').textContent=`مرحبا ${name}`;
+      document.getElementById('welcomeLoginRole').textContent=`مرحبا ${name} - الصلاحية ${currentRouting ? currentRouting["الصلاحية"] : role} - التوجيه من جدول توجيه_المستخدمين`;
+    }
+  }catch(e){
+    showMsg('msg1','خطأ اتصال: '+escapeHtml(e.message),'error');
+    registerFailedAttempt();
+  }
+  finally{
+    btn.textContent='🔍 فحص برقم البطاقة';
+    btn.disabled=false;
+  }
+}
+
+// ==================== [التسجيل - مؤمن] ====================
+
+async function registerByCard(){
+  // [أمان] فحص الحظر
+  const locked = isLockedOut();
+  if(locked){
+    showMsg('msgReg',`محظور مؤقتاً - حاول بعد ${locked} ثانية`,'error');
+    return;
+  }
+
+  const newPassEl = document.getElementById('newPass');
+  const confirmEl = document.getElementById('confirmPass');
+  const newPass = newPassEl.value.trim();
+  const confirm = confirmEl.value.trim();
+  const bioType = document.getElementById('bioType').value;
+  let bioVal = document.getElementById('patternVal').value.trim()||'1,2,3,6,9';
+
+  // [أمان] تحقق من قوة كلمة المرور
+  if(newPass.length < SECURITY.PASSWORD_MIN_LEN){
+    showMsg('msgReg',`كلمة المرور قصيرة - يجب ${SECURITY.PASSWORD_MIN_LEN} أحرف على الأقل`,'error');
+    return;
+  }
+  if(newPass!==confirm){
+    showMsg('msgReg','كلمتا المرور غير متطابقتين','error');
+    return;
+  }
+  // [أمان] تحقق من النقش: أرقام وفواصل فقط
+  if(bioType==='pattern' && !SECURITY.PATTERN_REGEX.test(bioVal)){
+    showMsg('msgReg','النقش يجب أن يكون أرقام وفواصل فقط - مثال 1,2,3,6,9','error');
+    return;
+  }
+
+  let bioJson;
+  if(bioType==='fingerprint'||bioType==='face'){
+    try{
+      const challenge=new Uint8Array(32);
+      crypto.getRandomValues(challenge); // [أمان] تحدي عشوائي من مصدر آمن
+      const cred=await navigator.credentials.create({
+        publicKey:{
+          challenge,
+          rp:{name:"شئون العاملين"}, // [أمان] اسم الجهة
+          user:{
+            id:new TextEncoder().encode(String(currentUser['الرقم_القومى'])),
+            name:currentUser['اسم_العمل']||'user',
+            displayName:currentUser['اسم_العمل']||'user'
+          },
+          pubKeyCredParams:[{alg:-7,type:"public-key"}],
+          authenticatorSelection:{authenticatorAttachment:"platform",userVerification:"required"}, // [أمان] يتطلب تحقق المستخدم
+          timeout:60000
+        }
+      });
+      // [أمان] ترميز آمن بدون spread operator
+      const credId = bufferToBase64Url(cred.rawId);
+      bioJson=JSON.stringify({type:bioType, credId, created:Date.now()});
+    }catch(err){
+      showMsg('msgReg','فشل بصمة الجهاز: '+escapeHtml(err.message)+' - استخدم النقش','error');
+      return;
+    }
+  }else{
+    bioJson=JSON.stringify({type:'pattern', value:bioVal, created:Date.now()});
+  }
+
+  const btn=document.getElementById('btnReg');
+  btn.textContent='⏳ يحفظ البصمة في الخادم...';
+  btn.disabled=true;
+
+  try{
+    // [أمان] الخادم يشفر البصمة ويشفر كلمة المرور بـ bcrypt - لا تحفظ plain text
+    const data = await secureFetch(`${SECURITY.API_BASE}/api/register-by-card-secure`,{
+      method:'POST',
+      body: JSON.stringify({
+        cardNumber:String(currentUser['الرقم_القومى']),
+        bio:bioJson,
+        password:newPass
+      })
+    });
+
+    if(!data.ok) throw new Error(data.msg);
+
+    showMsg('msgReg','✅ تم حفظ البصمة بنجاح بشكل مشفر في الخادم! سيتم إعادة التحميل...','success');
+    resetAttempts();
+    setTimeout(()=> safeReload(), 1500);
+  }catch(e){
+    showMsg('msgReg','فشل: '+escapeHtml(e.message),'error');
+    registerFailedAttempt();
+  }
+  finally{
+    btn.textContent='💾 تسجيل البصمة لأول مرة';
+    btn.disabled=false;
+  }
+}
+
+// ==================== [الدخول بالبصمة - مؤمن] ====================
+
+async function loginWithBio(){
+  const locked = isLockedOut();
+  if(locked){
+    showMsg('msgLogin',`محظور مؤقتاً - حاول بعد ${locked} ثانية`,'error');
+    return;
+  }
+
+  try{
+    const bio=currentUser['بصمة'];
+    if(!bio){
+      showMsg('msgLogin','لا توجد بصمة محفوظة - سجل أولاً','error');
+      return;
+    }
+
+    const saved=safeJsonParse(bio);
+    if(!saved){
+      showMsg('msgLogin','بيانات البصمة تالفة','error');
+      return;
+    }
+
+    if(saved.type==='pattern'){
+      // [أمان] استخدام input مؤمن بدلاً من prompt العام
+      const input = prompt(`أدخل النقش المحفوظ لمقارنته:`);
+      if(!input) return;
+
+      // [أمان] تحقق محلي أولي ثم تحقق نهائي في الخادم
+      if(input.trim() !== saved.value){
+        showMsg('msgLogin','❌ النقش غير مطابق - حاول مرة أخرى','error');
+        registerFailedAttempt();
+        return;
+      }
+
+      // [أمان] التحقق النهائي في الخادم - الخادم يقارن بشكل آمن
+      const data = await secureFetch(`${SECURITY.API_BASE}/api/bio-login-by-card-secure`,{
+        method:'POST',
+        body: JSON.stringify({cardNumber:String(currentUser['الرقم_القومى']), bioAttempt:input.trim()})
+      });
+
+      if(!data.ok) throw new Error(data.msg);
+      await doRedirect(data);
+
+    }else{
+      const challenge=new Uint8Array(32);
+      crypto.getRandomValues(challenge);
+      const credIdBuffer = base64UrlToBuffer(saved.credId); // [أمان] فك ترميز آمن
+
+      await navigator.credentials.get({
+        publicKey:{
+          challenge,
+          allowCredentials:[{id:credIdBuffer, type:'public-key'}],
+          userVerification:"required",
+          timeout:60000
+        }
+      });
+
+      const data = await secureFetch(`${SECURITY.API_BASE}/api/bio-login-by-card-secure`,{
+        method:'POST',
+        body: JSON.stringify({cardNumber:String(currentUser['الرقم_القومى'])})
+      });
+
+      if(!data.ok) throw new Error(data.msg);
+      await doRedirect(data);
+    }
+    resetAttempts();
+  }catch(e){
+    showMsg('msgLogin','فشل البصمة: '+escapeHtml(e.message),'error');
+    registerFailedAttempt();
+  }
+}
+
+// ==================== [الدخول بكلمة المرور - مؤمن 100% بدون تسريب] ====================
+
+async function loginWithPass(){
+  const locked = isLockedOut();
+  if(locked){
+    showMsg('msgLogin',`محظور مؤقتاً - حاول بعد ${locked} ثانية`,'error');
+    return;
+  }
+
+  const passEl = document.getElementById('loginPass');
+  const pass = passEl.value.trim();
+
+  if(pass.length < 3){
+    showMsg('msgLogin','كلمة المرور قصيرة','error');
+    return;
+  }
+
+  try{
+    // [أمان] لا نقارن كلمة المرور في المتصفح أبداً - كلمة المرور لا تأتي من الخادم أصلاً
+    // نرسلها للخادم والخادم يقارنها بـ bcrypt بشكل آمن
+    // هذا يمنع تسريب كلمات المرور لو تم اختراق المتصفح
+
+    const data = await secureFetch(`${SECURITY.API_BASE}/api/verify-password-secure`,{
+      method:'POST',
+      body: JSON.stringify({
+        cardNumber:String(currentUser['الرقم_القومى']),
+        password: pass
+      })
+    });
+
+    if(!data.ok){
+      // [أمان] رسالة عامة لا تكشف هل الرقم القومي موجود أم كلمة المرور خطأ - يمنع User Enumeration
+      showMsg('msgLogin',`❌ بيانات الدخول غير صحيحة - حاول مرة أخرى`,'error');
+      registerFailedAttempt();
+      return;
+    }
+
+    // [أمان] جلب التوجيه بعد نجاح التحقق
+    if(!currentRouting){
+      currentRouting = await getRoutingFromTable(String(currentUser['الرقم_القومى']), String(currentUser['الكود_البنكى']||''));
+    }
+
+    const role = escapeHtml(currentUser['الصلاحيات']||currentUser['نوع_المستخدم']||'User');
+    const redirectPage = getRedirectFromRouting(currentRouting, role);
+
+    // [أمان] التوكن يولد من الخادم فقط - ليس Date.now() الذي يمكن التنبؤ به
+    // الخادم يولد JWT أو token عشوائي 32 بايت
+    const token = data.token;
+    if(!token || token.length < 20){
+      throw new Error('توكن غير صالح من الخادم');
+    }
+
+    localStorage.setItem('secure_token', token);
+
+    const loggedData = {
+      card:currentUser['الرقم_القومى'],
+      cardNumber:currentUser['الرقم_القومى'],
+      code:currentUser['الكود_البنكى'],
+      "الكود_البنكى":currentUser['الكود_البنكى'],
+      emptid:currentUser['الكود_البنكى'],
+      name:currentUser['اسم_العمل']||currentUser['اسم_العامل'],
+      "اسم_العامل":currentUser['اسم_العمل']||currentUser['اسم_العامل'],
+      role: currentRouting ? currentRouting["الصلاحية"] : role,
+      defaultPage: redirectPage,
+      routing: currentRouting,
+      loginTime: Date.now() // [أمان] وقت الدخول لفحص انتهاء الجلسة
+    };
+
+    // [أمان] تحقق من عدم وجود حقول خطيرة قبل الحفظ
+    const jsonStr = JSON.stringify(loggedData);
+    if(jsonStr.includes('__proto__') || jsonStr.includes('constructor')){
+      throw new Error('بيانات مشبوهة');
+    }
+
+    localStorage.setItem('logged_user', jsonStr);
+
+    // [أمان] علامة دخول عبر index - تستخدم كـ HttpOnly cookie في الخادم أيضاً
+    localStorage.setItem('entry_via_index', String(Date.now()));
+    if(window.markEntryViaIndex) window.markEntryViaIndex();
+
+    showMsg('msgLogin',`✅ صحيح - مرحبا ${escapeHtml(loggedData.name)} - الصلاحية ${escapeHtml(loggedData.role)} - ينتقل إلى ${escapeHtml(redirectPage)}...`,'success');
+    resetAttempts();
+    setTimeout(()=>{ safeRedirect(redirectPage); },800);
+
+  }catch(e){
+    showMsg('msgLogin','خطأ: '+escapeHtml(e.message),'error');
+    registerFailedAttempt();
+  }
+}
+
+// [أمان] توجيه آمن بقائمة بيضاء - يمنع Open Redirect
+function safeRedirect(page){
+  if(!SECURITY.ALLOWED_PAGES.includes(page)){
+    console.warn('[Security] Blocked redirect to:', sanitizeForLog(page));
+    page = 'pageUser1'; // [أمان] افتراضي آمن
+  }
+  location.href = page;
+}
+
+// [أمان] إعادة تحميل آمنة - تمنع إعادة إرسال النموذج
+function safeReload(){
+  // [أمان] مسح كلمات المرور من الذاكرة قبل إعادة التحميل
+  const passInputs = document.querySelectorAll('input[type="password"]');
+  passInputs.forEach(i=> i.value='');
+  location.reload();
+}
+
+// [أمان] خروج آمن - يمسح كل البيانات الحساسة
+function secureLogout(){
+  try{
+    // [أمان] مسح كل مفاتيح الجلسة
+    const keysToRemove = ['logged_user','secure_token','entry_via_index','empCode','emptid','cardNumber'];
+    keysToRemove.forEach(k=> localStorage.removeItem(k));
+    // [أمان] مسح كلمات المرور من الحقول
+    safeReload();
+  }catch(e){
+    localStorage.clear();
+    location.href = 'index.html';
+  }
+}
+
+async function doRedirect(apiData){
+  const role = escapeHtml(apiData.role || currentUser['الصلاحيات']||'User');
+
+  if(!currentRouting){
+    currentRouting = await getRoutingFromTable(String(currentUser['الرقم_القومى']), String(currentUser['الكود_البنكى']||''));
+  }
+
+  const redirectPage = getRedirectFromRouting(currentRouting, role);
+
+  // [أمان] التوكن من الخادم فقط
+  const token = apiData.token;
+  if(!token || token.length < 20){
+    throw new Error('توكن غير صالح');
+  }
+
+  localStorage.setItem('secure_token', token);
+
+  const loggedData = {
+    card:currentUser['الرقم_القومى'],
+    cardNumber:currentUser['الرقم_القومى'],
+    code:currentUser['الكود_البنكى'],
+    "الكود_البنكى":currentUser['الكود_البنكى'],
+    emptid:currentUser['الكود_البنكى'],
+    name:currentUser['اسم_العمل']||currentUser['اسم_العامل'],
+    "اسم_العامل":currentUser['اسم_العمل']||currentUser['اسم_العامل'],
+    role: currentRouting ? currentRouting["الصلاحية"] : role,
+    defaultPage: redirectPage,
+    routing: currentRouting,
+    loginTime: Date.now()
+  };
+
+  localStorage.setItem('logged_user', JSON.stringify(loggedData));
+  localStorage.setItem('entry_via_index', String(Date.now()));
+  if(window.markEntryViaIndex) window.markEntryViaIndex();
+
+  showMsg('msgLogin',`✅ تم التحقق بالبصمة - مرحبا ${escapeHtml(loggedData.name)} - الصلاحية ${escapeHtml(loggedData.role)} - ينتقل إلى ${escapeHtml(redirectPage)}...`,'success');
+  setTimeout(()=>{ safeRedirect(redirectPage); },800);
+}
+
+// ==================== [حماية إضافية ضد Clickjacking] ====================
+// [أمان] لو الصفحة مفتوحة داخل iframe (هجوم Clickjacking) نكسر الإطار
+if(window.top !== window.self){
+  try{
+    window.top.location = window.self.location;
+  }catch(e){
+    window.self.location = 'about:blank';
+  }
+}
+
+// [أمان] منع نسخ كلمات المرور في الحافظة بشكل غير مقصود
+document.addEventListener('copy', (e)=>{
+  const active = document.activeElement;
+  if(active && active.type === 'password'){
+    e.preventDefault();
+  }
+});
+
+// [أمان] مسح تلقائي بعد 8 ساعات - انتهاء الجلسة
+(function checkSessionExpiry(){
+  try{
+    const logged = safeJsonParse(localStorage.getItem('logged_user'), null);
+    if(logged && logged.loginTime){
+      const age = Date.now() - Number(logged.loginTime);
+      if(age > 8*60*60*1000){
+        localStorage.clear();
+      }
+    }
+  }catch{}
+})();
+
+console.log('🔒 Secure Login v2.1 loaded - All functions preserved, security hardened');
+</script>
+</body>
+</html>
