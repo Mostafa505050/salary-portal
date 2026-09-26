@@ -159,14 +159,14 @@ async function fetchAssetWithCleanUrls(request, env){
     candidates.push('/'+base.toLowerCase()+'.html');
     // الاسم اللي في الصورة
     if(base.toLowerCase().includes('index-secure')) {
-      candidates.push('/index.html');
-      candidates.push('/index.html');
+      candidates.push('/Index-Secure-Professional.html');
+      candidates.push('/index-secure-professional.html');
       candidates.push('/index-biometric-camera-v5-FULL.html');
     }
   }
   if(path==='/'||path===''){ 
     candidates.unshift('/index.html'); 
-    candidates.unshift('/index.html');
+    candidates.unshift('/Index-Secure-Professional.html');
   }
   for(const candPath of candidates){
     try{
@@ -196,8 +196,8 @@ export default {
     if(isEntryHtmlPage(path)){
       if(!hasValidEntry(request) && !path.toLowerCase().includes('index')){
         let pageName=path.split('/').pop()||path;
-        const isSecureLogin = pageName.toLowerCase().includes('index-secure')||pageName.toLowerCase().includes('secure')||pageName.toLowerCase().includes('biometric')||pageName.toLowerCase().includes('professional');
-        if(!isSecureLogin){
+       const low = pageName.toLowerCase();
+       const isSecureLogin = low.includes('index-secure')|| low.includes('secure')|| low.includes('biometric')|| low.includes('professional')|| low.includes('pageadmin')|| low.includes('admin');        if(!isSecureLogin){
           return new Response(entryBlockedHTMLFixed(pageName),{status:403, headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-cache',...SECURITY_HEADERS}});
         }
       }
@@ -354,7 +354,7 @@ export default {
 
     if(!response || response.status===404){
       if(path.startsWith('/api/')) return new Response(JSON.stringify({error:"Not found", path}),{status:404,headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}});
-      return new Response(`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>404</title></head><body style="background:#020a05;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:Cairo"><div style="text-align:center"><h1>404</h1><p>${path} غير موجود</p><p>جرب:</p><a href="/index.html" style="color:#10b981;margin:5px">index.html</a><a href="/index.html" style="color:#10b981;margin:5px">index.html</a><br><br><a href="/api/debug-config" style="color:#a78bfa;font-size:11px">فحص الإعدادات /api/debug-config</a></div></div></body></html>`,{status:404,headers:{'Content-Type':'text/html; charset=utf-8',...SECURITY_HEADERS}});
+      return new Response(`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>404</title></head><body style="background:#020a05;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:Cairo"><div style="text-align:center"><h1>404</h1><p>${path} غير موجود</p><p>جرب:</p><a href="/index.html" style="color:#10b981;margin:5px">index.html</a><a href="/Index-Secure-Professional.html" style="color:#10b981;margin:5px">Index-Secure-Professional.html</a><br><br><a href="/api/debug-config" style="color:#a78bfa;font-size:11px">فحص الإعدادات /api/debug-config</a></div></div></body></html>`,{status:404,headers:{'Content-Type':'text/html; charset=utf-8',...SECURITY_HEADERS}});
     }
 
     const contentType=response.headers.get('Content-Type')||'';
@@ -366,4 +366,3 @@ export default {
     return addSecurityHeaders(response);
   }
 }
-
