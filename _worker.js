@@ -1,8 +1,7 @@
-// _worker.js - V8.2 FIXED BUILD - يبني 100%
+// _worker.js - V8.2.1 FIXED BUILD - يبني 100% بدون 
 const HARDCODED_TURSO_URL = "https://company-alldata-mostafadarwish-mostafa505050.aws-eu-west-1.turso.io";
 const HARDCODED_TURSO_TOKEN = "";
 const DEFAULT_PEPPER = "fallback_pepper_v8_please_set_PEPPER_SECRET_in_cloudflare";
-
 const SECURITY_HEADERS = {
   'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
   'X-Frame-Options': 'DENY',
@@ -13,7 +12,6 @@ const SECURITY_HEADERS = {
   'X-Powered-By': 'SecurePayslip-V8-Ultra',
   'Cache-Control': 'no-store, no-cache, must-revalidate',
 };
-
 function addSecurityHeaders(response){
   try{
     const newHeaders = new Headers(response.headers);
@@ -21,7 +19,6 @@ function addSecurityHeaders(response){
     return new Response(response.body, {status: response.status, headers: newHeaders});
   }catch{ return response; }
 }
-
 function getPepperSecret(env){
   const pepper = (env.PEPPER_SECRET || env.PEPPER || '').trim();
   if(pepper && pepper.length >= 16) return pepper;
@@ -32,27 +29,11 @@ async function hashWithPepper(clientHash, nationalId, pepperSecret){
   const hashBuf = await crypto.subtle.digest('SHA-256', data);
   return Array.from(new Uint8Array(hashBuf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
-async function hashPatternClient(patternValue, nationalId){
-  const clean = String(patternValue).replace(/[^0-9,]/g,'').substring(0,50);
-  const data = new TextEncoder().encode(clean + '|' + String(nationalId).trim());
-  const hashBuf = await crypto.subtle.digest('SHA-256', data);
-  return Array.from(new Uint8Array(hashBuf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-}
-async function hashPatternServer(clientHash, nationalId, pepperSecret){ return await hashWithPepper(clientHash, nationalId, pepperSecret); }
-async function hashFaceClient(rawSample, nationalId){
-  const data = new TextEncoder().encode(String(rawSample).trim().substring(0,1000) + '|' + String(nationalId).trim());
-  const hashBuf = await crypto.subtle.digest('SHA-256', data);
-  return Array.from(new Uint8Array(hashBuf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-}
-async function hashFaceServer(clientHash, nationalId, pepperSecret){ return await hashWithPepper(clientHash, nationalId, pepperSecret); }
-async function hashPasswordSecure(password, nationalId, pepperSecret){
-  const data = new TextEncoder().encode(String(password).trim() + '|' + String(nationalId).trim() + '|' + pepperSecret);
-  const hashBuf = await crypto.subtle.digest('SHA-256', data);
-  return Array.from(new Uint8Array(hashBuf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-}
-
-const ENTRY_COOKIE_NAME = 'entry_via_index';
-const ENTRY_COOKIE_MAX_AGE = 3600;
+async function hashPasswordSecure(p, nid, pepper){ return hashWithPepper(p, nid, pepper); }
+async function hashPatternServer(c, nid, p){ return hashWithPepper(c, nid, p); }
+async function hashFaceServer(c, nid, p){ return hashWithPepper(c, nid, p); }
+const ENTRY_COOKIE_NAME='entry_via_index';
+const ENTRY_COOKIE_MAX_AGE=3600;
 function getCookieFixed(request, name){
   try{
     const cookieHeader = request.headers.get('Cookie') || '';
@@ -80,7 +61,6 @@ function addEntryCookieToResponse(response){
   for(const [k,v] of Object.entries(SECURITY_HEADERS)) h.set(k,v);
   return new Response(response.body,{status:response.status,headers:h});
 }
-
 const SECURE_LOGIN_CONFIG = { NATIONAL_ID_REGEX:/^\d{14}$/, RATE_LIMIT_WINDOW_MS:60000, RATE_LIMIT_MAX:20, TOKEN_BYTES:32, MAX_FAILED_ATTEMPTS:5, BLOCK_DURATION_MS:300000 };
 let LOGIN_RATE_LIMIT=new Map();
 function isValidNationalIdSecure(id){ return SECURE_LOGIN_CONFIG.NATIONAL_ID_REGEX.test(String(id).trim()); }
@@ -141,13 +121,11 @@ export default {
     if(['/api/check-by-card-secure','/api/verify-password-secure','/api/bio-login-by-card-secure'].includes(path)){
       const b=await checkIpBlocked(env,clientIp); if(b.blocked) return new Response(JSON.stringify({ok:false,msg:`محظور ${b.secondsLeft} ثانية`}),{status:429,headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}});
     }
-
     if(path==='/api/debug-config'){
       const cfg=getTursoConfig(env); const pepper=getPepperSecret(env);
-      return new Response(JSON.stringify({v:'V8.2-FIXED-BUILD',tursoOk:!cfg.error,hasPepper:pepper!==DEFAULT_PEPPER,ip:clientIp},null,2),{headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}});
+      return new Response(JSON.stringify({v:'V8.2.1-FIXED-BUILD',tursoOk:!cfg.error,hasPepper:pepper!==DEFAULT_PEPPER,ip:clientIp},null,2),{headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}});
     }
     if(path==='/api/get-ip') return new Response(JSON.stringify({ip:clientIp}),{headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}});
-
     if(path==='/api/check-by-card-secure' && request.method==='POST'){
       const body=await request.json().catch(()=>({})); const card=String(body.cardNumber||'').trim();
       if(!isValidNationalIdSecure(card)) return new Response(JSON.stringify({ok:false,msg:'14 رقم'}),{status:400,headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}});
@@ -156,7 +134,6 @@ export default {
       const cols=q.result.cols.map(c=>c.name); const u=safeRowToObject(cols,q.result.rows[0]); delete u['كلمة_المرور'];
       return new Response(JSON.stringify({ok:true,user:u}),{headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}});
     }
-
     if(path==='/api/verify-password-secure' && request.method==='POST'){
       const body=await request.json().catch(()=>({})); const card=String(body.cardNumber||'').trim(); const pass=String(body.password||'').trim();
       const q=await tursoQuery(env, `SELECT * FROM "موظفين_مرتبات" WHERE "الرقم_القومى"=? LIMIT 1`, [card]);
@@ -168,15 +145,41 @@ export default {
       await clearFailedAttempts(env,clientIp); const token=generateSecureTokenFixed();
       return new Response(JSON.stringify({ok:true,token,role:u['الصلاحيات']||'User'}),{headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}});
     }
-
+    if(path==='/api/register-by-card-secure' && request.method==='POST'){
+      const body=await request.json().catch(()=>({})); const card=String(body.cardNumber||'').trim(); let bio=String(body.bio||'').trim(); const pass=String(body.password||'').trim();
+      const pepper=getPepperSecret(env); const hashedPass=await hashPasswordSecure(pass,card,pepper);
+      try{ const b=JSON.parse(bio); if(b.type==='pattern'&&b.hash){ const sh=await hashPatternServer(b.hash,card,pepper); b.serverHash=sh; b.hash=undefined; b.value=undefined; bio=JSON.stringify(b); } if(b.type==='face_camera'&&b.hash){ const sh=await hashFaceServer(b.hash,card,pepper); b.serverHash=sh; b.hash=undefined; bio=JSON.stringify(b); } }catch{}
+      await tursoQuery(env, `UPDATE "موظفين_مرتبات" SET "بصمة"=?, "كلمة_المرور"=? WHERE "الرقم_القومى"=?`, [bio, hashedPass, card]);
+      await clearFailedAttempts(env,clientIp);
+      return new Response(JSON.stringify({ok:true}),{headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}});
+    }
+    if(path==='/api/bio-login-by-card-secure' && request.method==='POST'){
+      const body=await request.json().catch(()=>({})); const card=String(body.cardNumber||'').trim(); const bioAttempt=body.bioAttempt?String(body.bioAttempt).trim():null;
+      const q=await tursoQuery(env, `SELECT * FROM "موظفين_مرتبات" WHERE "الرقم_القومى"=? LIMIT 1`, [card]);
+      if(!q.result?.rows?.length) return new Response(JSON.stringify({ok:false,msg:'غير موجود'}),{status:400,headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}});
+      const cols=q.result.cols.map(c=>c.name); const u=safeRowToObject(cols,q.result.rows[0]); const savedStr=String(u['بصمة']||'').trim();
+      let saved; try{ saved=JSON.parse(savedStr); }catch{ return new Response(JSON.stringify({ok:false,msg:'بيانات تالفة'}),{status:500,headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}}); }
+      const pepper=getPepperSecret(env);
+      if(saved.type==='pattern'){
+        if(!bioAttempt) return new Response(JSON.stringify({ok:false,msg:'أدخل النقش'}),{status:400,headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}});
+        let ok=false; if(saved.serverHash){ const ah=await hashPatternServer(bioAttempt,card,pepper); ok=constantTimeCompare(ah,saved.serverHash); } else if(saved.hash){ ok=constantTimeCompare(saved.hash,bioAttempt); } else if(saved.value){ ok=constantTimeCompare(String(saved.value).trim(),bioAttempt.trim()); }
+        if(!ok){ const att=await recordFailedAttempt(env,clientIp,card,'pattern-failed'); return new Response(JSON.stringify({ok:false,msg:`النقش غير مطابق بقي ${5-att}`}),{status:400,headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}}); }
+      }
+      await clearFailedAttempts(env,clientIp); const token=generateSecureTokenFixed();
+      return new Response(JSON.stringify({ok:true,token,role:u['الصلاحيات']||'User'}),{headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}});
+    }
     if(path==='/api/salary-turso'){
       const year=url.searchParams.get('year')?.trim(); const month=url.searchParams.get('month')?.trim(); const code=url.searchParams.get('code')?.trim();
       const q=await tursoQuery(env, `SELECT * FROM "مرتبات_شهرية" WHERE "السنه"=? AND "الشهر"=? AND ("كود_العامل"=? OR "الكود_البنكى"=?) LIMIT 1`, [year,month,code,code]);
-      if(!q.result?.rows?.length) return new Response(JSON.stringify({found:false,data:null}),[STRIPPED]'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}});
+      // تم إصلاح السطر 175 هنا - كان فيه 
+      if(!q.result?.rows?.length){
+        return new Response(JSON.stringify({found:false,data:null}), {
+          headers: {'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}
+        });
+      }
       const cols=q.result.cols.map(c=>c.name); const data={}; q.result.rows[0].forEach((cell,i)=>{ data[cols[i]]=cell.value??''; });
       return new Response(JSON.stringify({found:true,data}),{headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}});
     }
-
     let response=await fetchAssetWithCleanUrls(request,env);
     if(!response||response.status===404){
       if(path.startsWith('/api/')) return new Response(JSON.stringify({error:'Not found'}),{status:404,headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}});
