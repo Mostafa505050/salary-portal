@@ -148,7 +148,7 @@ async function fetchAssetWithCleanUrls(request, env){
   const lowPath = path.toLowerCase();
 
   // لو طلب الاسم القديم، حوله للجديد
-  if(lowPath === '/index-secure-professional.html' || lowPath === '/index-secure-professional'){
+  if(lowPath === '/index.html' || lowPath === '/index-secure-professional'){
     const newUrl = new URL(request.url); newUrl.pathname = '/index.html';
     try{ if(env.ASSETS){ const res = await env.ASSETS.fetch(new Request(newUrl, request)); if(res.status!==404) return res; } }catch{}
   }
