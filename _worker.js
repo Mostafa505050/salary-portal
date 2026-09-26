@@ -60,6 +60,8 @@ function hasValidEntry(request){
 }
 function isEntryHtmlPage(path){
   const low = path.toLowerCase();
+  // إصلاح نهائي: إلغاء حماية الدخول عبر الرئيسية لصفحات المرتبات - الحماية الحقيقية هي تسجيل الدخول
+  if(low.includes('pageadmin') || low.includes('pageuser') || low.includes('page-admin') || low.includes('page-user')) return false;
   if(['/api/','/js/','.js','.css','.json','.png','.jpg','.svg','.ico','real-monitoring','whitelist','allowed-ips','block-device','get-ip','blocked-devices','blocked-list','turso','cache-','favicon','auth','login','dashboard','protect.js','real-logger.js','debug-config'].some(s=> low.includes(s.toLowerCase()))) return false;
   let pageName = path.split('/').pop() || '';
   if(path==='/' || path==='' || pageName==='' ) return false;
