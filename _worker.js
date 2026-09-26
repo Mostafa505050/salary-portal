@@ -624,7 +624,15 @@ export default {
 
     const contentType=response.headers.get('Content-Type')||'';
     if(contentType.includes('text/html')&&response.status===200){
-      const isIndex=(path==='/'||path===''||path.toLowerCase().endsWith('Index-Secure-Professional.html'));
+      const lower = path.toLowerCase();
+      const isIndex = (
+        path==='/' ||
+        path==='' ||
+        lower.endsWith('/index.html') ||
+        lower.endsWith('index.html') ||
+        lower.includes('index-secure-professional') ||
+        lower.includes('index-secure')
+      );
       if(isIndex) return addEntryCookieToResponse(addSecurityHeaders(response));
       return addSecurityHeaders(response);
     }
