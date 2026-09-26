@@ -285,13 +285,18 @@ async function secureFetch(url, options={}){
       throw new Error('استجابة غير متوقعة من الخادم'); // [أمان] لو الخادم رجع HTML بدل JSON قد يكون هجوم
     }
 
-    const text = await res.text();
-    if(text.length > 200000) throw new Error('بيانات كبيرة جداً'); // [أمان] منع تحميل ملفات ضخمة
-    if(text.includes('__proto__') || text.includes('constructor')){ // [أمان] منع Prototype Pollution في الاستجابة
-      throw new Error('بيانات مشبوهة');
-    }
+const text = await res.text();
+let json = JSON.parse(text);
 
-    return JSON.parse(text);
+// نفحص المفاتيح فقط، مش النص الخام
+function hasDangerousKeys(obj){
+  if(Object.prototype.hasOwnProperty.call(obj, '__proto__')) return true;
+  if(Object.prototype.hasOwnProperty.call(obj, 'constructor')) return true;
+  return false;
+}
+if(hasDangerousKeys(json)){
+  throw new Error('بيانات مشبوهة'); // فقط لو فيه اختراق حقيقي
+}
 
   }catch(err){
     clearTimeout(timeoutId);
