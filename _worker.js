@@ -320,15 +320,21 @@ export default {
       }
     }
 
-    if(isEntryHtmlPage(path)){
-      if(!hasValidEntry(request) && !path.toLowerCase().includes('index')){
-        let pageName=path.split('/').pop()||path;
-        const isSecureLogin = pageName.toLowerCase().includes('index-secure')||pageName.toLowerCase().includes('secure')||pageName.toLowerCase().includes('biometric')||pageName.toLowerCase().includes('professional')||pageName.toLowerCase().includes('v9')||pageName.toLowerCase().includes('v10');
-        if(!isSecureLogin){
-          return new Response(entryBlockedHTMLFixed(pageName),{status:403, headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-cache',...SECURITY_HEADERS}});
-        }
-      }
-    }
+	// حماية بسيطة: كل الصفحات تمر عبر index.html فقط
+	if(isEntryHtmlPage(path)){
+	  if(!hasValidEntry(request) && !path.toLowerCase().includes('index.html')){
+		return new Response(entryBlockedHTMLFixed(path),{status:403, headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-cache',...SECURITY_HEADERS}});
+	  }
+	}	
+    // if(isEntryHtmlPage(path)){
+      // if(!hasValidEntry(request) && !path.toLowerCase().includes('index')){
+        // let pageName=path.split('/').pop()||path;
+        // const isSecureLogin = pageName.toLowerCase().includes('index-secure')||pageName.toLowerCase().includes('secure')||pageName.toLowerCase().includes('biometric')||pageName.toLowerCase().includes('professional')||pageName.toLowerCase().includes('v9')||pageName.toLowerCase().includes('v10');
+        // if(!isSecureLogin){
+          // return new Response(entryBlockedHTMLFixed(pageName),{status:403, headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-cache',...SECURITY_HEADERS}});
+        // }
+      // }
+    // }
 
     // API تشخيصي محدث V8
     if(path==='/api/debug-config'){
