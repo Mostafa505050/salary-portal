@@ -300,7 +300,7 @@ export default {
   async fetch(request, env, ctx){
     const url=new URL(request.url); const path=url.pathname;
 
-    if(url.protocol==='http:'){ return Response.redirect(url.toString().replace('http://','https://'),301); }
+    // if(url.protocol==='http:'){ return Response.redirect(url.toString().replace('http://','https://'),301); }
 
     if(request.method==='OPTIONS'){
       return new Response(null,{status:204, headers:{'Access-Control-Allow-Origin':'*','Access-Control-Allow-Methods':'GET,POST,OPTIONS','Access-Control-Allow-Headers':'Content-Type,Authorization',...SECURITY_HEADERS}});
