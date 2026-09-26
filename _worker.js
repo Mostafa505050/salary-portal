@@ -194,7 +194,7 @@ export default {
 
     // منع الدخول إلا عبر index - مع استثناء صفحات الدخول
     if(isEntryHtmlPage(path)){
-      if(!hasValidEntry(request) && !path.toLowerCase().includes('index')){
+      if(!hasValidEntry(request) && !path.toLowerCase().includes('Index-Secure-Professional')){
         let pageName=path.split('/').pop()||path;
         const isSecureLogin = pageName.toLowerCase().includes('index-secure')||pageName.toLowerCase().includes('secure')||pageName.toLowerCase().includes('biometric')||pageName.toLowerCase().includes('professional');
         if(!isSecureLogin){
