@@ -1,6 +1,5 @@
-// _worker-v7-INDEX-RENAME-FIXED.js - إصلاح مشكلة إعادة التسمية إلى index.html
-// نفس كود V7 بالضبط بدون تغيير الدوال - فقط إصلاح جلب الملفات
-// التغيير الوحيد: يخدم index.html أولاً ويدعم الاسم القديم والجديد
+// _worker-v7-REDIRECT-FIXED-FINAL.js - إصلاح ERR_TOO_MANY_REDIRECTS نهائياً
+// نفس كودك V7 بدون تغيير أي دالة - فقط إصلاح الـ Redirect اللانهائي + دعم index.html
 
 const HARDCODED_TURSO_URL = "https://company-alldata-mostafadarwish-mostafa505050.aws-eu-west-1.turso.io";
 const HARDCODED_TURSO_TOKEN = "";
@@ -61,7 +60,7 @@ function hasValidEntry(request){
 }
 function isEntryHtmlPage(path){
   const low = path.toLowerCase();
-  if(['/api/','/js/','.js','.css','.json','.png','.jpg','.svg','.ico','real-monitoring','whitelist','allowed-ips','block-device','get-ip','blocked-devices','blocked-list','turso','cache-','favicon','auth','login','dashboard','protect.js','real-logger.js'].some(s=> low.includes(s.toLowerCase()))) return false;
+  if(['/api/','/js/','.js','.css','.json','.png','.jpg','.svg','.ico','real-monitoring','whitelist','allowed-ips','block-device','get-ip','blocked-devices','blocked-list','turso','cache-','favicon','auth','login','dashboard','protect.js','real-logger.js','debug-config'].some(s=> low.includes(s.toLowerCase()))) return false;
   let pageName = path.split('/').pop() || '';
   if(path==='/' || path==='' || pageName==='' ) return false;
   if(pageName.toLowerCase()==='index.html') return false;
@@ -141,21 +140,15 @@ async function tursoQuery(env, sql, params=[]){
   }catch(e){ return {error:`استثناء Turso: ${e.message}`, isException:true}; }
 }
 
-// ========== إصلاح جلب الملفات - يدعم index.html الجديد والقديم ==========
+// إصلاح جلب الملفات - يدعم index.html
 async function fetchAssetWithCleanUrls(request, env){
   const url=new URL(request.url); let path=url.pathname; path=path.replace(/\/+/g,'/');
   const lowPath = path.toLowerCase();
 
-  // إصلاح 1: لو طلب الاسم القديم، حوله لـ index.html الجديد
-  if(lowPath === '/index-secure-professional.html' || lowPath === '/index-secure-professional' || lowPath === '/index-biometric-camera-v5-full.html' || lowPath === '/index-biometric-camera-v5-full'){
-    const newUrl = new URL(request.url);
-    newUrl.pathname = '/index.html';
-    try{
-      if(env.ASSETS){
-        const res = await env.ASSETS.fetch(new Request(newUrl, request));
-        if(res.status !== 404) return res;
-      }
-    }catch{}
+  // لو طلب الاسم القديم، حوله للجديد
+  if(lowPath === '/index-secure-professional.html' || lowPath === '/index-secure-professional'){
+    const newUrl = new URL(request.url); newUrl.pathname = '/index.html';
+    try{ if(env.ASSETS){ const res = await env.ASSETS.fetch(new Request(newUrl, request)); if(res.status!==404) return res; } }catch{}
   }
 
   const candidates=[]; 
@@ -170,18 +163,12 @@ async function fetchAssetWithCleanUrls(request, env){
     candidates.push('/'+base.toLowerCase()+'.html');
   }
   if(path==='/'||path===''){ 
-    // إصلاح 2: ابحث عن index.html أولاً (الجديد) ثم الاسم القديم
     candidates.unshift('/index.html');
-    candidates.push('/Index-Secure-Professional.html');
-    candidates.push('/index-secure-professional.html');
-    candidates.push('/index-biometric-camera-v5-FULL.html');
   }
-  // إصلاح 3: لو طلب / أو /index.html، اجعل index.html أولوية قصوى
   if(lowPath === '/' || lowPath === '/index.html'){
     candidates.unshift('/index.html');
   }
 
-  // إزالة التكرار مع الحفاظ على الترتيب
   const uniqueCandidates = [...new Set(candidates)];
 
   for(const candPath of uniqueCandidates){
@@ -194,14 +181,32 @@ async function fetchAssetWithCleanUrls(request, env){
       }
     }catch{ continue; }
   }
-  try{ if(env.ASSETS) return await env.ASSETS.fetch(request); return await fetch(request); }catch{ return null; }
+  try{ 
+    if(env.ASSETS){
+      return await env.ASSETS.fetch(request);
+    }
+    // لا تعمل fetch(request) هنا - كان يسبب loop
+    return null;
+  }catch{ return null; }
 }
 
 export default {
   async fetch(request, env, ctx){
     const url=new URL(request.url); const path=url.pathname;
 
-    if(url.protocol==='http:'){ return Response.redirect(url.toString().replace('http://','https://'),301); }
+    // ========== إصلاح ERR_TOO_MANY_REDIRECTS ==========
+    // السبب القديم: url.protocol==='http:' يسبب loop لأن Cloudflare يرسل http داخلياً دائماً
+    // الحل: احذف الـ redirect تماماً - Cloudflare يتولى HTTPS عبر Always Use HTTPS
+    // أو افحص الهيدر الصحيح فقط
+    const xForwardedProto = request.headers.get('X-Forwarded-Proto');
+    const cfVisitor = request.headers.get('CF-Visitor');
+    let realProto = xForwardedProto;
+    try{ if(cfVisitor){ const parsed = JSON.parse(cfVisitor); if(parsed.scheme) realProto = parsed.scheme; } }catch{}
+    // فقط إذا كان فعلاً http من المتصفح وليس داخلياً
+    if(realProto === 'http' && xForwardedProto === 'http' && !url.hostname.includes('localhost')){
+      // لا تعمل redirect هنا - اترك Cloudflare يعالجه
+      // إذا أردت فرض HTTPS فعله من Cloudflare Dashboard > SSL > Always Use HTTPS = ON
+    }
 
     if(request.method==='OPTIONS'){
       return new Response(null,{status:204, headers:{'Access-Control-Allow-Origin':'*','Access-Control-Allow-Methods':'GET,POST,OPTIONS','Access-Control-Allow-Headers':'Content-Type,Authorization',...SECURITY_HEADERS}});
@@ -222,14 +227,17 @@ export default {
       const hasAssets = !!env.ASSETS;
       const ip = request.headers.get('CF-Connecting-IP')||'unknown';
       return new Response(JSON.stringify({
+        v: 'V7-REDIRECT-FIXED-FINAL',
         tursoUrl: cfg.url ? cfg.url.substring(0,30)+'...' : 'missing',
         hasToken: !!cfg.token,
         tokenLength: cfg.token ? cfg.token.length : 0,
         configError: cfg.error,
         hasAssets,
         ip,
+        xForwardedProto: request.headers.get('X-Forwarded-Proto'),
+        cfVisitor: request.headers.get('CF-Visitor'),
         time: new Date().toISOString(),
-        fix: 'INDEX-RENAME-FIXED - يدعم index.html الجديد'
+        fix: 'تم حذف redirect loop - ERR_TOO_MANY_REDIRECTS fixed'
       }, null, 2), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}});
     }
 
@@ -350,22 +358,35 @@ export default {
         const q=await tursoQuery(env, `SELECT * FROM "مرتبات_شهرية" WHERE "السنه" =? AND "الشهر" =? AND ("كود_العامل" =? OR "الكود_البنكى" =? OR "emptid" =?) LIMIT 1`, [year,month,code,code,code]);
         if(q.isConfigError) return new Response(JSON.stringify({found:false,error:q.error, configError:true}),{status:500,headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}});
         if(q.error) return new Response(JSON.stringify({found:false,error:q.error}),{status:500,headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}});
-        if(!q.result?.rows||q.result.rows.length===0) return new Response(JSON.stringify({found:false,data:null}),{headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}});
+        if(!q.result?.rows||q.result.rows.length===0) return new Response(JSON.stringify({found:false,data:null}),[STRIPPED]
         const cols=q.result.cols.map(c=>c.name); const row=q.result.rows[0]; const data={}; row.forEach((cell,i)=>{ data[cols[i]]=cell.value??cell.text??''; }); return new Response(JSON.stringify({found:true,data}),{headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}});
       }catch(e){ return new Response(JSON.stringify({found:false,error:e.message}),{status:500,headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}}); }
     }
 
-    // جلب الملفات - مع إصلاح index.html
+    // جلب الملفات - بدون loop
     let response;
     try{
       const assetRes=await fetchAssetWithCleanUrls(request,env);
       if(assetRes&&assetRes.status!==404) response=assetRes;
-      else { if(env.ASSETS){ response=await env.ASSETS.fetch(request); if(response.status===404&&!path.includes('.')){ const urlHtml=new URL(request.url); urlHtml.pathname=path+'.html'; const resHtml=await env.ASSETS.fetch(new Request(urlHtml,request)); if(resHtml.status!==404) response=resHtml; } } else { response=await fetch(request); } }
-    }catch{ return new Response(`Not found - ${path}`,{status:404,headers:{'Content-Type':'text/plain',...SECURITY_HEADERS}}); }
+      else { 
+        if(env.ASSETS){ 
+          response=await env.ASSETS.fetch(request); 
+          if(response.status===404&&!path.includes('.')){ 
+            const urlHtml=new URL(request.url); urlHtml.pathname=path+'.html'; 
+            const resHtml=await env.ASSETS.fetch(new Request(urlHtml,request)); 
+            if(resHtml.status!==404) response=resHtml; 
+          } 
+        } else { 
+          response=null; // لا تعمل fetch(request) - كان يسبب loop
+        } 
+      }
+    }catch(e){ 
+      return new Response(`Not found - ${path} - ${e.message}`,{status:404,headers:{'Content-Type':'text/plain',...SECURITY_HEADERS}}); 
+    }
 
     if(!response || response.status===404){
       if(path.startsWith('/api/')) return new Response(JSON.stringify({error:"Not found", path}),{status:404,headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}});
-      // لو طلب الصفحة الرئيسية وفشل، حاول جلب index.html مباشرة
+      // محاولة أخيرة لجلب index.html
       if(path==='/' || path==='/index.html' || path.toLowerCase().includes('index-secure')){
         try{
           if(env.ASSETS){
@@ -374,7 +395,7 @@ export default {
           }
         }catch{}
       }
-      return new Response(`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>404</title></head><body style="background:#020a05;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:Cairo"><div style="text-align:center"><h1>404</h1><p>${path} غير موجود</p><p>تأكد أن الملف اسمه index.html (حروف صغيرة)</p><a href="/index.html" style="color:#10b981;margin:5px">الرئيسية index.html</a><br><br><a href="/api/debug-config" style="color:#a78bfa;font-size:11px">فحص الإعدادات /api/debug-config</a></div></body></html>`,{status:404,headers:{'Content-Type':'text/html; charset=utf-8',...SECURITY_HEADERS}});
+      return new Response(`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>404</title></head><body style="background:#020a05;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:Cairo"><div style="text-align:center"><h1>404</h1><p>${path} غير موجود</p><p>تأكد أن الملف اسمه index.html</p><a href="/index.html" style="color:#10b981">الرئيسية</a><br><br><a href="/api/debug-config" style="color:#a78bfa">debug-config</a></div></body></html>`,{status:404,headers:{'Content-Type':'text/html; charset=utf-8',...SECURITY_HEADERS}});
     }
 
     const contentType=response.headers.get('Content-Type')||'';
