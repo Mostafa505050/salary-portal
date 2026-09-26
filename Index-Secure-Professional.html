@@ -495,7 +495,9 @@ async function checkByCard(){
       document.getElementById('empName').value=name; document.getElementById('empCode').value=code;
       // إصلاح 1: مرحبا اسم المستخدم
       document.getElementById('welcomeRegName').textContent=`مرحبا ${name}`;
-      document.getElementById('welcomeRegRole').textContent=`الصلاحية ${role} - الكود ${code}`;
+      document.getElementById('welcomeRegRole').textContent=`الصلاحية ${role}`;
+      // document.getElementById('welcomeRegRole').textContent=`الصلاحية ${role} - الكود ${code}`;
+     
       setTimeout(()=>{initPatternCanvas('patternCanvas','patternDisplay',patternSequence,false); onBioMethodChange();},100);
     }else{
       document.getElementById('step1').classList.add('hidden'); document.getElementById('stepLogin').classList.remove('hidden');
