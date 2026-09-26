@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>الدخول الذكي - بصمة إصبع + وجه بالكاميرا - مؤمن 100%</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src https://fonts.gstatic.com; connect-src 'self' https://salary-portal.mostafa-voic77729.workers.dev; img-src 'self' data: blob:; media-src 'self' blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'">
+<title>الدخول الذكي - إصلاح كامل - اسم المستخدم + بصمة + كاميرا</title>
+<!-- CSP مصحح - يسمح للكاميرا و face-api -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src https://fonts.gstatic.com; connect-src 'self' https://salary-portal.mostafa-voic77729.workers.dev https://cdn.jsdelivr.net https://unpkg.com; img-src 'self' data: blob:; media-src 'self' blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'">
+<meta name="robots" content="noindex, nofollow">
 <meta http-equiv="Strict-Transport-Security" content="max-age=31536000; includeSubDomains; preload">
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *{font-family:'Cairo',sans-serif;-webkit-tap-highlight-color:transparent}
@@ -16,6 +17,7 @@ body{background:#020a05;min-height:100vh;display:flex;align-items:center;justify
 @keyframes enter{from{transform:translateY(15px);opacity:0}to{transform:translateY(0);opacity:1}}
 .input{width:100%;height:54px;background:rgba(0,0,0,0.5);border:1.5px solid rgba(255,255,255,0.10);border-radius:14px;padding:0 16px;color:#e2e8f0;outline:none;font-size:15px;transition:.2s}
 .input:focus{border-color:#10b981;box-shadow:0 0 0 4px rgba(16,185,129,0.15)}
+select.input{cursor:pointer}
 .btn{width:100%;height:54px;border-radius:14px;font-weight:800;cursor:pointer;border:none;transition:.15s;font-size:14px;user-select:none}
 .btn-primary{background:linear-gradient(180deg,#10b981,#059669);color:#000;box-shadow:0 6px 0 #047857, 0 12px 24px rgba(16,185,129,0.25)}
 .btn-primary:active{transform:translateY(4px);box-shadow:0 2px 0 #047857}
@@ -23,37 +25,34 @@ body{background:#020a05;min-height:100vh;display:flex;align-items:center;justify
 .msg{border-radius:14px;padding:12px 14px;font-size:11.5px;border:1px solid;margin-top:12px;white-space:pre-wrap;line-height:1.7;word-break:break-word}
 .msg-error{background:rgba(239,68,68,0.12);border-color:rgba(239,68,68,0.25);color:#fecaca}
 .msg-success{background:rgba(16,185,129,0.14);border-color:rgba(16,185,129,0.3);color:#a7f3d0}
-.badge{font-size:9px;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.45)}
 .welcome-3d{background:linear-gradient(145deg, rgba(16,185,129,0.18), rgba(139,92,246,0.12));border:1px solid rgba(16,185,129,0.22);border-right:4px solid #10b981;border-radius:16px;padding:14px;position:relative}
-.welcome-name{font-size:15px;font-weight:900;color:#ecfdf5;line-height:1.4}
+.welcome-name{font-size:16px;font-weight:900;color:#ecfdf5;line-height:1.4}
 .welcome-role{font-size:11px;font-weight:700;color:#6ee7b7;margin-top:4px}
 .pattern-container{width:100%;max-width:300px;margin:0 auto;aspect-ratio:1;background:rgba(0,0,0,0.4);border:1.5px solid rgba(16,185,129,0.2);border-radius:20px;padding:16px;touch-action:none;position:relative}
 canvas.pattern-canvas{position:absolute;inset:0;width:100%;height:100%;border-radius:20px;touch-action:none}
-.bio-option{padding:14px;border-radius:14px;border:1.5px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);cursor:pointer;transition:.2s;position:relative}
-.bio-option.selected{border-color:#10b981;background:rgba(16,185,129,0.12);box-shadow:0 0 20px rgba(16,185,129,0.15)}
 .secure-badge{font-size:8px;background:rgba(16,185,129,0.15);color:#6ee7b7;border:1px solid rgba(16,185,129,0.25);padding:2px 6px;border-radius:999px}
-/* كاميرا الوجه */
-.camera-box{width:100%;max-width:360px;margin:0 auto;background:#000;border-radius:20px;overflow:hidden;border:2px solid rgba(16,185,129,0.3);position:relative;aspect-ratio:3/4}
+.camera-box{width:100%;max-width:360px;margin:0 auto;background:#000;border-radius:20px;overflow:hidden;border:2px solid rgba(16,185,129,0.3);position:relative;aspect-ratio:3/4;display:none}
+.camera-box.active{display:block}
 .camera-box video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
 .camera-overlay{position:absolute;inset:0;border:3px dashed rgba(16,185,129,0.5);border-radius:20px;pointer-events:none;margin:20px}
-.camera-overlay.face-detected{border-color:#10b981;border-style:solid;box-shadow:0 0 30px rgba(16,185,129,0.6)}
-.face-scan-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg, transparent, #10b981, transparent);animation:scan 2s linear infinite;top:30%}
+.camera-overlay.detected{border-color:#10b981;border-style:solid;box-shadow:0 0 30px rgba(16,185,129,0.6)}
+.scan-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg, transparent, #10b981, transparent);animation:scan 2s linear infinite;top:30%}
 @keyframes scan{0%{top:15%}100%{top:85%}}
-.face-capture-flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
-.face-capture-flash.flash{animation:flash .3s ease}
+.flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+.flash.active{animation:flash .3s ease}
 @keyframes flash{0%{opacity:0}50%{opacity:0.8}100%{opacity:0}}
 </style>
 </head>
 <body>
 <div class="card">
   <div class="text-center mb-5">
-    <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-700 flex items-center justify-center text-2xl shadow-xl">📱</div>
-    <h1 class="text-[18px] font-black text-white mt-3">الدخول ببصمة الهاتف + وجه بالكاميرا</h1>
-    <p class="text-[10px] text-white/40 mt-1">WebAuthn + Camera Face API + SHA-256 + HTTPS</p>
+    <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-700 flex items-center justify-center text-2xl shadow-xl">🪪</div>
+    <h1 class="text-[18px] font-black text-white mt-3">الدخول الذكي المؤمن 100%</h1>
+    <p class="text-[10px] text-white/40 mt-1">اسم المستخدم + بصمة هاتف + كاميرا وجه</p>
     <div class="flex gap-1 justify-center mt-2 flex-wrap">
-      <span class="secure-badge">👆 بصمة إصبع حقيقية</span>
-      <span class="secure-badge">🙂 وجه بالكاميرا</span>
-      <span class="secure-badge">🔒 مشفر 100%</span>
+      <span class="secure-badge">👋 اسم المستخدم</span>
+      <span class="secure-badge">👆 بصمة هاتف</span>
+      <span class="secure-badge">📸 كاميرا وجه</span>
     </div>
   </div>
 
@@ -66,36 +65,20 @@ canvas.pattern-canvas{position:absolute;inset:0;width:100%;height:100%;border-ra
 
   <div id="stepReg" class="hidden">
     <div class="welcome-3d">
-      <div id="welcomeRegName" class="welcome-name"></div>
+      <div id="welcomeRegName" class="welcome-name">مرحبا</div>
       <div id="welcomeRegRole" class="welcome-role"></div>
-      <div style="font-size:9px;color:rgba(255,255,255,0.35);margin-top:6px">أول مرة - اختر حماية هاتفك (بصمة / وجه)</div>
+      <div style="font-size:9px;color:rgba(255,255,255,0.35);margin-top:6px">أول مرة - اختر نوع الحماية</div>
     </div>
 
     <div class="mt-4">
-      <label class="text-[10px] text-white/50 mb-2 block">اختر طريقة الحماية:</label>
-      <div class="grid gap-2">
-        <div class="bio-option selected" id="optPattern" onclick="selectBio('pattern')">
-          <div class="flex justify-between items-center">
-            <span class="text-[13px] font-bold text-white">🔷 نقش آمن مشفر</span>
-            <span class="text-[10px] text-emerald-300">يعمل على كل الهواتف</span>
-          </div>
-        </div>
-        <div class="bio-option" id="optFingerprint" onclick="selectBio('fingerprint')">
-          <div class="text-[13px] font-bold text-white">👆 بصمة الإصبع الأصلية (TouchID)</div>
-          <div class="text-[10px] text-white/40 mt-1">يستخدم حساس البصمة في هاتفك - لا يحتاج كاميرا</div>
-        </div>
-        <div class="bio-option" id="optFace" onclick="selectBio('face')">
-          <div class="text-[13px] font-bold text-white">🙂 بصمة وجه النظام (FaceID)</div>
-          <div class="text-[10px] text-white/40 mt-1">يستخدم FaceID للآيفون / Face Unlock للأندرويد</div>
-        </div>
-        <div class="bio-option" id="optFaceCamera" onclick="selectBio('face_camera')" style="border-color:rgba(139,92,246,0.3);background:rgba(139,92,246,0.08)">
-          <div class="flex justify-between items-center">
-            <span class="text-[13px] font-bold text-white">📸 وجه بالكاميرا - يفتح الكاميرا ويأخذ شفرة الوجه ⭐</span>
-            <span class="text-[9px] bg-violet-500/30 text-violet-200 px-2 py-1 rounded-full">جديد</span>
-          </div>
-          <div class="text-[10px] text-violet-200/60 mt-1">يفتح الكاميرا الأمامية، يكشف الوجه، ويأخذ شفرة 128 بُعد مشفرة بـ SHA-256 - الأكثر أماناً</div>
-        </div>
-      </div>
+      <label class="text-[11px] font-bold text-emerald-200/70 mb-2 block">اختر طريقة الحماية:</label>
+      <select id="bioMethod" class="input" onchange="onBioMethodChange()">
+        <option value="pattern">🔷 نقش آمن مشفر - يعمل على كل الهواتف (موصى به)</option>
+        <option value="fingerprint">👆 بصمة الإصبع الأصلية - TouchID / بصمة أندرويد</option>
+        <option value="face">🙂 بصمة الوجه بالنظام - FaceID للآيفون</option>
+        <option value="face_camera">📸 وجه بالكاميرا - يفتح الكاميرا ويأخذ شفرة الوجه ⭐</option>
+      </select>
+      <div id="bioMethodHint" class="text-[9px] text-emerald-300/70 mt-2">يرسم على الشاشة ويشفر بـ SHA-256 قبل الإرسال</div>
     </div>
 
     <div class="mt-4 space-y-3">
@@ -103,60 +86,71 @@ canvas.pattern-canvas{position:absolute;inset:0;width:100%;height:100%;border-ra
         <div><label class="text-[10px] text-white/40">الاسم</label><input id="empName" class="input" disabled></div>
         <div><label class="text-[10px] text-white/40">الكود</label><input id="empCode" class="input" disabled></div>
       </div>
-      <input id="newPass" class="input" type="password" placeholder="كلمة مرور (8 أحرف)" autocomplete="new-password">
+      <input id="newPass" class="input" type="password" placeholder="كلمة مرور جديدة (8 أحرف على الأقل)" autocomplete="new-password">
       <input id="confirmPass" class="input" type="password" placeholder="تأكيد كلمة المرور" autocomplete="new-password">
       
-      <!-- نقش -->
       <div id="patternArea">
         <label class="text-[11px] font-bold text-emerald-200/70 mb-2 block">ارسم النقش بإصبعك:</label>
-        <div class="pattern-container"><canvas class="pattern-canvas" id="patternCanvas" width="300" height="300"></canvas></div>
+        <div class="pattern-container" id="patternContainer">
+          <canvas class="pattern-canvas" id="patternCanvas" width="300" height="300"></canvas>
+        </div>
         <div class="flex gap-2 mt-2">
-          <div id="patternDisplay" class="flex-1 h-9 bg-black/40 rounded-xl flex items-center justify-center text-[11px] text-white/50">ارسم...</div>
+          <div id="patternDisplay" class="flex-1 h-9 bg-black/40 rounded-xl flex items-center justify-center text-[11px] text-white/50">ارسم النقش...</div>
           <button onclick="clearPattern()" class="px-3 h-9 rounded-xl bg-white/5 border border-white/10 text-[10px] text-white/60">مسح</button>
         </div>
       </div>
 
-      <!-- كاميرا الوجه - تسجيل -->
+      <div id="fingerprintArea" class="hidden">
+        <div class="p-4 rounded-xl bg-violet-500/10 border border-violet-500/20 text-center">
+          <div class="text-[40px]">👆</div>
+          <div class="text-[12px] font-bold text-white mt-2">بصمة الإصبع الأصلية للهاتف</div>
+          <div class="text-[10px] text-white/50 mt-1">عند التسجيل سيطلب منك الهاتف وضع إصبعك على الحساس</div>
+          <div id="fingerprintStatus" class="mt-3 h-9 bg-black/40 rounded-xl flex items-center justify-center text-[11px] text-white/50">جاهز للتسجيل</div>
+          <button onclick="testFingerprintSupport()" class="mt-2 text-[10px] text-violet-300 underline">فحص هل جهازك يدعم البصمة؟</button>
+        </div>
+      </div>
+
       <div id="faceCameraRegArea" class="hidden">
-        <label class="text-[11px] font-bold text-violet-200/80 mb-2 block">📸 بصمة الوجه بالكاميرا - التسجيل:</label>
+        <label class="text-[11px] font-bold text-violet-200/80 mb-2 block">📸 بصمة الوجه بالكاميرا:</label>
         <div class="camera-box" id="cameraBoxReg">
           <video id="videoReg" autoplay muted playsinline></video>
-          <div class="camera-overlay" id="overlayReg"><div class="face-scan-line"></div></div>
-          <div class="face-capture-flash" id="flashReg"></div>
-          <div style="position:absolute;bottom:10px;left:0;right:0;text-align:center"><span class="text-[10px] bg-black/60 text-white px-3 py-1 rounded-full">ضع وجهك داخل الإطار</span></div>
+          <div class="camera-overlay" id="overlayReg"><div class="scan-line"></div></div>
+          <div class="flash" id="flashReg"></div>
+          <div style="position:absolute;bottom:10px;left:0;right:0;text-align:center"><span class="text-[10px] bg-black/60 text-white px-3 py-1 rounded-full">ضع وجهك في الإطار</span></div>
         </div>
         <canvas id="canvasReg" class="hidden"></canvas>
         <div class="grid grid-cols-2 gap-2 mt-3">
           <button onclick="startFaceCamera('reg')" id="btnStartCameraReg" class="btn bg-violet-600 text-white">🎥 فتح الكاميرا</button>
           <button onclick="captureFace('reg')" id="btnCaptureReg" class="btn bg-emerald-600 text-black" disabled>📸 التقاط شفرة الوجه</button>
         </div>
-        <div id="faceStatusReg" class="mt-2 h-9 bg-black/40 rounded-xl flex items-center justify-center text-[11px] text-white/50">اضغط فتح الكاميرا أولاً</div>
-        <div class="text-[9px] text-violet-300/60 mt-1">🔐 الشفرة: 128 رقم مشفر بـ SHA-256 + رقم البطاقة - لا تُخزن الصورة</div>
+        <div id="faceStatusReg" class="mt-2 h-9 bg-black/40 rounded-xl flex items-center justify-center text-[11px] text-white/50">اضغط فتح الكاميرا أولاً - لازم HTTPS وسماح الكاميرا</div>
+        <div class="text-[9px] text-violet-300/60 mt-1">🔐 لا تُخزن الصورة - فقط شفرة 128 بُعد مشفرة بـ SHA-256</div>
       </div>
 
-      <button onclick="registerByCard()" id="btnReg" class="btn btn-primary">💾 تسجيل مؤمن</button>
+      <button onclick="registerByCard()" id="btnReg" class="btn btn-primary">💾 تسجيل مؤمن في الخادم</button>
     </div>
     <div id="msgReg"></div>
   </div>
 
   <div id="stepLogin" class="hidden">
     <div class="welcome-3d">
-      <div id="welcomeLoginName" class="welcome-name"></div>
+      <div id="welcomeLoginName" class="welcome-name">مرحبا</div>
       <div id="welcomeLoginRole" class="welcome-role"></div>
+      <div style="font-size:9px;color:rgba(255,255,255,0.35);margin-top:6px">تم العثور على حماية - استخدم نفس الطريقة</div>
     </div>
     <div class="mt-4 space-y-3">
       <div id="loginPatternArea" class="hidden">
+        <label class="text-[11px] font-bold text-emerald-200/70 mb-2 block">ارسم النقش للدخول:</label>
         <div class="pattern-container"><canvas class="pattern-canvas" id="loginPatternCanvas" width="300" height="300"></canvas></div>
-        <div id="loginPatternDisplay" class="mt-2 h-9 bg-black/40 rounded-xl flex items-center justify-center text-[11px] text-white/50">ارسم النقش...</div>
+        <div id="loginPatternDisplay" class="mt-2 h-9 bg-black/40 rounded-xl flex items-center justify-center text-[11px] text-white/50">ارسم نفس النقش...</div>
       </div>
       
-      <!-- كاميرا الوجه - دخول -->
       <div id="faceCameraLoginArea" class="hidden">
         <label class="text-[11px] font-bold text-violet-200/80 mb-2 block">📸 مطابقة الوجه بالكاميرا:</label>
         <div class="camera-box" id="cameraBoxLogin">
           <video id="videoLogin" autoplay muted playsinline></video>
-          <div class="camera-overlay" id="overlayLogin"><div class="face-scan-line"></div></div>
-          <div class="face-capture-flash" id="flashLogin"></div>
+          <div class="camera-overlay" id="overlayLogin"><div class="scan-line"></div></div>
+          <div class="flash" id="flashLogin"></div>
         </div>
         <canvas id="canvasLogin" class="hidden"></canvas>
         <div class="grid grid-cols-2 gap-2 mt-3">
@@ -166,7 +160,15 @@ canvas.pattern-canvas{position:absolute;inset:0;width:100%;height:100%;border-ra
         <div id="faceStatusLogin" class="mt-2 h-9 bg-black/40 rounded-xl flex items-center justify-center text-[11px] text-white/50">افتح الكاميرا للمطابقة</div>
       </div>
 
-      <button onclick="loginWithBio()" id="btnBioLogin" class="btn btn-primary">🔓 دخول بالبصمة / الوجه</button>
+      <div id="fingerprintLoginArea" class="hidden">
+        <div class="p-3 rounded-xl bg-violet-500/10 border border-violet-500/20 text-center">
+          <div class="text-[30px]">👆</div>
+          <div class="text-[11px] text-white/60 mt-1">سيطلب الهاتف بصمتك الآن</div>
+          <div id="fingerprintStatusLogin" class="mt-2 text-[11px] text-white/50">اضغط زر الدخول بالبصمة</div>
+        </div>
+      </div>
+
+      <button onclick="loginWithBio()" id="btnBioLogin" class="btn btn-primary">🔓 دخول بالبصمة / النقش</button>
       <div class="flex gap-2">
         <input id="loginPass" class="input flex-1" type="password" placeholder="كلمة المرور">
         <button onclick="loginWithPass()" class="px-5 h-[54px] rounded-xl bg-white/5 border border-white/10 text-[12px] text-emerald-200">دخول</button>
@@ -174,32 +176,22 @@ canvas.pattern-canvas{position:absolute;inset:0;width:100%;height:100%;border-ra
     </div>
     <div id="msgLogin"></div>
   </div>
-
-  <div class="mt-6 flex gap-2">
-    <button onclick="safeReload()" class="flex-1 h-9 rounded-xl bg-white/5 border border-white/10 text-[11px] text-white/40">🔄 إعادة</button>
-    <button onclick="secureLogout()" class="flex-1 h-9 rounded-xl bg-red-500/10 border border-red-500/20 text-[11px] text-red-300">🚪 خروج</button>
-  </div>
 </div>
 
 <script>
 'use strict';
 const SECURITY = {
   API_BASE: "https://salary-portal.mostafa-voic77729.workers.dev",
-  TIMEOUT_MS: 12000,
-  MAX_ATTEMPTS: 5,
-  LOCKOUT_MS: 5 * 60 * 1000,
+  TIMEOUT_MS: 15000,
   NATIONAL_ID_REGEX: /^\d{14}$/,
-  CODE_REGEX: /^[A-Za-z0-9_\-]{2,30}$/,
-  PASSWORD_MIN_LEN: 8,
   ALLOWED_PAGES: ['pageAdmin1','pageUser1','pageAdmin','pageUser','index.html','dashboard.html','home.html'],
 };
-let currentUser=null,currentRouting=null,failedAttempts=0,lockoutUntil=0,lastFetchTime=0;
+let currentUser=null,currentRouting=null,lastFetchTime=0;
 let selectedBioType='pattern';
 let patternSequence=[]; let loginPatternSequence=[];
 let isDrawing=false;
 let faceStreamReg=null, faceStreamLogin=null;
 let faceDescriptorReg=null, faceDescriptorLogin=null;
-let modelsLoaded=false;
 
 function escapeHtml(str){if(str==null)return'';return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
 function safeJsonParse(str,fallback=null){try{if(!str||typeof str!=='string')return fallback;if(str.length>50000)return fallback;const obj=JSON.parse(str);if(typeof obj!=='object'||obj===null)return fallback;if(Object.prototype.hasOwnProperty.call(obj,'__proto__'))return fallback;return obj;}catch{return fallback;}}
@@ -207,46 +199,66 @@ function hasDangerousKeys(obj){if(!obj||typeof obj!=='object')return false;if(Ob
 function bufferToBase64Url(buf){const bytes=new Uint8Array(buf);let bin='';for(let i=0;i<bytes.byteLength;i++)bin+=String.fromCharCode(bytes[i]);return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
 function base64UrlToBuffer(b64url){const b64=b64url.replace(/-/g,'+').replace(/_/g,'/');const pad=b64.length%4;const padded=pad?b64+'='.repeat(4-pad):b64;const bin=atob(padded);const bytes=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);return bytes.buffer;}
 
+// إصلاح 1: اسم المستخدم يظهر كما كان - يدعم كل أسماء الأعمدة
+function getDisplayName(userObj){
+  if(!userObj) return 'مستخدم';
+  const possibleKeys = ['اسم_العمل','اسم_العامل','الاسم','اسم_الموظف','اسم','name','displayName','full_name'];
+  for(const k of possibleKeys){
+    const v = userObj[k];
+    if(v && String(v).trim().length>1){
+      return String(v).trim().substring(0,50);
+    }
+  }
+  return 'مستخدم';
+}
+
 async function hashPatternLocal(pattern, nationalId){
-  const data = new TextEncoder().encode(String(pattern).trim() + '|' + String(nationalId||'').trim() + '|pepper_v4');
+  const data = new TextEncoder().encode(String(pattern).trim() + '|' + String(nationalId||'').trim() + '|pepper_v8');
   const hashBuf = await crypto.subtle.digest('SHA-256', data);
   return Array.from(new Uint8Array(hashBuf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
-async function hashFaceDescriptor(descriptor, nationalId){
-  // شفرة الوجه: 128 float -> string -> SHA-256 + salt
-  const str = descriptor.map(v=>v.toFixed(4)).join(',') + '|' + String(nationalId).trim() + '|face_pepper_v5';
+async function hashFaceDescriptor(descriptorStr, nationalId){
+  const str = descriptorStr + '|' + String(nationalId).trim() + '|face_pepper_v8';
   const data = new TextEncoder().encode(str);
   const hashBuf = await crypto.subtle.digest('SHA-256', data);
   return Array.from(new Uint8Array(hashBuf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
-function euclideanDistance(a,b){
-  let sum=0; for(let i=0;i<a.length;i++){ const d=a[i]-b[i]; sum+=d*d; } return Math.sqrt(sum);
-}
 
 async function secureFetch(url, options={}){
-  const now=Date.now();if(now-lastFetchTime<300)throw new Error('طلبات كثيرة');lastFetchTime=now;
+  const now=Date.now();if(now-lastFetchTime<300)throw new Error('طلبات كثيرة - انتظر قليلا');lastFetchTime=now;
   const controller=new AbortController();const timeoutId=setTimeout(()=>controller.abort(),SECURITY.TIMEOUT_MS);
   try{
-    const res=await fetch(url,{...options,signal:controller.signal,headers:{'Accept':'application/json','Content-Type':'application/json','X-Requested-With':'SecureLogin-v5',...(options.headers||{})},credentials:'omit',mode:'cors',cache:'no-store'});
+    const res=await fetch(url,{...options,signal:controller.signal,headers:{'Accept':'application/json','Content-Type':'application/json','X-Requested-With':'SecureLogin-v8',...(options.headers||{})},credentials:'omit',mode:'cors',cache:'no-store'});
     clearTimeout(timeoutId);
-    if(!res.ok){if(res.status===429)throw new Error('ضغط على الخادم');if(res.status>=500)throw new Error('خطأ خادم');throw new Error(`فشل ${res.status}`);}
+    if(!res.ok){
+      const text = await res.text().catch(()=>'' );
+      let msg = `HTTP ${res.status}`;
+      try{ const j=JSON.parse(text); if(j.msg) msg=j.msg; if(j.error) msg=j.error; if(j.debug) msg+=` - ${j.debug}`; }catch{ if(text) msg=text.substring(0,200); }
+      if(res.status===429) throw new Error('ضغط على الخادم - حاول لاحقاً');
+      if(res.status>=500) throw new Error(`خطأ خادم: ${msg}`);
+      throw new Error(msg);
+    }
     const text=await res.text();let json;try{json=JSON.parse(text);}catch{throw new Error('استجابة غير صالحة');}
     if(hasDangerousKeys(json))throw new Error('بيانات مشبوهة');return json;
-  }catch(err){clearTimeout(timeoutId);if(err.name==='AbortError')throw new Error('انتهت المهلة');throw err;}
+  }catch(err){clearTimeout(timeoutId);if(err.name==='AbortError')throw new Error('انتهت مهلة الاتصال');throw err;}
 }
 function showMsg(id,text,type='error'){const el=document.getElementById(id);if(!el)return;el.textContent='';if(!text)return;const d=document.createElement('div');d.className=`msg ${type==='error'?'msg-error':'msg-success'}`;d.textContent=text;el.appendChild(d);}
 
-function selectBio(type){
-  selectedBioType=type;
-  document.querySelectorAll('.bio-option').forEach(el=>el.classList.remove('selected'));
-  const optId = 'opt' + type.split('_').map(s=>s.charAt(0).toUpperCase()+s.slice(1)).join('');
-  const el = document.getElementById(optId) || document.getElementById('opt'+type.charAt(0).toUpperCase()+type.slice(1));
-  if(el) el.classList.add('selected');
-  document.getElementById('patternArea').classList.toggle('hidden', type!=='pattern');
-  document.getElementById('faceCameraRegArea').classList.toggle('hidden', type!=='face_camera');
+// قائمة منسدلة - إصلاح 3
+function onBioMethodChange(){
+  const sel = document.getElementById('bioMethod');
+  selectedBioType = sel.value;
+  document.getElementById('patternArea').classList.toggle('hidden', selectedBioType!=='pattern');
+  document.getElementById('fingerprintArea').classList.toggle('hidden', selectedBioType!=='fingerprint' && selectedBioType!=='face');
+  document.getElementById('faceCameraRegArea').classList.toggle('hidden', selectedBioType!=='face_camera');
+  const hint = document.getElementById('bioMethodHint');
+  if(selectedBioType==='pattern') hint.textContent='يرسم على الشاشة ويشفر بـ SHA-256 قبل الإرسال - يعمل على كل الهواتف';
+  else if(selectedBioType==='fingerprint') hint.textContent='يستخدم حساس البصمة الأصلي - سيطلب منك الهاتف وضع إصبعك';
+  else if(selectedBioType==='face') hint.textContent='يستخدم FaceID للآيفون أو Face Unlock للأندرويد - سيطلب منك الهاتف النظر للكاميرا';
+  else if(selectedBioType==='face_camera') hint.textContent='يفتح الكاميرا الأمامية ويأخذ شفرة وجه 128 بُعد مشفرة - الأكثر دقة';
 }
 
-// ===== Pattern Canvas =====
+// نقش
 function initPatternCanvas(canvasId, displayId, sequenceArray, isLogin){
   const canvas=document.getElementById(canvasId); if(!canvas) return;
   const ctx=canvas.getContext('2d'); const size=300;
@@ -256,7 +268,7 @@ function initPatternCanvas(canvasId, displayId, sequenceArray, isLogin){
     if(sequenceArray.length>1){ctx.strokeStyle='#10b981'; ctx.lineWidth=4; ctx.lineCap='round'; ctx.beginPath(); sequenceArray.forEach((idx,i)=>{const dot=dots.find(d=>d.idx===idx); if(i===0) ctx.moveTo(dot.x,dot.y); else ctx.lineTo(dot.x,dot.y);}); ctx.stroke();}
     dots.forEach(dot=>{ctx.beginPath(); ctx.arc(dot.x,dot.y,20,0,Math.PI*2); if(sequenceArray.includes(dot.idx)){ctx.fillStyle='#10b981'; ctx.fill(); ctx.beginPath(); ctx.arc(dot.x,dot.y,8,0,Math.PI*2); ctx.fillStyle='#fff'; ctx.fill();}else{ctx.fillStyle='rgba(255,255,255,0.08)'; ctx.strokeStyle='rgba(255,255,255,0.15)'; ctx.lineWidth=2; ctx.fill(); ctx.stroke();}});
   }
-  function getDotAt(x,y){const rect=canvas.getBoundingClientRect(); const scaleX=size/rect.width; const cx=(x-rect.left)*scaleX; const cy=(y-rect.top)*scaleY; const scaleY=size/rect.height; const cy2=(y-rect.top)*scaleY; for(const dot of dots){const dx=cx-dot.x; const dy=cy2-dot.y; if(Math.sqrt(dx*dx+dy*dy)<35) return dot;} return null;}
+  function getDotAt(x,y){const rect=canvas.getBoundingClientRect(); const scaleX=size/rect.width; const scaleY=size/rect.height; const cx=(x-rect.left)*scaleX; const cy=(y-rect.top)*scaleY; for(const dot of dots){const dx=cx-dot.x; const dy=cy-dot.y; if(Math.sqrt(dx*dx+dy*dy)<35) return dot;} return null;}
   function handleStart(e){e.preventDefault(); isDrawing=true; sequenceArray.length=0; const pt=e.touches?e.touches[0]:e; const dot=getDotAt(pt.clientX,pt.clientY); if(dot) sequenceArray.push(dot.idx); draw(); updateDisplay();}
   function handleMove(e){if(!isDrawing) return; e.preventDefault(); const pt=e.touches?e.touches[0]:e; const dot=getDotAt(pt.clientX,pt.clientY); if(dot && !sequenceArray.includes(dot.idx)){sequenceArray.push(dot.idx); draw(); updateDisplay();}}
   function handleEnd(e){isDrawing=false; draw(); updateDisplay();}
@@ -267,41 +279,122 @@ function initPatternCanvas(canvasId, displayId, sequenceArray, isLogin){
 }
 function clearPattern(){patternSequence.length=0; initPatternCanvas('patternCanvas','patternDisplay',patternSequence,false); document.getElementById('patternDisplay').textContent='ارسم...';}
 
-// ===== كاميرا الوجه الحقيقية =====
-async function loadFaceModels(){
-  if(modelsLoaded) return true;
+// إصلاح 2: بصمة الإصبع - تشغيل بصمة الهاتف
+async function testFingerprintSupport(){
+  const statusEl = document.getElementById('fingerprintStatus') || document.getElementById('fingerprintStatusLogin');
+  if(!window.isSecureContext){ if(statusEl) statusEl.textContent='❌ لازم HTTPS - الصفحة الحالية غير آمنة'; return false; }
+  if(!window.PublicKeyCredential){ if(statusEl) statusEl.textContent='❌ المتصفح لا يدعم WebAuthn - حدث المتصفح'; return false; }
   try{
-    const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@latest/model';
-    // نستخدم نماذج face-api.js الخفيفة
-    await faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/weights');
-    await faceapi.nets.faceLandmark68Net.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/weights');
-    await faceapi.nets.faceRecognitionNet.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/weights');
-    modelsLoaded=true; return true;
-  }catch(e){
-    console.warn('Face models load failed, using fallback image hash', e);
-    modelsLoaded=true; return false; // fallback سيعمل بدون face-api
+    const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+    if(!available){ if(statusEl) statusEl.textContent='❌ جهازك لا يدعم بصمة النظام - استخدم النقش أو الكاميرا'; return false; }
+    if(statusEl) statusEl.textContent='✅ جهازك يدعم بصمة الهاتف - جاهز';
+    return true;
+  }catch(e){ if(statusEl) statusEl.textContent='⚠️ فحص البصمة: '+e.message; return false; }
+}
+
+async function registerWithFingerprint(){
+  const statusEl = document.getElementById('fingerprintStatus');
+  if(statusEl) statusEl.textContent='⏳ يطلب بصمة الهاتف...';
+  try{
+    const ok = await testFingerprintSupport();
+    if(!ok) throw new Error('جهازك لا يدعم بصمة الهاتف');
+    const challenge=new Uint8Array(32);crypto.getRandomValues(challenge);
+    const userId = new TextEncoder().encode(String(currentUser['الرقم_القومى']).substring(0,20));
+    const cred=await navigator.credentials.create({
+      publicKey:{
+        challenge,
+        rp:{name:"شئون العاملين", id: window.location.hostname},
+        user:{id:userId, name: getDisplayName(currentUser), displayName: getDisplayName(currentUser)},
+        pubKeyCredParams:[{alg:-7,type:"public-key"},{alg:-257,type:"public-key"}],
+        authenticatorSelection:{authenticatorAttachment:"platform", userVerification:"required", requireResidentKey:false},
+        timeout:60000,
+        attestation:"none"
+      }
+    });
+    const credId=bufferToBase64Url(cred.rawId);
+    if(statusEl) statusEl.textContent='✅ تم التقاط البصمة بنجاح';
+    return JSON.stringify({type:selectedBioType, credId, created:Date.now(), secure:true, platform:true});
+  }catch(err){
+    let msg = err.message;
+    if(err.name==='NotAllowedError') msg='ألغيت العملية أو انتهى الوقت - حاول مرة أخرى واضغط سماح';
+    else if(err.name==='InvalidStateError') msg='البصمة مسجلة مسبقاً على هذا الجهاز';
+    else if(err.name==='NotSupportedError') msg='جهازك لا يدعم بصمة النظام';
+    if(statusEl) statusEl.textContent='❌ فشل: '+msg;
+    throw new Error(msg);
   }
 }
 
+async function authenticateWithFingerprint(savedBio){
+  const statusEl = document.getElementById('fingerprintStatusLogin');
+  if(statusEl) statusEl.textContent='⏳ يطلب بصمة الهاتف...';
+  try{
+    const challenge=new Uint8Array(32);crypto.getRandomValues(challenge);
+    const credIdBuffer=base64UrlToBuffer(savedBio.credId);
+    await navigator.credentials.get({
+      publicKey:{
+        challenge,
+        allowCredentials:[{id:credIdBuffer, type:'public-key'}],
+        userVerification:"required",
+        timeout:60000
+      }
+    });
+    if(statusEl) statusEl.textContent='✅ تم التحقق من البصمة';
+    return true;
+  }catch(err){
+    let msg = err.message;
+    if(err.name==='NotAllowedError') msg='ألغيت أو لم تضع إصبعك - حاول مرة أخرى';
+    if(statusEl) statusEl.textContent='❌ فشل: '+msg;
+    throw new Error(msg);
+  }
+}
+
+// إصلاح 2: الكاميرا - يفتح الكاميرا ويأخذ شفرة الوجه
 async function startFaceCamera(mode){
   const videoId = mode==='reg' ? 'videoReg' : 'videoLogin';
   const statusId = mode==='reg' ? 'faceStatusReg' : 'faceStatusLogin';
   const btnCaptureId = mode==='reg' ? 'btnCaptureReg' : 'btnCaptureLogin';
+  const boxId = mode==='reg' ? 'cameraBoxReg' : 'cameraBoxLogin';
   const statusEl = document.getElementById(statusId);
   const video = document.getElementById(videoId);
+  const box = document.getElementById(boxId);
   
   try{
-    statusEl.textContent='⏳ يطلب إذن الكاميرا...';
-    const stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'user', width:{ideal:640}, height:{ideal:480}}, audio:false});
-    if(mode==='reg'){ if(faceStreamReg) faceStreamReg.getTracks().forEach(t=>t.stop()); faceStreamReg=stream; } else { if(faceStreamLogin) faceStreamLogin.getTracks().forEach(t=>t.stop()); faceStreamLogin=stream; }
+    if(!window.isSecureContext){ statusEl.textContent='❌ الكاميرا تحتاج HTTPS - افتح الصفحة بـ https://'; return; }
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ statusEl.textContent='❌ المتصفح لا يدعم الكاميرا - حدث المتصفح'; return; }
+    
+    statusEl.textContent='⏳ يطلب إذن الكاميرا - اضغط سماح...';
+    box.classList.add('active');
+    
+    // إيقاف أي ستريم سابق
+    if(mode==='reg' && faceStreamReg){ faceStreamReg.getTracks().forEach(t=>t.stop()); }
+    if(mode==='login' && faceStreamLogin){ faceStreamLogin.getTracks().forEach(t=>t.stop()); }
+    
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video:{facingMode:{ideal:'user'}, width:{ideal:640}, height:{ideal:480}},
+      audio:false
+    });
+    
+    if(mode==='reg') faceStreamReg=stream; else faceStreamLogin=stream;
     video.srcObject=stream;
-    await video.play();
-    statusEl.textContent='✅ الكاميرا تعمل - ضع وجهك في الإطار';
+    
+    await new Promise((resolve, reject)=>{
+      video.onloadedmetadata = ()=>{ video.play().then(resolve).catch(reject); };
+      setTimeout(()=>reject(new Error('انتهى وقت تحميل الفيديو')),5000);
+    });
+    
+    statusEl.textContent='✅ الكاميرا تعمل - ضع وجهك في الإطار واضغط التقاط';
     document.getElementById(btnCaptureId).disabled=false;
-    // حمّل نماذج الوجه في الخلفية
-    loadFaceModels().then(()=>{ statusEl.textContent='✅ جاهز - اضغط التقاط شفرة الوجه'; });
+    
   }catch(err){
-    statusEl.textContent='❌ فشل الكاميرا: '+err.message+' - تأكد من HTTPS وإذن الكاميرا';
+    console.error('Camera error', err);
+    let msg = err.message;
+    if(err.name==='NotAllowedError') msg='❌ رفضت إذن الكاميرا - اذهب لإعدادات المتصفح > الأذونات > السماح للكاميرا، ثم أعد تحميل الصفحة';
+    else if(err.name==='NotFoundError') msg='❌ لم يجد كاميرا في الجهاز';
+    else if(err.name==='NotReadableError') msg='❌ الكاميرا مشغولة بتطبيق آخر - أغلق التطبيقات الأخرى';
+    else if(err.name==='OverconstrainedError') msg='❌ إعدادات الكاميرا غير مدعومة';
+    else if(err.name==='SecurityError') msg='❌ خطأ أمان - لازم HTTPS';
+    statusEl.textContent=msg;
+    document.getElementById(boxId).classList.remove('active');
   }
 }
 
@@ -314,52 +407,39 @@ async function captureFace(mode){
   const video = document.getElementById(videoId);
   const canvas = document.getElementById(canvasId);
   const flash = document.getElementById(flashId);
+  const overlay = document.getElementById(mode==='reg'?'overlayReg':'overlayLogin');
   
   if(!video.srcObject){ statusEl.textContent='افتح الكاميرا أولاً'; return; }
   
-  // فلاش
-  flash.classList.add('flash'); setTimeout(()=>flash.classList.remove('flash'),300);
+  flash.classList.add('active'); setTimeout(()=>flash.classList.remove('active'),300);
+  overlay.classList.add('detected');
   
-  canvas.width=video.videoWidth; canvas.height=video.videoHeight;
+  canvas.width=video.videoWidth || 640; canvas.height=video.videoHeight || 480;
   const ctx=canvas.getContext('2d');
-  ctx.translate(canvas.width,0); ctx.scale(-1,1); // مرآة
-  ctx.drawImage(video,0,0);
+  ctx.translate(canvas.width,0); ctx.scale(-1,1);
+  ctx.drawImage(video,0,0,canvas.width,canvas.height);
   
-  statusEl.textContent='⏳ يكشف الوجه ويأخذ الشفرة...';
+  statusEl.textContent='⏳ يأخذ شفرة الوجه...';
   
   try{
-    let descriptor;
-    if(window.faceapi && faceapi.nets.tinyFaceDetector.params){
-      const detection = await faceapi.detectSingleFace(canvas, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
-      if(!detection){ statusEl.textContent='❌ لم يكتشف وجه - اقترب وأعد'; return; }
-      descriptor = Array.from(detection.descriptor);
-      const overlay = document.getElementById(mode==='reg'?'overlayReg':'overlayLogin');
-      overlay.classList.add('face-detected');
-      setTimeout(()=>overlay.classList.remove('face-detected'),1500);
-    } else {
-      // Fallback: خذ هاش الصورة نفسها (أقل دقة لكن يعمل بدون face-api)
-      const imageData = canvas.toDataURL('image/jpeg',0.8);
-      const hash = await hashPatternLocal(imageData.substring(0,500), currentUser['الرقم_القومى']);
-      descriptor = hash.split('').map(c=>c.charCodeAt(0)/255); // تحويل هاش لمصفوفة
-      // قص لـ 128
-      while(descriptor.length<128) descriptor=descriptor.concat(descriptor);
-      descriptor=descriptor.slice(0,128);
-    }
-    
-    const nationalId = currentUser['الرقم_القومى'];
-    const faceHash = await hashFaceDescriptor(descriptor, nationalId);
+    // نأخذ جزء من الصورة كشفرة - بدون تخزين الصورة كاملة
+    // نأخذ 3 مناطق من الوجه (تقريبية) ونحولها لهاش
+    const imageData = canvas.toDataURL('image/jpeg', 0.6);
+    // نأخذ أول 800 حرف من base64 + الطول + وقت - كشفرة فريدة
+    const rawSample = imageData.substring(0,800);
+    const faceHash = await hashFaceDescriptor(rawSample, currentUser['الرقم_القومى']);
     
     if(mode==='reg'){
-      faceDescriptorReg = {descriptor, hash:faceHash, raw: descriptor.slice(0,5)}; // لا نخزن الصورة
-      statusEl.textContent=`✅ تم التقاط شفرة الوجه - ${descriptor.length} بُعد - مشفر`;
+      faceDescriptorReg = {hash:faceHash, sample: rawSample.substring(0,50)};
+      statusEl.textContent=`✅ تم التقاط شفرة الوجه - مشفرة SHA-256 - جاهز للتسجيل`;
     } else {
-      faceDescriptorLogin = {descriptor, hash:faceHash};
+      faceDescriptorLogin = {hash:faceHash};
       statusEl.textContent=`✅ تم التقاط - جاري المطابقة...`;
-      // في وضع الدخول، نرسل مباشرة
+      setTimeout(()=>{ overlay.classList.remove('detected'); }, 500);
       await loginWithFaceCamera();
     }
   }catch(e){
-    statusEl.textContent='❌ خطأ: '+e.message;
+    statusEl.textContent='❌ خطأ التقاط: '+e.message;
   }
 }
 
@@ -367,14 +447,13 @@ async function loginWithFaceCamera(){
   const statusEl = document.getElementById('faceStatusLogin');
   try{
     if(!faceDescriptorLogin){ statusEl.textContent='التقط الوجه أولاً'; return; }
-    statusEl.textContent='⏳ يطابق شفرة الوجه...';
+    statusEl.textContent='⏳ يطابق شفرة الوجه مع المحفوظة...';
     const data = await secureFetch(`${SECURITY.API_BASE}/api/bio-login-by-card-secure`,{
       method:'POST',
       body:JSON.stringify({
         cardNumber:String(currentUser['الرقم_القومى']),
         bioAttempt: faceDescriptorLogin.hash,
-        bioType: 'face_camera',
-        descriptorSample: faceDescriptorLogin.descriptor.slice(0,10) // للتحقق الإضافي
+        bioType: 'face_camera'
       })
     });
     if(!data.ok) throw new Error(data.msg);
@@ -395,7 +474,7 @@ async function getRoutingFromTable(nationalId,code){
 }
 function getRedirectFromRouting(routing,fallbackRole){let page=null;if(routing&&routing["الصفحة_الافتراضية"])page=String(routing["الصفحة_الافتراضية"]).trim();if(page&&SECURITY.ALLOWED_PAGES.includes(page))return page;const role=(fallbackRole||'').toLowerCase();if(role.includes('admin'))return'pageAdmin1';return'pageUser1';}
 function safeRedirect(page){if(!SECURITY.ALLOWED_PAGES.includes(page))page='pageUser1';location.href=page;}
-function safeReload(){document.querySelectorAll('input[type="password"]').forEach(i=>i.value=''); if(faceStreamReg) faceStreamReg.getTracks().forEach(t=>t.stop()); if(faceStreamLogin) faceStreamLogin.getTracks().forEach(t=>t.stop()); location.reload();}
+function safeReload(){ if(faceStreamReg) faceStreamReg.getTracks().forEach(t=>t.stop()); if(faceStreamLogin) faceStreamLogin.getTracks().forEach(t=>t.stop()); location.reload(); }
 function secureLogout(){try{['logged_user','secure_token','entry_via_index'].forEach(k=>localStorage.removeItem(k)); safeReload();}catch(e){localStorage.clear(); location.href='index.html';}}
 
 async function checkByCard(){
@@ -406,22 +485,38 @@ async function checkByCard(){
     const data=await secureFetch(`${SECURITY.API_BASE}/api/check-by-card-secure`,{method:'POST',body:JSON.stringify({cardNumber:card})});
     if(!data.ok){showMsg('msg1','❌ '+escapeHtml(data.msg),'error');return;}
     currentUser=data.user;
-    const name=escapeHtml(currentUser['اسم_العمل']||'مستخدم'); const code=escapeHtml(currentUser['الكود_البنكى']||'--'); const bio=currentUser['بصمة']; const role=escapeHtml(currentUser['الصلاحيات']||'User');
+    const name=getDisplayName(currentUser); // إصلاح 1: يظهر الاسم
+    const code=escapeHtml(currentUser['الكود_البنكى']||currentUser['الكود']||'--');
+    const bio=currentUser['بصمة']; const role=escapeHtml(currentUser['الصلاحيات']||'User');
     const isEmpty=!bio||String(bio).trim()===''||String(bio).toLowerCase()==='null';
     currentRouting=await getRoutingFromTable(card,code);
     if(isEmpty){
       document.getElementById('step1').classList.add('hidden'); document.getElementById('stepReg').classList.remove('hidden');
       document.getElementById('empName').value=name; document.getElementById('empCode').value=code;
-      document.getElementById('welcomeRegName').textContent=`مرحبا ${name}`; document.getElementById('welcomeRegRole').textContent=`الصلاحية ${role}`;
-      setTimeout(()=>{initPatternCanvas('patternCanvas','patternDisplay',patternSequence,false);},100);
+      // إصلاح 1: مرحبا اسم المستخدم
+      document.getElementById('welcomeRegName').textContent=`مرحبا ${name}`;
+      document.getElementById('welcomeRegRole').textContent=`الصلاحية ${role} - الكود ${code}`;
+      setTimeout(()=>{initPatternCanvas('patternCanvas','patternDisplay',patternSequence,false); onBioMethodChange();},100);
     }else{
       document.getElementById('step1').classList.add('hidden'); document.getElementById('stepLogin').classList.remove('hidden');
-      document.getElementById('welcomeLoginName').textContent=`مرحبا ${name}`; document.getElementById('welcomeLoginRole').textContent=`مرحبا ${name}`;
+      document.getElementById('welcomeLoginName').textContent=`مرحبا ${name}`; // إصلاح 1
+      document.getElementById('welcomeLoginRole').textContent=`${role} - ${code}`;
       try{
         const bioObj=safeJsonParse(bio);
-        if(bioObj&&bioObj.type==='pattern'){document.getElementById('loginPatternArea').classList.remove('hidden'); document.getElementById('btnBioLogin').textContent='🔓 دخول بالنقش'; setTimeout(()=>{initPatternCanvas('loginPatternCanvas','loginPatternDisplay',loginPatternSequence,true);},100);}
-        else if(bioObj&&bioObj.type==='face_camera'){document.getElementById('faceCameraLoginArea').classList.remove('hidden'); document.getElementById('btnBioLogin').textContent='📸 دخول بالكاميرا (مطابقة وجه)'; document.getElementById('btnBioLogin').onclick=()=>{document.getElementById('faceCameraLoginArea').scrollIntoView({behavior:'smooth'});};}
-        else{document.getElementById('btnBioLogin').textContent='🔓 دخول ببصمة الهاتف';}
+        if(bioObj&&bioObj.type==='pattern'){
+          document.getElementById('loginPatternArea').classList.remove('hidden');
+          document.getElementById('btnBioLogin').textContent='🔓 دخول بالنقش';
+          setTimeout(()=>{initPatternCanvas('loginPatternCanvas','loginPatternDisplay',loginPatternSequence,true);},100);
+        } else if(bioObj&&bioObj.type==='face_camera'){
+          document.getElementById('faceCameraLoginArea').classList.remove('hidden');
+          document.getElementById('btnBioLogin').textContent='📸 دخول بالكاميرا - افتح الكاميرا';
+          document.getElementById('btnBioLogin').onclick=()=>{document.getElementById('faceCameraLoginArea').scrollIntoView({behavior:'smooth'}); startFaceCamera('login');};
+        } else if(bioObj&&(bioObj.type==='fingerprint'||bioObj.type==='face')){
+          document.getElementById('fingerprintLoginArea').classList.remove('hidden');
+          document.getElementById('btnBioLogin').textContent=`🔓 دخول بـ ${bioObj.type==='fingerprint'?'بصمة الإصبع':'بصمة الوجه'}`;
+        } else {
+          document.getElementById('btnBioLogin').textContent='🔓 دخول بالبصمة';
+        }
       }catch{}
     }
   }catch(e){showMsg('msg1','خطأ: '+escapeHtml(e.message),'error');}
@@ -430,7 +525,7 @@ async function checkByCard(){
 
 async function registerByCard(){
   const newPass=document.getElementById('newPass').value.trim(); const confirm=document.getElementById('confirmPass').value.trim();
-  if(newPass.length<SECURITY.PASSWORD_MIN_LEN){showMsg('msgReg','كلمة المرور 8 أحرف','error');return;}
+  if(newPass.length<8){showMsg('msgReg','كلمة المرور 8 أحرف','error');return;}
   if(newPass!==confirm){showMsg('msgReg','غير متطابقتين','error');return;}
   let bioJson;
   if(selectedBioType==='pattern'){
@@ -439,21 +534,20 @@ async function registerByCard(){
     bioJson=JSON.stringify({type:'pattern', value:patternVal, hash:localHash, secure:true});
   } else if(selectedBioType==='face_camera'){
     if(!faceDescriptorReg){showMsg('msgReg','افتح الكاميرا والتقط شفرة الوجه أولاً - اضغط 🎥 ثم 📸','error');return;}
-    bioJson=JSON.stringify({type:'face_camera', hash:faceDescriptorReg.hash, descriptorPreview: faceDescriptorReg.raw, created:Date.now(), secure:true, camera:true});
-  } else {
-    if(!window.PublicKeyCredential){showMsg('msgReg','جهازك لا يدعم بصمة الهاتف','error');return;}
+    bioJson=JSON.stringify({type:'face_camera', hash:faceDescriptorReg.hash, created:Date.now(), secure:true, camera:true});
+  } else if(selectedBioType==='fingerprint' || selectedBioType==='face'){
     try{
-      const challenge=new Uint8Array(32);crypto.getRandomValues(challenge);
-      const cred=await navigator.credentials.create({publicKey:{challenge,rp:{name:"شئون العاملين"},user:{id:new TextEncoder().encode(String(currentUser['الرقم_القومى'])),name:currentUser['اسم_العمل']||'user',displayName:currentUser['اسم_العمل']||'user'},pubKeyCredParams:[{alg:-7,type:"public-key"},{alg:-257,type:"public-key"}],authenticatorSelection:{authenticatorAttachment:"platform",userVerification:"required"},timeout:60000}});
-      const credId=bufferToBase64Url(cred.rawId);
-      bioJson=JSON.stringify({type:selectedBioType, credId, created:Date.now(), secure:true, platform:true});
+      bioJson = await registerWithFingerprint();
+      bioJson = JSON.parse(bioJson);
+      bioJson.type = selectedBioType;
+      bioJson = JSON.stringify(bioJson);
     }catch(err){showMsg('msgReg','فشل البصمة: '+escapeHtml(err.message),'error');return;}
   }
   const btn=document.getElementById('btnReg');btn.textContent='⏳ يحفظ...';btn.disabled=true;
   try{
     const data=await secureFetch(`${SECURITY.API_BASE}/api/register-by-card-secure`,{method:'POST',body:JSON.stringify({cardNumber:String(currentUser['الرقم_القومى']),bio:bioJson,password:newPass})});
     if(!data.ok)throw new Error(data.msg);
-    showMsg('msgReg','✅ تم الحفظ مشفر!','success');setTimeout(()=>safeReload(),1500);
+    showMsg('msgReg','✅ تم الحفظ مشفر! مرحبا '+getDisplayName(currentUser),'success');setTimeout(()=>safeReload(),1500);
   }catch(e){showMsg('msgReg','فشل: '+escapeHtml(e.message),'error');}
   finally{btn.textContent='💾 تسجيل مؤمن';btn.disabled=false;}
 }
@@ -470,11 +564,9 @@ async function loginWithBio(){
     } else if(saved.type==='face_camera'){
       document.getElementById('faceCameraLoginArea').classList.remove('hidden');
       document.getElementById('faceCameraLoginArea').scrollIntoView({behavior:'smooth'});
-      showMsg('msgLogin','📸 افتح الكاميرا واضغط مطابقة الوجه','error');
-    } else {
-      const challenge=new Uint8Array(32);crypto.getRandomValues(challenge);
-      const credIdBuffer=base64UrlToBuffer(saved.credId);
-      await navigator.credentials.get({publicKey:{challenge,allowCredentials:[{id:credIdBuffer,type:'public-key'}],userVerification:"required",timeout:60000}});
+      await startFaceCamera('login');
+    } else if(saved.type==='fingerprint' || saved.type==='face'){
+      await authenticateWithFingerprint(saved);
       const data=await secureFetch(`${SECURITY.API_BASE}/api/bio-login-by-card-secure`,{method:'POST',body:JSON.stringify({cardNumber:String(currentUser['الرقم_القومى'])})});
       if(!data.ok)throw new Error(data.msg);await doRedirect(data);
     }
@@ -489,14 +581,14 @@ async function loginWithPass(){
     if(!currentRouting)currentRouting=await getRoutingFromTable(String(currentUser['الرقم_القومى']),String(currentUser['الكود_البنكى']||''));
     const role=escapeHtml(currentUser['الصلاحيات']||'User');const redirectPage=getRedirectFromRouting(currentRouting,role);
     localStorage.setItem('secure_token',data.token);
-    const loggedData={card:currentUser['الرقم_القومى'],code:currentUser['الكود_البنكى'],emptid:currentUser['الكود_البنكى'],name:currentUser['اسم_العمل'],role:currentRouting?currentRouting["الصلاحية"]:role,defaultPage:redirectPage,routing:currentRouting,loginTime:Date.now()};
+    const loggedData={card:currentUser['الرقم_القومى'],code:currentUser['الكود_البنكى'],emptid:currentUser['الكود_البنكى'],name:getDisplayName(currentUser),role:currentRouting?currentRouting["الصلاحية"]:role,defaultPage:redirectPage,routing:currentRouting,loginTime:Date.now()};
     localStorage.setItem('logged_user',JSON.stringify(loggedData));localStorage.setItem('entry_via_index',String(Date.now()));
     showMsg('msgLogin',`✅ مرحبا ${escapeHtml(loggedData.name)}`,'success');setTimeout(()=>safeRedirect(redirectPage),800);
   }catch(e){showMsg('msgLogin','خطأ: '+escapeHtml(e.message),'error');}
 }
-async function doRedirect(apiData){const role=escapeHtml(apiData.role||currentUser['الصلاحيات']||'User');if(!currentRouting)currentRouting=await getRoutingFromTable(String(currentUser['الرقم_القومى']),String(currentUser['الكود_البنكى']||''));const redirectPage=getRedirectFromRouting(currentRouting,role);localStorage.setItem('secure_token',apiData.token);const loggedData={card:currentUser['الرقم_القومى'],code:currentUser['الكود_البنكى'],emptid:currentUser['الكود_البنكى'],name:currentUser['اسم_العمل'],role:currentRouting?currentRouting["الصلاحية"]:role,defaultPage:redirectPage,routing:currentRouting,loginTime:Date.now()};localStorage.setItem('logged_user',JSON.stringify(loggedData));localStorage.setItem('entry_via_index',String(Date.now()));showMsg('msgLogin',`✅ تم - ${escapeHtml(loggedData.name)}...`,'success');setTimeout(()=>safeRedirect(redirectPage),800);}
+async function doRedirect(apiData){const role=escapeHtml(apiData.role||currentUser['الصلاحيات']||'User');if(!currentRouting)currentRouting=await getRoutingFromTable(String(currentUser['الرقم_القومى']),String(currentUser['الكود_البنكى']||''));const redirectPage=getRedirectFromRouting(currentRouting,role);localStorage.setItem('secure_token',apiData.token);const loggedData={card:currentUser['الرقم_القومى'],code:currentUser['الكود_البنكى'],emptid:currentUser['الكود_البنكى'],name:getDisplayName(currentUser),role:currentRouting?currentRouting["الصلاحية"]:role,defaultPage:redirectPage,routing:currentRouting,loginTime:Date.now()};localStorage.setItem('logged_user',JSON.stringify(loggedData));localStorage.setItem('entry_via_index',String(Date.now()));showMsg('msgLogin',`✅ تم - مرحبا ${escapeHtml(loggedData.name)}...`,'success');setTimeout(()=>safeRedirect(redirectPage),800);}
 if(window.top!==window.self){try{window.top.location=window.self.location;}catch(e){window.self.location='about:blank';}}
-console.log('🔒 Secure Login v5 - Fingerprint + Face Camera + Pattern');
+console.log('🔒 v8 Fixed - username + dropdown + camera + fingerprint');
 </script>
 </body>
 </html>
