@@ -271,9 +271,9 @@ async function fetchAssetWithCleanUrls(request, env){
     const base = path.split('/').pop();
     candidates.push('/'+base+'.html');
     candidates.push('/'+base.toLowerCase()+'.html');
-    if(base.toLowerCase().includes('index-secure')) {
+    if(base.toLowerCase().includes('index')) {
+      /* candidates.push('/index.html'); */
       candidates.push('/index.html');
-      candidates.push('/index-secure-professional.html');
       candidates.push('/index-biometric-camera-v5-FULL.html');
       candidates.push('/index-v10-ultra-secure-final.html');
       candidates.push('/index-v9-face-direct-auto.html');
@@ -281,7 +281,7 @@ async function fetchAssetWithCleanUrls(request, env){
   }
   if(path==='/'||path===''){ 
     candidates.unshift('/index.html'); 
-    candidates.unshift('/Index-Secure-Professional.html');
+  /*   candidates.unshift('/index.html'); */
   }
   for(const candPath of candidates){
     try{
