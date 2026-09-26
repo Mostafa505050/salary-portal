@@ -1,5 +1,8 @@
-// _worker-v7-FINAL-INDEX-FIX.js - يعمل مع index.html ومع Index-Secure-Professional.html - نهائي
-// يصلح: ERR_TOO_MANY_REDIRECTS + 404 عند تغيير الاسم + حجب pageAdmin1
+// _worker-V9-FINAL-PROTECTED-AND-INDEX-FIXED.js
+// يصلح 3 مشاكل معاً:
+// 1- ERR_TOO_MANY_REDIRECTS / The page isn't redirecting properly - تم حذفه نهائياً
+// 2- يدعم index.html و Index-Secure-Professional.html معاً
+// 3- يرجع حماية الدخول عبر الرئيسية فقط لـ pageAdmin1 و pageUser1 بشكل صحيح
 
 const HARDCODED_TURSO_URL = "https://company-alldata-mostafadarwish-mostafa505050.aws-eu-west-1.turso.io";
 const HARDCODED_TURSO_TOKEN = "";
@@ -39,24 +42,68 @@ async function hashFaceSecure(faceHashAttempt, nationalId){
   }catch{ return String(faceHashAttempt); }
 }
 
-// إلغاء حماية الدخول عبر الرئيسية لصفحات المرتبات - الحماية الحقيقية هي تسجيل الدخول
+const ENTRY_COOKIE_NAME = 'entry_via_index';
+const ENTRY_COOKIE_MAX_AGE = 3600;
+
+function getCookieFixed(request, name){
+  try{
+    const cookieHeader = request.headers.get('Cookie') || '';
+    const cookies = cookieHeader.split(';').map(c=>c.trim());
+    for(const c of cookies){
+      const [k,...rest] = c.split('=');
+      if(k && k.trim()===name) return rest.join('=').trim();
+    }
+  }catch{}
+  return null;
+}
+
+function hasValidEntry(request){
+  // 1- كوكيز
+  const entryCookie = getCookieFixed(request, ENTRY_COOKIE_NAME);
+  if(entryCookie && entryCookie==='1') return true;
+  // 2- Referer - تم تحسينه ليعمل مع strict-origin-when-cross-origin
+  try{
+    const ref = request.headers.get('Referer') || '';
+    if(!ref) return false;
+    const lowRef = ref.toLowerCase();
+    // لو جاي من index.html أو الاسم القديم
+    if(lowRef.includes('index.html') || lowRef.includes('index-secure-professional') || lowRef.includes('index-secure')) return true;
+    if(lowRef.endsWith('/') || lowRef.includes('/index')) return true;
+    // لو جاي من نفس الدومين (حتى لو الـ referer هو origin فقط بسبب Referrer-Policy)
+    try{
+      const refUrl = new URL(ref);
+      const reqUrl = new URL(request.url);
+      if(refUrl.hostname === reqUrl.hostname) return true;
+    }catch{}
+  }catch{}
+  return false;
+}
+
 function isEntryHtmlPage(path){
   const low = path.toLowerCase();
-  if(low.includes('pageadmin') || low.includes('pageuser')) return false;
-  if(['/api/','/js/','.js','.css','.json','.png','.jpg','.svg','.ico','whitelist','allowed-ips','block-device','get-ip','blocked-devices','blocked-list','turso','cache-','favicon','protect.js','real-logger.js','debug-config'].some(s=> low.includes(s))) return false;
+  // استثناءات لا تحميها
+  if(['/api/','/js/','.js','.css','.json','.png','.jpg','.svg','.ico','real-monitoring','whitelist','allowed-ips','block-device','get-ip','blocked-devices','blocked-list','turso','cache-','favicon','auth','login','dashboard','protect.js','real-logger.js','debug-config'].some(s=> low.includes(s.toLowerCase()))) return false;
   let pageName = path.split('/').pop() || '';
-  if(path==='/' || path==='' || pageName==='') return false;
+  if(path==='/' || path==='' || pageName==='' ) return false;
+  // لا تحمي صفحات الدخول نفسها
   if(pageName.toLowerCase()==='index.html') return false;
-  if(low.includes('index-secure')) return false; // لا تحجب صفحة الدخول القديمة
+  if(low.includes('index-secure-professional')) return false;
+  if(low.includes('index-secure') && !low.includes('pageadmin') && !low.includes('pageuser')) return false;
+  // احمي كل صفحات html الأخرى و pageAdmin1 و pageUser1 (حتى بدون امتداد)
   if(path.endsWith('.html')) return true;
   if(!pageName.includes('.') && !path.startsWith('/api/')) return true;
   return false;
 }
+
+function entryBlockedHTMLFixed(pageName){
+  return `<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>الدخول عبر الرئيسية</title><style>body{min-height:100vh;background:#0a0e1a;color:#fff;display:flex;align-items:center;justify-content:center;font-family:Cairo, Tahoma} .box{background:rgba(255,255,255,0.08);padding:40px;border-radius:24px;text-align:center;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1);max-width:400px} h1{color:#f59e0b;font-size:22px;margin:15px 0} p{color:#94a3b8;margin:10px 0} a{display:inline-block;margin-top:15px;padding:12px 30px;background:#10b981;color:#fff;text-decoration:none;border-radius:10px;font-weight:bold} a:hover{background:#059669}</style></head><body><div class="box"><div style="font-size:56px">🔐</div><h1>الدخول عبر الرئيسية فقط</h1><p>${pageName}</p><p style="font-size:13px">يجب تسجيل الدخول من الصفحة الرئيسية أولاً</p><a href="/index.html">الرئيسية</a></div></body></html>`;
+}
+
 function addEntryCookieToResponse(response){
   try{
     const newHeaders = new Headers(response.headers);
-    newHeaders.set('Set-Cookie', `entry_via_index=1; Path=/; Max-Age=3600; SameSite=Lax`);
-    newHeaders.set('Cache-Control', 'no-cache');
+    newHeaders.set('Set-Cookie', `${ENTRY_COOKIE_NAME}=1; Path=/; Max-Age=${ENTRY_COOKIE_MAX_AGE}; SameSite=Lax`);
+    newHeaders.set('Cache-Control', 'no-cache, no-store, must-revalidate');
     for(const [k,v] of Object.entries(SECURITY_HEADERS)) newHeaders.set(k,v);
     return new Response(response.body, {status:response.status, headers:newHeaders});
   }catch{ return response; }
@@ -89,8 +136,8 @@ function constantTimeCompare(a,b){ const sa=String(a); const sb=String(b); if(sa
 function getTursoConfig(env){
   let url = (env.TURSO_URL || env.TURSO_URLL || HARDCODED_TURSO_URL || '').trim();
   let token = (env.TURSO_TOKEN || env.TURSO_TOKENL || HARDCODED_TURSO_TOKEN || '').trim();
-  if(!url){ return {url:null, token:null, error:'TURSO_URL غير موجود'}; }
-  if(!token || token.length < 10){ return {url:null, token:null, error:'TURSO_TOKEN فارغ - ضعه في Variables'}; }
+  if(!url){ return {url:null, token:null, error:'TURSO_URL غير موجود في متغيرات البيئة'}; }
+  if(!token || token.length < 10){ return {url:null, token:null, error:'TURSO_TOKEN فارغ'}; }
   if(token.includes("PASTE_YOUR")){ return {url:null, token:null, error:'TURSO_TOKEN افتراضي'}; }
   if(url.startsWith('libsql://')) url='https://'+url.slice(8);
   if(url &&!url.startsWith('https://')) url='https://'+url;
@@ -114,42 +161,47 @@ async function tursoQuery(env, sql, params=[]){
   }catch(e){ return {error:e.message, isException:true}; }
 }
 
-// إصلاح جلب الملفات - يدعم index.html الجديد والقديم
+// دعم index.html و Index-Secure-Professional.html معاً - بدون loop
 async function fetchAssetWithCleanUrls(request, env){
   const url=new URL(request.url);
   let path=url.pathname.replace(/\/+/g,'/');
   const lowPath = path.toLowerCase();
 
-  // قائمة مرشحات ذكية - index.html أولوية قصوى
-  const candidates = [];
+  const candidates=[]; 
 
-  // لو طلب / أو /index.html أو الاسم القديم -> جرب كل الاحتمالات
+  // للرئيسية جرب كل الأسماء
   if(lowPath === '/' || lowPath === '/index.html' || lowPath === '/index-secure-professional.html' || lowPath === '/index-secure-professional'){
     candidates.push('/index.html');
     candidates.push('/Index-Secure-Professional.html');
     candidates.push('/index-secure-professional.html');
-    candidates.push('/INDEX-SECURE-PROFESSIONAL.HTML');
     candidates.push('/');
   } else {
     candidates.push(path);
-    const hasExt = path.split('/').pop()?.includes('.')||false;
-    if(!hasExt && path !== '/'){
-      candidates.push(path + '.html');
-      candidates.push(path + '/index.html');
-      // لدعم pageAdmin1 بدون امتداد
-      candidates.push('/' + path.split('/').pop() + '.html');
-      candidates.push('/' + path.split('/').pop().toLowerCase() + '.html');
+    const hasExt=path.split('/').pop()?.includes('.')||false;
+    if(!hasExt && path!=='/'){
+      candidates.push(path+'.html');
+      candidates.push(path+'/index.html');
+      candidates.push(path.toLowerCase()+'.html');
+      const base = path.split('/').pop();
+      candidates.push('/'+base+'.html');
+      candidates.push('/'+base.toLowerCase()+'.html');
+      // دعم pageAdmin1
+      if(lowPath.includes('pageadmin1')){ candidates.push('/pageAdmin1.html'); candidates.push('/pageAdmin1'); }
+      if(lowPath.includes('pageuser1')){ candidates.push('/pageUser1.html'); candidates.push('/pageUser1'); }
     }
-    // لو طلب الاسم القديم مباشرة
     if(lowPath.includes('index-secure')){
       candidates.unshift('/index.html');
+      candidates.unshift('/Index-Secure-Professional.html');
     }
   }
 
-  // إزالة التكرار
-  const unique = [...new Set(candidates)];
+  if(path==='/'||path===''){ 
+    candidates.unshift('/index.html');
+  }
 
-  for(const candPath of unique){
+  const uniqueCandidates = [...new Set(candidates)];
+
+  for(const candPath of uniqueCandidates){
     try{
       const candUrl=new URL(request.url); candUrl.pathname=candPath;
       const candReq=new Request(candUrl, request);
@@ -159,40 +211,54 @@ async function fetchAssetWithCleanUrls(request, env){
       }
     }catch{ continue; }
   }
-
-  // محاولة أخيرة مباشرة
-  try{
+  try{ 
     if(env.ASSETS){
-      // جرب index.html مباشرة لو فشل كل شيء وكان الطلب للرئيسية
-      if(lowPath === '/' || lowPath === '/index.html'){
-        const direct = await env.ASSETS.fetch(new Request(new URL('/index.html', request.url), request));
-        if(direct && direct.status!==404) return direct;
-      }
       return await env.ASSETS.fetch(request);
     }
-  }catch{}
-  return null;
+    return null;
+  }catch{ return null; }
 }
 
 export default {
   async fetch(request, env, ctx){
-    const url=new URL(request.url);
+    const url=new URL(request.url); 
     const path=url.pathname;
 
-    // إلغاء Redirect اللانهائي - Cloudflare يتولى HTTPS من Dashboard
+    // === إصلاح نهائي لـ ERR_TOO_MANY_REDIRECTS ===
+    // لا تعمل أي redirect هنا - Cloudflare Dashboard > SSL > Always Use HTTPS = ON يتولى الأمر
+
     if(request.method==='OPTIONS'){
       return new Response(null,{status:204, headers:{'Access-Control-Allow-Origin':'*','Access-Control-Allow-Methods':'GET,POST,OPTIONS','Access-Control-Allow-Headers':'Content-Type,Authorization',...SECURITY_HEADERS}});
     }
 
+    // === إرجاع الحماية لـ pageAdmin1 و pageUser1 ===
+    if(isEntryHtmlPage(path)){
+      if(!hasValidEntry(request)){
+        let pageName=path.split('/').pop()||path;
+        return new Response(entryBlockedHTMLFixed(pageName),{status:403, headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-cache',...SECURITY_HEADERS}});
+      }
+    }
+
     if(path==='/api/debug-config'){
       const cfg = getTursoConfig(env);
+      const hasAssets = !!env.ASSETS;
+      const ip = request.headers.get('CF-Connecting-IP')||'unknown';
+      const xForwardedProto = request.headers.get('X-Forwarded-Proto')||'';
+      const cfVisitor = request.headers.get('CF-Visitor')||'';
+      const referer = request.headers.get('Referer')||'';
+      const cookie = request.headers.get('Cookie')||'';
       return new Response(JSON.stringify({
-        v: 'FINAL-INDEX-FIX',
-        hasAssets: !!env.ASSETS,
+        v: 'V9-FINAL-PROTECTED-AND-INDEX-FIXED',
+        hasAssets,
         tursoConfigured: !cfg.error,
-        error: cfg.error,
-        time: new Date().toISOString(),
-        note: 'يعمل مع index.html ومع Index-Secure-Professional.html'
+        tursoError: cfg.error,
+        ip,
+        xForwardedProto,
+        cfVisitor,
+        referer,
+        hasEntryCookie: cookie.includes(ENTRY_COOKIE_NAME),
+        fix: 'تم إرجاع الحماية + إصلاح Redirect Loop + دعم index.html والاسم القديم',
+        time: new Date().toISOString()
       }, null, 2), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}});
     }
 
@@ -297,7 +363,7 @@ export default {
       }catch(e){ return new Response(JSON.stringify({found:false,error:e.message}),{status:500,headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}}); }
     }
 
-    // جلب الملفات
+    // جلب الملفات - بدون fetch(request) الذي يسبب loop
     let response;
     try{
       const assetRes=await fetchAssetWithCleanUrls(request,env);
@@ -314,8 +380,9 @@ export default {
 
     if(!response || response.status===404){
       if(path.startsWith('/api/')) return new Response(JSON.stringify({error:"Not found", path}),{status:404,headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}});
-      // محاولة أخيرة: index.html
-      if(path==='/' || lowPath(path) || path.toLowerCase().includes('index')){
+      // محاولة أخيرة للرئيسية - جرب الاسمين
+      const lowPath = path.toLowerCase();
+      if(lowPath==='/' || lowPath==='/index.html' || lowPath.includes('index-secure')){
         try{
           if(env.ASSETS){
             const directIndex = await env.ASSETS.fetch(new Request(new URL('/index.html', request.url), request));
@@ -325,18 +392,16 @@ export default {
           }
         }catch{}
       }
-      return new Response(`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>404</title></head><body style="background:#020a05;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:Cairo"><div style="text-align:center"><h1>404</h1><p>${path} غير موجود</p><p>الملفات المتاحة: index.html</p><a href="/index.html" style="color:#10b981">الرئيسية</a> | <a href="/Index-Secure-Professional.html" style="color:#f59e0b">الاسم القديم</a><br><br><a href="/api/debug-config" style="color:#a78bfa">فحص</a></div></body></html>`,{status:404,headers:{'Content-Type':'text/html; charset=utf-8',...SECURITY_HEADERS}});
+      return new Response(`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>404</title></head><body style="background:#020a05;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:Cairo"><div style="text-align:center"><h1>404</h1><p>${path} غير موجود</p><a href="/index.html" style="color:#10b981">الرئيسية</a><br><br><a href="/api/debug-config" style="color:#a78bfa">فحص</a></div></body></html>`,{status:404,headers:{'Content-Type':'text/html; charset=utf-8',...SECURITY_HEADERS}});
     }
 
     const contentType=response.headers.get('Content-Type')||'';
     if(contentType.includes('text/html')&&response.status===200){
-      const isIndex=(path==='/'||path===''||path.toLowerCase().endsWith('index.html')||path.toLowerCase().includes('index-secure'));
+      const isIndex=(path==='/'||path===''||path.toLowerCase().endsWith('index.html')||path.toLowerCase().includes('index-secure-professional')||path.toLowerCase().includes('index-secure'));
       if(isIndex) return addEntryCookieToResponse(addSecurityHeaders(response));
       return addSecurityHeaders(response);
     }
     return addSecurityHeaders(response);
   }
 }
-
-function lowPath(p){ return p==='/' || p==='/index.html' || p==='' }
 
