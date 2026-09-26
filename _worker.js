@@ -83,7 +83,7 @@ export default {
       const year=url.searchParams.get('year')?.trim(); const month=url.searchParams.get('month')?.trim(); const code=url.searchParams.get('code')?.trim();
       const q=await tursoQuery(env, `SELECT * FROM "مرتبات_شهرية" WHERE "السنه"=? AND "الشهر"=? AND ("كود_العامل"=? OR "الكود_البنكى"=?) LIMIT 1`, [year,month,code,code]);
       if(!q.result?.rows?.length){
-        return new Response(JSON.stringify({found:false,data:null}),[STRIPPED]
+        return new Response(JSON.stringify({found:false,data:null}),
           headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}
         });
       }
