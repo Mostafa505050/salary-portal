@@ -1,8 +1,9 @@
-// _worker-v7-FIXED-SERVER-ERROR.js - إصلاح نهائي لخطأ الخادم + Not Found + بصمة وجه وكاميرا
-// السبب الرئيسي لخطأ الخادم: TURSO_TOKEN فارغ + رسائل خطأ عامة تخفي السبب
+// _worker-v7-INDEX-RENAME-FIXED.js - إصلاح مشكلة إعادة التسمية إلى index.html
+// نفس كود V7 بالضبط بدون تغيير الدوال - فقط إصلاح جلب الملفات
+// التغيير الوحيد: يخدم index.html أولاً ويدعم الاسم القديم والجديد
 
 const HARDCODED_TURSO_URL = "https://company-alldata-mostafadarwish-mostafa505050.aws-eu-west-1.turso.io";
-const HARDCODED_TURSO_TOKEN = ""; // يجب وضعه في متغيرات البيئة Cloudflare
+const HARDCODED_TURSO_TOKEN = "";
 
 const SECURITY_HEADERS = {
   'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
@@ -105,16 +106,12 @@ function checkRateLimitSecure(ip, endpoint){
 function safeRowToObject(cols,row){ const obj={}; row.forEach((cell,i)=>{ const key=cols[i]; if(!key) return; if(key.includes('__proto__')||key.includes('constructor')) return; obj[key]=cell.value??cell.text??''; }); return obj; }
 function constantTimeCompare(a,b){ const sa=String(a); const sb=String(b); if(sa.length!==sb.length) return false; let result=0; for(let i=0;i<sa.length;i++) result|=sa.charCodeAt(i)^sb.charCodeAt(i); return result===0; }
 
-// ========== إصلاح جذري لـ Turso - يكشف الخطأ بدقة ==========
 function getTursoConfig(env){
   let url = (env.TURSO_URL || env.TURSO_URLL || HARDCODED_TURSO_URL || '').trim();
   let token = (env.TURSO_TOKEN || env.TURSO_TOKENL || HARDCODED_TURSO_TOKEN || '').trim();
-  
-  // تحقق مفصل
   if(!url){ return {url:null, token:null, error:'TURSO_URL غير موجود في متغيرات البيئة'}; }
   if(!token || token.length < 10){ return {url:null, token:null, error:'TURSO_TOKEN فارغ أو قصير - ضعه في Cloudflare > Settings > Variables'}; }
   if(token.includes("PASTE_YOUR")){ return {url:null, token:null, error:'TURSO_TOKEN مازال نص افتراضي'}; }
-  
   if(url.startsWith('libsql://')) url='https://'+url.slice(8);
   if(url &&!url.startsWith('https://')) url='https://'+url;
   return {url, token, error:null};
@@ -144,9 +141,23 @@ async function tursoQuery(env, sql, params=[]){
   }catch(e){ return {error:`استثناء Turso: ${e.message}`, isException:true}; }
 }
 
-// ========== جلب الملفات مع Clean URLs - إصلاح Not Found ==========
+// ========== إصلاح جلب الملفات - يدعم index.html الجديد والقديم ==========
 async function fetchAssetWithCleanUrls(request, env){
   const url=new URL(request.url); let path=url.pathname; path=path.replace(/\/+/g,'/');
+  const lowPath = path.toLowerCase();
+
+  // إصلاح 1: لو طلب الاسم القديم، حوله لـ index.html الجديد
+  if(lowPath === '/index-secure-professional.html' || lowPath === '/index-secure-professional' || lowPath === '/index-biometric-camera-v5-full.html' || lowPath === '/index-biometric-camera-v5-full'){
+    const newUrl = new URL(request.url);
+    newUrl.pathname = '/index.html';
+    try{
+      if(env.ASSETS){
+        const res = await env.ASSETS.fetch(new Request(newUrl, request));
+        if(res.status !== 404) return res;
+      }
+    }catch{}
+  }
+
   const candidates=[]; 
   candidates.push(path);
   const hasExt=path.split('/').pop()?.includes('.')||false;
@@ -157,18 +168,23 @@ async function fetchAssetWithCleanUrls(request, env){
     const base = path.split('/').pop();
     candidates.push('/'+base+'.html');
     candidates.push('/'+base.toLowerCase()+'.html');
-    // الاسم اللي في الصورة
-    if(base.toLowerCase().includes('index-secure')) {
-      candidates.push('/Index-Secure-Professional.html');
-      candidates.push('/index-secure-professional.html');
-      candidates.push('/index-biometric-camera-v5-FULL.html');
-    }
   }
   if(path==='/'||path===''){ 
-    candidates.unshift('/index.html'); 
-    candidates.unshift('/Index-Secure-Professional.html');
+    // إصلاح 2: ابحث عن index.html أولاً (الجديد) ثم الاسم القديم
+    candidates.unshift('/index.html');
+    candidates.push('/Index-Secure-Professional.html');
+    candidates.push('/index-secure-professional.html');
+    candidates.push('/index-biometric-camera-v5-FULL.html');
   }
-  for(const candPath of candidates){
+  // إصلاح 3: لو طلب / أو /index.html، اجعل index.html أولوية قصوى
+  if(lowPath === '/' || lowPath === '/index.html'){
+    candidates.unshift('/index.html');
+  }
+
+  // إزالة التكرار مع الحفاظ على الترتيب
+  const uniqueCandidates = [...new Set(candidates)];
+
+  for(const candPath of uniqueCandidates){
     try{
       const candUrl=new URL(request.url); candUrl.pathname=candPath;
       const candReq=new Request(candUrl, request);
@@ -185,14 +201,12 @@ export default {
   async fetch(request, env, ctx){
     const url=new URL(request.url); const path=url.pathname;
 
-    // إجبار HTTPS
     if(url.protocol==='http:'){ return Response.redirect(url.toString().replace('http://','https://'),301); }
 
     if(request.method==='OPTIONS'){
       return new Response(null,{status:204, headers:{'Access-Control-Allow-Origin':'*','Access-Control-Allow-Methods':'GET,POST,OPTIONS','Access-Control-Allow-Headers':'Content-Type,Authorization',...SECURITY_HEADERS}});
     }
 
-    // منع الدخول إلا عبر index - مع استثناء صفحات الدخول
     if(isEntryHtmlPage(path)){
       if(!hasValidEntry(request) && !path.toLowerCase().includes('index')){
         let pageName=path.split('/').pop()||path;
@@ -203,7 +217,6 @@ export default {
       }
     }
 
-    // ========== API تشخيصي جديد - لمعرفة سبب خطأ الخادم ==========
     if(path==='/api/debug-config'){
       const cfg = getTursoConfig(env);
       const hasAssets = !!env.ASSETS;
@@ -215,7 +228,8 @@ export default {
         configError: cfg.error,
         hasAssets,
         ip,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),
+        fix: 'INDEX-RENAME-FIXED - يدعم index.html الجديد'
       }, null, 2), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}});
     }
 
@@ -224,7 +238,6 @@ export default {
       return new Response(JSON.stringify({ip}),{headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*','Cache-Control':'no-cache',...SECURITY_HEADERS}});
     }
 
-    // ========== فحص البطاقة - مع رسائل خطأ واضحة ==========
     if(path==='/api/check-by-card-secure' && request.method==='POST'){
       try{
         const ip=request.headers.get('CF-Connecting-IP')||'unknown';
@@ -234,13 +247,11 @@ export default {
         const cardNumber=String(body.cardNumber||'').trim();
         if(!isValidNationalIdSecure(cardNumber)) return new Response(JSON.stringify({ok:false,msg:'رقم البطاقة 14 رقم'}),{status:400,headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}});
         
-        // جرب الجدولين المحتملين
         let q = await tursoQuery(env, `SELECT * FROM "موظفين_مرتبات" WHERE "الرقم_القومى"=? LIMIT 1`, [cardNumber]);
         if(q.isConfigError){
           return new Response(JSON.stringify({ok:false,msg:`خطأ إعدادات قاعدة البيانات: ${q.error} - اذهب لـ Cloudflare > Settings > Variables وأضف TURSO_TOKEN`, debug:q.error}),{status:500,headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}});
         }
         if(q.error){
-          // جرب اسم عمود مختلف
           let q2 = await tursoQuery(env, `SELECT * FROM "موظفين_مرتبات" WHERE "الرقم_القومي"=? LIMIT 1`, [cardNumber]);
           if(q2.error){
             return new Response(JSON.stringify({ok:false,msg:`خطأ قاعدة البيانات: ${q.error} / ${q2.error}`, debug:`${q.error} | ${q2.error}`}),{status:500,headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}});
@@ -344,7 +355,7 @@ export default {
       }catch(e){ return new Response(JSON.stringify({found:false,error:e.message}),{status:500,headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}}); }
     }
 
-    // جلب الملفات
+    // جلب الملفات - مع إصلاح index.html
     let response;
     try{
       const assetRes=await fetchAssetWithCleanUrls(request,env);
@@ -354,12 +365,21 @@ export default {
 
     if(!response || response.status===404){
       if(path.startsWith('/api/')) return new Response(JSON.stringify({error:"Not found", path}),{status:404,headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*',...SECURITY_HEADERS}});
-      return new Response(`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>404</title></head><body style="background:#020a05;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:Cairo"><div style="text-align:center"><h1>404</h1><p>${path} غير موجود</p><p>جرب:</p><a href="/index.html" style="color:#10b981;margin:5px">index.html</a><a href="/Index-Secure-Professional.html" style="color:#10b981;margin:5px">Index-Secure-Professional.html</a><br><br><a href="/api/debug-config" style="color:#a78bfa;font-size:11px">فحص الإعدادات /api/debug-config</a></div></div></body></html>`,{status:404,headers:{'Content-Type':'text/html; charset=utf-8',...SECURITY_HEADERS}});
+      // لو طلب الصفحة الرئيسية وفشل، حاول جلب index.html مباشرة
+      if(path==='/' || path==='/index.html' || path.toLowerCase().includes('index-secure')){
+        try{
+          if(env.ASSETS){
+            const directIndex = await env.ASSETS.fetch(new Request(new URL('/index.html', request.url), request));
+            if(directIndex.status !== 404) return addEntryCookieToResponse(addSecurityHeaders(directIndex));
+          }
+        }catch{}
+      }
+      return new Response(`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>404</title></head><body style="background:#020a05;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:Cairo"><div style="text-align:center"><h1>404</h1><p>${path} غير موجود</p><p>تأكد أن الملف اسمه index.html (حروف صغيرة)</p><a href="/index.html" style="color:#10b981;margin:5px">الرئيسية index.html</a><br><br><a href="/api/debug-config" style="color:#a78bfa;font-size:11px">فحص الإعدادات /api/debug-config</a></div></body></html>`,{status:404,headers:{'Content-Type':'text/html; charset=utf-8',...SECURITY_HEADERS}});
     }
 
     const contentType=response.headers.get('Content-Type')||'';
     if(contentType.includes('text/html')&&response.status===200){
-      const isIndex=(path==='/'||path===''||path.toLowerCase().endsWith('index.html'));
+      const isIndex=(path==='/'||path===''||path.toLowerCase().endsWith('index.html')||path.toLowerCase().includes('index-secure'));
       if(isIndex) return addEntryCookieToResponse(addSecurityHeaders(response));
       return addSecurityHeaders(response);
     }
