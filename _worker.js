@@ -624,7 +624,7 @@ export default {
 
     const contentType=response.headers.get('Content-Type')||'';
     if(contentType.includes('text/html')&&response.status===200){
-      const isIndex=(path==='/'||path===''||path.toLowerCase().endsWith('index.html'));
+      const isIndex=(path==='/'||path===''||path.toLowerCase().endsWith('Index-Secure-Professional.html'));
       if(isIndex) return addEntryCookieToResponse(addSecurityHeaders(response));
       return addSecurityHeaders(response);
     }
