@@ -193,15 +193,15 @@ export default {
     }
 
     // منع الدخول إلا عبر index - مع استثناء صفحات الدخول
-    if(isEntryHtmlPage(path)){
-      if(!hasValidEntry(request) && !path.toLowerCase().includes('index')){
-        let pageName=path.split('/').pop()||path;
-       const low = pageName.toLowerCase();
-       const isSecureLogin = low.includes('index-secure')|| low.includes('secure')|| low.includes('biometric')|| low.includes('professional')|| low.includes('pageadmin')|| low.includes('admin');        if(!isSecureLogin){
-          return new Response(entryBlockedHTMLFixed(pageName),{status:403, headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-cache',...SECURITY_HEADERS}});
-        }
-      }
-    }
+//    if(isEntryHtmlPage(path)){
+//      if(!hasValidEntry(request) && !path.toLowerCase().includes('index')){
+ //       let pageName=path.split('/').pop()||path;
+  //     const low = pageName.toLowerCase();
+   //    const isSecureLogin = low.includes('index-secure')|| low.includes('secure')|| low.includes('biometric')|| low.includes('professional')|| low.includes('pageadmin')|| low.includes('admin')|| low.includes('Login-Mohamed Mostafa.html')|| low.includes('admin');        if(!isSecureLogin){
+   //       return new Response(entryBlockedHTMLFixed(pageName),{status:403, headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-cache',...SECURITY_HEADERS}});
+   //     }
+   //   }
+  //  }
 
     // ========== API تشخيصي جديد - لمعرفة سبب خطأ الخادم ==========
     if(path==='/api/debug-config'){
