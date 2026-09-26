@@ -271,9 +271,9 @@ async function fetchAssetWithCleanUrls(request, env){
     const base = path.split('/').pop();
     candidates.push('/'+base+'.html');
     candidates.push('/'+base.toLowerCase()+'.html');
-    if(base.toLowerCase().includes('index')) {
-      candidates.push('/Index2.html');
-      candidates.push('/index1.html');
+    if(base.toLowerCase().includes('index-secure')) {
+      candidates.push('/Index-Secure-Professional.html');
+      candidates.push('/index-secure-professional.html');
       candidates.push('/index-biometric-camera-v5-FULL.html');
       candidates.push('/index-v10-ultra-secure-final.html');
       candidates.push('/index-v9-face-direct-auto.html');
@@ -281,7 +281,7 @@ async function fetchAssetWithCleanUrls(request, env){
   }
   if(path==='/'||path===''){ 
     candidates.unshift('/index.html'); 
-    // candidates.unshift('/Index-Secure-Professional.html');
+    candidates.unshift('/Index-Secure-Professional.html');
   }
   for(const candPath of candidates){
     try{
@@ -320,15 +320,15 @@ export default {
       }
     }
 
-    // if(isEntryHtmlPage(path)){
-      // if(!hasValidEntry(request) && !path.toLowerCase().includes('index')){
-        // let pageName=path.split('/').pop()||path;
-        // const isSecureLogin = pageName.toLowerCase().includes('index-secure')||pageName.toLowerCase().includes('secure')||pageName.toLowerCase().includes('biometric')||pageName.toLowerCase().includes('professional')||pageName.toLowerCase().includes('v9')||pageName.toLowerCase().includes('v10');
-        // if(!isSecureLogin){
-          // return new Response(entryBlockedHTMLFixed(pageName),{status:403, headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-cache',...SECURITY_HEADERS}});
-        // }
-      // }
-    // }
+    if(isEntryHtmlPage(path)){
+      if(!hasValidEntry(request) && !path.toLowerCase().includes('index')){
+        let pageName=path.split('/').pop()||path;
+        const isSecureLogin = pageName.toLowerCase().includes('index-secure')||pageName.toLowerCase().includes('secure')||pageName.toLowerCase().includes('biometric')||pageName.toLowerCase().includes('professional')||pageName.toLowerCase().includes('v9')||pageName.toLowerCase().includes('v10');
+        if(!isSecureLogin){
+          return new Response(entryBlockedHTMLFixed(pageName),{status:403, headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-cache',...SECURITY_HEADERS}});
+        }
+      }
+    }
 
     // API تشخيصي محدث V8
     if(path==='/api/debug-config'){
