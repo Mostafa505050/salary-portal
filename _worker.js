@@ -1,11 +1,4 @@
 // _worker-v8-PEPPER-IP-BLOCK-ULTRA-FIXED.js - V8 نهائي - نقطة الدخول Index-Secure-Professional.html
-// 1- PEPPER_SECRET من متغيرات البيئة
-// 2- حظر IP تلقائي بعد 5 محاولات فاشلة لمدة 5 دقائق
-// 3- جدول audit_log لتسجيل كل محاولة دخول
-// 4- تشفير كلمات المرور بـ SHA-256 + Pepper + NationalID
-// 5- دعم V10 (hash فقط بدون value + كشف حيوية)
-// 6- إصلاح نقطة الدخول لتصبح Index-Secure-Professional.html
-
 const HARDCODED_TURSO_URL = "https://company-alldata-mostafadarwish-mostafa505050.aws-eu-west-1.turso.io";
 const HARDCODED_TURSO_TOKEN = "";
 const DEFAULT_PEPPER = "fallback_pepper_v8_please_set_PEPPER_SECRET_in_cloudflare";
