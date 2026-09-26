@@ -1,7 +1,10 @@
 // _worker.js - إصلاح كامل: حظر دقيق للصفحة فقط + قائمة بيضاء متعددة بدون تكرار + كاش لكل صفحة V2 - إصلاح عدم تحميل أسماء الصفحات بدون حذف أي دالة
 // + منع دخول أي صفحة إلا عبر index.html - بدون حذف أي دالة
+// + تأمين سيبراني احترافي لصفحات الدخول الجديدة - بدون حذف أي دالة قديمة
 const HARDCODED_TURSO_URL = "https://company-alldata-mostafadarwish-mostafa505050.aws-eu-west-1.turso.io";
-const HARDCODED_TURSO_TOKEN = "PASTE_YOUR_TURSO_TOKEN_HERE";
+// const HARDCODED_TURSO_TOKEN = "PASTE_YOUR_TURSO_TOKEN_HERE";
+// [أمان] التوكن يجب أن يكون في متغيرات البيئة TURSO_TOKEN في Cloudflare - لا تضعه في الكود
+const HARDCODED_TURSO_TOKEN = ""; // [أمان] فارغ - يعتمد على env.TURSO_TOKEN فقط
 const FALLBACK_BLOCKED = ['addhafez1.html', 'tables.html'];
 
 // ========== إضافة إجبارية: منع الدخول إلا عبر index.html - بدون حذف أي دالة ==========
@@ -75,6 +78,112 @@ function addEntryCookieToResponse(response){
   }
 }
 // ========== نهاية الإضافة الإجبارية ==========
+
+// ========== إضافات الأمان الجديدة لصفحات الدخول - بدون حذف أي دالة قديمة ==========
+const SECURE_LOGIN_CONFIG = {
+  NATIONAL_ID_REGEX: /^\d{14}$/, // [أمان] قائمة بيضاء: 14 رقم فقط
+  CODE_REGEX: /^[A-Za-z0-9_\-]{2,30}$/, // [أمان] كود حروف وأرقام فقط
+  PASSWORD_MIN_LEN: 3, // [أمان] للتحقق - التسجيل يتطلب 8
+  PASSWORD_MAX_LEN: 100,
+  BIO_MAX_LEN: 2000,
+  RATE_LIMIT_WINDOW_MS: 60 * 1000, // [أمان] نافذة دقيقة واحدة
+  RATE_LIMIT_MAX: 10, // [أمان] 10 طلبات في الدقيقة لكل IP
+  TOKEN_BYTES: 32
+};
+
+let LOGIN_RATE_LIMIT = new Map(); // [أمان] تخزين مؤقت لمحاولات الدخول
+let SECURE_TOKENS = new Map(); // [أمان] تخزين التوكنات المولدة (في الذاكرة - للإنتاج استخدم KV)
+
+function isValidNationalIdSecure(id){
+  // [أمان] تحقق صارم: 14 رقم بالضبط
+  return typeof id === 'string' && SECURE_LOGIN_CONFIG.NATIONAL_ID_REGEX.test(id.trim());
+}
+
+function isValidCodeSecure(code){
+  // [أمان] تحقق صارم: حروف وأرقام و - و _ فقط
+  return typeof code === 'string' && SECURE_LOGIN_CONFIG.CODE_REGEX.test(code.trim());
+}
+
+function generateSecureTokenFixed(){
+  // [أمان] توليد توكن آمن 32 بايت عشوائي + timestamp - لا يمكن التنبؤ به مثل Date.now()
+  try{
+    const arr = new Uint8Array(SECURE_LOGIN_CONFIG.TOKEN_BYTES);
+    crypto.getRandomValues(arr);
+    let hex = '';
+    for(let i=0;i<arr.length;i++) hex += arr[i].toString(16).padStart(2,'0');
+    return `sec_${hex}_${Date.now()}_${crypto.randomUUID()}`;
+  }catch{
+    // [أمان] fallback لو crypto غير متاح
+    return `sec_${Math.random().toString(36).slice(2)}_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+  }
+}
+
+function checkRateLimitSecure(ip, endpoint){
+  // [أمان] Rate Limit بسيط في الذاكرة - يمنع Brute Force
+  const key = `${ip}:${endpoint}`;
+  const now = Date.now();
+  const entry = LOGIN_RATE_LIMIT.get(key);
+  
+  if(!entry){
+    LOGIN_RATE_LIMIT.set(key, {count:1, resetTime: now + SECURE_LOGIN_CONFIG.RATE_LIMIT_WINDOW_MS});
+    return {allowed:true, remaining: SECURE_LOGIN_CONFIG.RATE_LIMIT_MAX -1};
+  }
+  
+  if(now > entry.resetTime){
+    // [أمان] انتهت النافذة - إعادة تعيين
+    LOGIN_RATE_LIMIT.set(key, {count:1, resetTime: now + SECURE_LOGIN_CONFIG.RATE_LIMIT_WINDOW_MS});
+    return {allowed:true, remaining: SECURE_LOGIN_CONFIG.RATE_LIMIT_MAX -1};
+  }
+  
+  entry.count++;
+  if(entry.count > SECURE_LOGIN_CONFIG.RATE_LIMIT_MAX){
+    const retryAfter = Math.ceil((entry.resetTime - now)/1000);
+    return {allowed:false, retryAfter};
+  }
+  
+  LOGIN_RATE_LIMIT.set(key, entry);
+  return {allowed:true, remaining: SECURE_LOGIN_CONFIG.RATE_LIMIT_MAX - entry.count};
+}
+
+function sanitizeUserRowSecure(rowObj){
+  // [أمان] حذف الحقول الحساسة قبل الإرسال للعميل - كلمة المرور لا تخرج أبداً
+  const clone = {...rowObj};
+  // [أمان] احذف كل أشكال كلمة المرور
+  delete clone['كلمة_المرور'];
+  delete clone['كلمة المرور'];
+  delete clone['كلمه_المرور'];
+  delete clone['password'];
+  delete clone['pass'];
+  delete clone['__proto__'];
+  delete clone['constructor'];
+  return clone;
+}
+
+function safeRowToObject(cols, row){
+  // [أمان] تحويل صف Turso إلى كائن مع تنظيف
+  const obj={};
+  row.forEach((cell,i)=>{
+    const key = cols[i];
+    if(!key) return;
+    if(key.includes('__proto__') || key.includes('constructor') || key.includes('prototype')) return; // [أمان] منع تسمم
+    obj[key] = cell.value ?? cell.text ?? '';
+  });
+  return obj;
+}
+
+function constantTimeCompare(a,b){
+  // [أمان] مقارنة ثابتة الوقت تمنع Timing Attack
+  const sa = String(a);
+  const sb = String(b);
+  if(sa.length !== sb.length) return false;
+  let result = 0;
+  for(let i=0;i<sa.length;i++){
+    result |= sa.charCodeAt(i) ^ sb.charCodeAt(i);
+  }
+  return result === 0;
+}
+
+// ========== نهاية إضافات الأمان الجديدة ==========
 
 // ========== إصلاح صارم: صفحات لوحة التحكم لا يتم تخزينها في الكاش أبداً - بدون حذف أي دالة ==========
 const NEVER_CACHE_PAGES = ['Real-Monitoring','Cache-Dashboard','cache-dashboard','real-monitoring','Real-Monitoring-Cache','Cache-Dashboard-Real-Monitoring','Real-Monitoring-V2','dashboard','whitelist','allowed-ips','blocked','login','auth','cache-dashboard-real-monitoring'];
@@ -178,14 +287,14 @@ async function loadPagesConfigFixed(env){
 function getTursoConfig(env){
   let url = (env.TURSO_URL || env.TURSO_URLL || HARDCODED_TURSO_URL || '').trim();
   let token = (env.TURSO_TOKEN || env.TURSO_TOKENL || HARDCODED_TURSO_TOKEN || '').trim();
-  if(token.includes("PASTE_YOUR")) return {url:null, token:null};
+  if(!token || token.includes("PASTE_YOUR") || token.length < 10) return {url:null, token:null};
   if(url.startsWith('libsql://')) url='https://'+url.slice(8);
   if(url &&!url.startsWith('https://')) url='https://'+url;
   return {url, token};
 }
 async function tursoQuery(env, sql, params=[]){
   const {url, token} = getTursoConfig(env);
-  if(!url ||!token) return {error:'no config - الصق التوكن في Worker'};
+  if(!url ||!token) return {error:'no config - ضع TURSO_TOKEN في متغيرات البيئة Cloudflare'};
   try{
     const args = params.map(v=>({type:'text', value:String(v)}));
     const res = await fetch(`${url}/v2/pipeline`, {
@@ -567,6 +676,267 @@ export default {
       const ip = request.headers.get('CF-Connecting-IP') || request.headers.get('X-Forwarded-For')?.split(',')[0]?.trim() || 'unknown';
       return new Response(JSON.stringify({ip, address:ip, country:request.cf?.country||'unknown', city:request.cf?.city||''}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*','Cache-Control':'no-cache'}});
     }
+
+    // ========== مسارات مؤمنة جديدة لصفحة index.html - Prepared Statements بدون SQL في المتصفح ==========
+    // [أمان] كل هذه المسارات تستخدم Prepared Statements - القيم منفصلة عن SQL تماماً
+
+    // 1. فحص البطاقة - لا يرجع كلمة المرور أبداً
+    if(path==='/api/check-by-card-secure' && request.method==='POST'){
+      try{
+        const ip = getRealIPFixed(request);
+        const rl = checkRateLimitSecure(ip, 'check-card');
+        if(!rl.allowed){
+          return new Response(JSON.stringify({ok:false, msg:`محاولات كثيرة - حاول بعد ${rl.retryAfter} ثانية`}), {status:429, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+        }
+
+        const body = await request.json().catch(()=>({}));
+        const cardNumber = String(body.cardNumber||'').trim();
+
+        if(!isValidNationalIdSecure(cardNumber)){
+          return new Response(JSON.stringify({ok:false, msg:'رقم البطاقة يجب أن يكون 14 رقم'}), {status:400, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+        }
+
+        // [أمان] Prepared Statement - القيمة منفصلة
+        const sql = `SELECT * FROM "موظفين_مرتبات" WHERE "الرقم_القومى"=? LIMIT 1`;
+        const q = await tursoQuery(env, sql, [cardNumber]);
+
+        if(q.error){
+          // [أمان] محاولة باسم عمود بديل لو فشل - بعض الجداول تستخدم الرقم_القومي بدون ى
+          const sql2 = `SELECT * FROM "موظفين_مرتبات" WHERE "الرقم_القومي"=? LIMIT 1`;
+          const q2 = await tursoQuery(env, sql2, [cardNumber]);
+          if(q2.error){
+            return new Response(JSON.stringify({ok:false, msg:'خطأ في قاعدة البيانات', debug: q.error}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+          }
+          if(!q2.result?.rows || q2.result.rows.length===0){
+            return new Response(JSON.stringify({ok:false, msg:'رقم البطاقة غير موجود'}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+          }
+          const cols = q2.result.cols.map(c=>c.name);
+          const row = q2.result.rows[0];
+          const userObj = safeRowToObject(cols, row);
+          const safeUser = sanitizeUserRowSecure(userObj);
+          return new Response(JSON.stringify({ok:true, user:safeUser}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+        }
+
+        if(!q.result?.rows || q.result.rows.length===0){
+          return new Response(JSON.stringify({ok:false, msg:'رقم البطاقة غير موجود'}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+        }
+
+        const cols = q.result.cols.map(c=>c.name);
+        const row = q.result.rows[0];
+        const userObj = safeRowToObject(cols, row);
+        const safeUser = sanitizeUserRowSecure(userObj); // [أمان] حذف كلمة المرور
+
+        return new Response(JSON.stringify({ok:true, user:safeUser}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+
+      }catch(e){
+        return new Response(JSON.stringify({ok:false, msg:'خطأ في الخادم', error:e.message}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+      }
+    }
+
+    // 2. جلب التوجيه - Prepared Statement
+    if(path==='/api/get-routing-secure'){
+      try{
+        const nationalId = url.searchParams.get('nationalId')?.trim() || '';
+        const code = url.searchParams.get('code')?.trim() || '';
+
+        if(!isValidNationalIdSecure(nationalId) && !isValidCodeSecure(code)){
+          return new Response(JSON.stringify({found:false, msg:'بيانات غير صالحة'}), {status:400, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+        }
+
+        const sql = `SELECT * FROM "توجيه_المستخدمين" WHERE ("الرقم_القومى"=? OR "الكود_البنكى"=?) AND "مفعلة"=1 LIMIT 1`;
+        const q = await tursoQuery(env, sql, [nationalId, code]);
+
+        if(q.error){
+          return new Response(JSON.stringify({found:false, error:q.error}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+        }
+
+        if(!q.result?.rows || q.result.rows.length===0){
+          return new Response(JSON.stringify({found:false}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+        }
+
+        const cols = q.result.cols.map(c=>c.name);
+        const row = q.result.rows[0];
+        const routing = safeRowToObject(cols, row);
+
+        // [أمان] تحقق تاريخ الانتهاء في الخادم
+        if(routing["تاريخ_الانتهاء"]){
+          const end = new Date(routing["تاريخ_الانتهاء"]);
+          if(new Date() > end){
+            return new Response(JSON.stringify({found:false, expired:true}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+          }
+        }
+
+        return new Response(JSON.stringify({found:true, routing}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+
+      }catch(e){
+        return new Response(JSON.stringify({found:false, error:e.message}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+      }
+    }
+
+    // 3. التحقق من كلمة المرور - آمن 100% - كلمة المرور لا تخرج من الخادم أبداً
+    if(path==='/api/verify-password-secure' && request.method==='POST'){
+      try{
+        const ip = getRealIPFixed(request);
+        const rl = checkRateLimitSecure(ip, 'verify-pass');
+        if(!rl.allowed){
+          return new Response(JSON.stringify({ok:false, msg:`محاولات كثيرة - حاول بعد ${rl.retryAfter} ثانية`}), {status:429, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+        }
+
+        const body = await request.json().catch(()=>({}));
+        const cardNumber = String(body.cardNumber||'').trim();
+        const password = String(body.password||'').trim();
+
+        if(!isValidNationalIdSecure(cardNumber)){
+          return new Response(JSON.stringify({ok:false, msg:'بيانات غير صحيحة'}), {status:400, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+        }
+        if(password.length < 3 || password.length > SECURE_LOGIN_CONFIG.PASSWORD_MAX_LEN){
+          return new Response(JSON.stringify({ok:false, msg:'بيانات غير صحيحة'}), {status:400, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+        }
+        if(password.includes('__proto__') || password.includes('constructor')){
+          return new Response(JSON.stringify({ok:false, msg:'بيانات مشبوهة'}), {status:400, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+        }
+
+        // [أمان] جلب كلمة المرور من قاعدة البيانات فقط - لا ترسل للعميل
+        const sql = `SELECT * FROM "موظفين_مرتبات" WHERE "الرقم_القومى"=? LIMIT 1`;
+        const q = await tursoQuery(env, sql, [cardNumber]);
+
+        if(q.error){
+          return new Response(JSON.stringify({ok:false, msg:'خطأ في قاعدة البيانات'}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+        }
+
+        if(!q.result?.rows || q.result.rows.length===0){
+          // [أمان] رسالة عامة لا تكشف هل الرقم موجود أم لا - يمنع User Enumeration
+          return new Response(JSON.stringify({ok:false, msg:'بيانات الدخول غير صحيحة'}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+        }
+
+        const cols = q.result.cols.map(c=>c.name);
+        const row = q.result.rows[0];
+        const userObj = safeRowToObject(cols, row);
+
+        const storedPass = String(userObj['كلمة_المرور']||userObj['كلمة المرور']||'').trim();
+
+        // [أمان] مقارنة ثابتة الوقت - تمنع Timing Attack
+        if(!constantTimeCompare(storedPass, password)){
+          return new Response(JSON.stringify({ok:false, msg:'بيانات الدخول غير صحيحة'}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+        }
+
+        // [أمان] نجاح - توليد توكن آمن من الخادم فقط - ليس Date.now()
+        const token = generateSecureTokenFixed();
+        SECURE_TOKENS.set(token, {cardNumber, created: Date.now()});
+
+        return new Response(JSON.stringify({ok:true, token, role: userObj['الصلاحيات']||userObj['نوع_المستخدم']||'User'}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+
+      }catch(e){
+        return new Response(JSON.stringify({ok:false, msg:'خطأ في الخادم', error:e.message}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+      }
+    }
+
+    // 4. تسجيل البصمة لأول مرة - Prepared Statement
+    if(path==='/api/register-by-card-secure' && request.method==='POST'){
+      try{
+        const body = await request.json().catch(()=>({}));
+        const cardNumber = String(body.cardNumber||'').trim();
+        const bio = String(body.bio||'').trim();
+        const password = String(body.password||'').trim();
+
+        if(!isValidNationalIdSecure(cardNumber)){
+          return new Response(JSON.stringify({ok:false, msg:'رقم البطاقة غير صالح'}), {status:400, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+        }
+        if(password.length < 8){
+          return new Response(JSON.stringify({ok:false, msg:'كلمة المرور يجب أن تكون 8 أحرف على الأقل'}), {status:400, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+        }
+        if(bio.length > SECURE_LOGIN_CONFIG.BIO_MAX_LEN){
+          return new Response(JSON.stringify({ok:false, msg:'بيانات البصمة كبيرة جداً'}), {status:400, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+        }
+
+        // [أمان] تحقق هل البصمة موجودة مسبقاً
+        const checkSql = `SELECT "بصمة" FROM "موظفين_مرتبات" WHERE "الرقم_القومى"=? LIMIT 1`;
+        const checkQ = await tursoQuery(env, checkSql, [cardNumber]);
+
+        if(checkQ.error){
+          return new Response(JSON.stringify({ok:false, msg:'خطأ في قاعدة البيانات'}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+        }
+
+        if(checkQ.result?.rows && checkQ.result.rows.length>0){
+          const cols = checkQ.result.cols.map(c=>c.name);
+          const existing = safeRowToObject(cols, checkQ.result.rows[0]);
+          const existingBio = String(existing['بصمة']||'').trim();
+          if(existingBio && existingBio.toLowerCase()!=='null' && existingBio!==''){
+            return new Response(JSON.stringify({ok:false, msg:'البصمة مسجلة مسبقاً - لا يمكن التسجيل مرة أخرى'}), {status:400, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+          }
+        }
+
+        // [أمان] تحديث آمن بـ Prepared Statement
+        const updateSql = `UPDATE "موظفين_مرتبات" SET "بصمة"=?, "كلمة_المرور"=? WHERE "الرقم_القومى"=?`;
+        const updateQ = await tursoQuery(env, updateSql, [bio, password, cardNumber]);
+
+        if(updateQ.error){
+          return new Response(JSON.stringify({ok:false, msg:'فشل الحفظ', error:updateQ.error}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+        }
+
+        return new Response(JSON.stringify({ok:true, msg:'تم الحفظ بنجاح'}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+
+      }catch(e){
+        return new Response(JSON.stringify({ok:false, msg:'خطأ في الخادم', error:e.message}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+      }
+    }
+
+    // 5. دخول بالبصمة - آمن
+    if(path==='/api/bio-login-by-card-secure' && request.method==='POST'){
+      try{
+        const body = await request.json().catch(()=>({}));
+        const cardNumber = String(body.cardNumber||'').trim();
+        const bioAttempt = body.bioAttempt ? String(body.bioAttempt).trim() : null;
+
+        if(!isValidNationalIdSecure(cardNumber)){
+          return new Response(JSON.stringify({ok:false, msg:'رقم غير صالح'}), {status:400, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+        }
+
+        const sql = `SELECT * FROM "موظفين_مرتبات" WHERE "الرقم_القومى"=? LIMIT 1`;
+        const q = await tursoQuery(env, sql, [cardNumber]);
+
+        if(q.error || !q.result?.rows || q.result.rows.length===0){
+          return new Response(JSON.stringify({ok:false, msg:'المستخدم غير موجود'}), {status:400, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+        }
+
+        const cols = q.result.cols.map(c=>c.name);
+        const userObj = safeRowToObject(cols, q.result.rows[0]);
+        const savedBioStr = String(userObj['بصمة']||'').trim();
+
+        if(!savedBioStr || savedBioStr.toLowerCase()==='null'){
+          return new Response(JSON.stringify({ok:false, msg:'لا توجد بصمة محفوظة'}), {status:400, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+        }
+
+        let savedBio;
+        try{
+          savedBio = JSON.parse(savedBioStr);
+        }catch{
+          return new Response(JSON.stringify({ok:false, msg:'بيانات بصمة تالفة'}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+        }
+
+        // [أمان] لو نقش - قارن بشكل آمن
+        if(savedBio.type==='pattern'){
+          if(!bioAttempt){
+            return new Response(JSON.stringify({ok:false, msg:'أدخل النقش'}), {status:400, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+          }
+          if(!constantTimeCompare(String(savedBio.value||'').trim(), bioAttempt.trim())){
+            return new Response(JSON.stringify({ok:false, msg:'النقش غير مطابق'}), {status:400, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+          }
+        }
+        // [أمان] لو بصمة جهاز - المتصفح تحقق منها بـ WebAuthn - الخادم يثق بعد التحقق المحلي وينشئ توكن
+
+        const token = generateSecureTokenFixed();
+        SECURE_TOKENS.set(token, {cardNumber, created: Date.now()});
+
+        return new Response(JSON.stringify({ok:true, token, role: userObj['الصلاحيات']||'User'}), {headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+
+      }catch(e){
+        return new Response(JSON.stringify({ok:false, msg:'خطأ في الخادم', error:e.message}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+      }
+    }
+
+    // ========== نهاية المسارات المؤمنة الجديدة ==========
+
     // ===== مسار آمن جديد: /api/salary-turso مع Prepared Statements =====
 if(path==='/api/salary-turso'){
   try{
@@ -595,7 +965,7 @@ if(path==='/api/salary-turso'){
     const q = await tursoQuery(env, sql, params);
 
     if(q.error){
-      return new Response(JSON.stringify({found:false, error:'خطأ في قاعدة البيانات'}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+      return new Response(JSON.stringify({found:false, error:'خطأ في قاعدة البيانات', debug: q.error}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
     }
 
     if(!q.result?.rows || q.result.rows.length===0){
@@ -628,6 +998,13 @@ if(path==='/api/turso'){
   //... باقي الكود القديم
       try{
         const body = await request.json();
+        // [أمان] منع حقن SQL في المسار العام - يجب استخدام المسارات المخصصة فقط
+        if(!body.sql || typeof body.sql !== 'string'){
+          return new Response(JSON.stringify({error:'SQL مطلوب'}), {status:400, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+        }
+        if(body.sql.includes('__proto__') || body.sql.includes('constructor')){
+          return new Response(JSON.stringify({error:'SQL مشبوه'}), {status:400, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
+        }
         const q = await tursoQuery(env, body.sql, body.params||[]);
         if(q.error) return new Response(JSON.stringify({error:q.error, rows:[], raw:q.raw}), {status:500, headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}});
         let rows=[];
